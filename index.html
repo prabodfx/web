@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enhanced Spacing Comparison Cards</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins :wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at center, #0e001b, #000);
+      height: 100%;
+      overflow-x: hidden;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .foreground {
+      position: relative;
+      z-index: 1;
+      padding: 10px;
+      min-height: 100vh;
+    }
+    .instruction-text-top {
+      text-align: center;
+      font-size: 1.50rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 12px 30px;
+      border-radius: 30px;
+      display: inline-block;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .container-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      justify-items: center;
+      gap: 40px;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0 10px;
+    }
+    .comparison-card {
+      width: 350px;
+      height: 500px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    .comparison-card:hover {
+      transform: translateY(-5px);
+    }
+    @media (max-width: 699px) {
+
+      .instruction-text-top {
+        font-size: 1.40rem;
+        padding: 12px 30px;
+        margin-top: 10px;
+
+      }
+      .container-row {
+        gap: 30px;
+      }
+      .comparison-card {
+        width: 100%;
+        max-width: 350px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+    @media (max-width: 480px) {
+      .container-row {
+        gap: 25px;
+      }
+      .instruction-text-top {
+        font-size: 1.30rem;
+        padding: 12px 25px;
+        margin-top: 10px;
+      }
+      .compare-handle {
+        width: 42px;
+        height: 42px;
+      }
+      .image-labels {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+      }
+    }
+    .image-compare {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .image-compare img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+    .before-image {
+      clip-path: inset(0 50% 0 0);
+      transition: clip-path 0.4s ease;
+    }
+    .compare-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 48px;
+      height: 48px;
+      background: #fff;
+      border: 3px solid #2c3e50;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: ew-resize;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .compare-handle::after {
+      content: '<>';
+      font-size: 1.2rem;
+      color: #2c3e50;
+    }
+    .image-labels {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 10;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .image-labels span {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.95rem;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .image-labels span.hidden {
+      opacity: 0;
+    }
+    .divider-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #2c3e50;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="galaxy"></canvas>
+  <div class="foreground">
+    <div class="instruction-text-top">Swipe Left or Right</div>
+    <div class="container-row">
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after.jpg" class="after-image">
+          <img src="images/before.jpeg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after2.jpg" class="after-image">
+          <img src="images/before2.jpeg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after3.jpg" class="after-image">
+          <img src="images/before3.jpeg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after4.jpg" class="after-image">
+          <img src="images/before4.jpg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after5.jpg" class="after-image">
+          <img src="images/before5.jpg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="images/after6.jpg" class="after-image">
+          <img src="images/before6.jpg" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Galaxy background animation
+    const canvas = document.getElementById('galaxy');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      createStars(500);
+      updateAllComparers(); // Update image sliders on resize
+    });
+
+    window.addEventListener('focus', () => {
+      resizeCanvas();
+      createStars(500);
+    });
+
+    function createStars(count) {
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: Math.random() * canvas.width
+        });
+      }
+    }
+
+    function drawStars() {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const focalLength = canvas.width;
+      ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let star of stars) {
+        star.z -= 2;
+        if (star.z <= 0) star.z = canvas.width;
+        const k = focalLength / star.z;
+        const x = (star.x - cx) * k + cx;
+        const y = (star.y - cy) * k + cy;
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+        const size = (1 - star.z / canvas.width) * 2;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(200, 100, 255, 0.8)";
+        ctx.shadowColor = "rgba(200, 100, 255, 0.6)";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function animate() {
+      drawStars();
+      requestAnimationFrame(animate);
+    }
+
+    resizeCanvas();
+    createStars(500);
+    animate();
+
+    // Image comparer logic
+    class ImageComparer {
+      constructor(container) {
+        this.container = container;
+        this.handle = container.querySelector('.compare-handle');
+        this.divider = container.querySelector('.divider-line');
+        this.beforeImage = container.querySelector('.before-image');
+        this.labelBefore = container.querySelector('.image-labels span:first-child');
+        this.labelAfter = container.querySelector('.image-labels span:last-child');
+        this.isDragging = false;
+        this.rect = null;
+        this.init();
+      }
+      init() {
+        this.addEvents();
+        this.updateSlider(50);
+      }
+      addEvents() {
+        this.handle.addEventListener('mousedown', () => this.startDrag());
+        document.addEventListener('mouseup', () => this.stopDrag());
+        document.addEventListener('mousemove', e => this.drag(e.clientX));
+        this.handle.addEventListener('touchstart', e => {
+          e.preventDefault();
+          this.startDrag();
+          this.drag(e.touches[0].clientX);
+        });
+        document.addEventListener('touchend', () => this.stopDrag());
+        document.addEventListener('touchmove', e => {
+          e.preventDefault();
+          this.drag(e.touches[0].clientX);
+        });
+      }
+      startDrag() {
+        this.isDragging = true;
+        this.rect = this.container.getBoundingClientRect();
+        this.handle.style.transition = 'none';
+        this.divider.style.transition = 'none';
+        this.beforeImage.style.transition = 'none';
+      }
+      stopDrag() {
+        this.isDragging = false;
+        this.handle.style.transition = '';
+        this.divider.style.transition = '';
+        this.beforeImage.style.transition = '';
+      }
+      drag(clientX) {
+        if (!this.isDragging) return;
+        const x = clientX - this.rect.left;
+        const percent = (x / this.rect.width) * 100;
+        this.updateSlider(percent);
+      }
+      updateSlider(percent) {
+        const p = Math.min(Math.max(percent, 0), 100);
+        this.beforeImage.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+        this.handle.style.left = `${p}%`;
+        this.divider.style.left = `${p}%`;
+        if (p <= 25) {
+          this.labelBefore.classList.add('hidden');
+          this.labelAfter.classList.remove('hidden');
+        } else if (p >= 77) {
+          this.labelAfter.classList.add('hidden');
+          this.labelBefore.classList.remove('hidden');
+        } else {
+          this.labelBefore.classList.remove('hidden');
+          this.labelAfter.classList.remove('hidden');
+        }
+      }
+    }
+
+    let comparers = [];
+
+    function updateAllComparers() {
+      comparers.forEach(c => {
+        c.rect = c.container.getBoundingClientRect();
+        c.updateSlider(parseFloat(c.handle.style.left) || 50);
+      });
+    }
+
+    document.querySelectorAll('.image-compare').forEach(container => {
+      comparers.push(new ImageComparer(container));
+    });
+  </script>
+</body>
+</html>
