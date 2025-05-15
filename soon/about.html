@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About - Prabod Saranga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-color: #f00;
+      --main-glow: 0 0 15px var(--main-color);
+      --main-glow-hover: 0 0 30px var(--main-color);
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: transparent;
+      color: #fff;
+      overflow-x: hidden;
+      height: 100%;
+    }
+
+    canvas#galaxy {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: #000;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      max-width: 1200px;
+      margin: auto;
+      position: relative;
+    }
+
+    .corner-name {
+      background: var(--main-color);
+      padding: 8px 20px;
+      border-radius: 25px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: var(--main-glow);
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .menu-toggle {
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      display: none;
+      z-index: 1001;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding-top: 60px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+
+    .mobile-nav.active {
+      display: flex;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .mobile-nav a {
+      margin: 12px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+    }
+
+    .about-section {
+      max-width: 800px;
+      margin: 0rem auto 0;
+      padding: 0rem 5% 1rem;
+      text-align: justify;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .about-title {
+      font-size: 3rem;
+      color: var(--main-color);
+      text-shadow: var(--main-glow);
+      margin-bottom: 1rem;
+    }
+
+    .about-text {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #ccc;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .menu-toggle { display: block; }
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .corner-name {
+        margin-right: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<canvas id="galaxy"></canvas>
+
+<div class="container">
+  <div class="corner-name">Prabod Saranga</div>
+  <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="#">Skills</a>
+    <a href="#">Service</a>
+    <a href="#">Contact</a>
+  </nav>
+</div>
+
+<!-- Mobile nav menu -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+  <a href="#">Skills</a>
+  <a href="#">Service</a>
+  <a href="#">Contact</a>
+</div>
+
+<section class="about-section">
+  <h1 class="about-title">About Me</h1>
+  <p class="about-text">
+    I'm <strong>Prabod Saranga</strong>, a passionate and creative web designer with a focus on building modern, elegant, and responsive digital experiences. I believe in the power of design to transform ideas into beautiful interfaces.
+  </p>
+  <p class="about-text">
+    With a strong background in photo editing and video editing, I bring visuals to life — blending aesthetic appeal with functionality. I continuously explore new technologies and push creative boundaries to craft work that truly stands out.
+  </p>
+  <p class="about-text">
+    Whether I'm designing a brand identity, developing a personal portfolio, or editing cinematic content, my goal is to deliver experiences that are not just functional, but emotionally engaging and visually exceptional.
+  </p>
+</section>
+
+<script>
+  const canvas = document.getElementById('galaxy');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars = [];
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: w > 768 ? 500 : 200 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      z: Math.random() * w
+    }));
+  }
+
+  function draw() {
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2;
+    for (let s of stars) {
+      s.z -= 2;
+      if (s.z <= 0) s.z = w;
+      const k = w / s.z;
+      const x = (s.x - cx) * k + cx;
+      const y = (s.y - cy) * k + cy;
+      if (x >= 0 && x < w && y >= 0 && y < h) {
+        const size = (1 - s.z / w) * 2;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+
+  function toggleMenu() {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    nav.classList.toggle("active");
+    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+  }
+
+  document.addEventListener('click', function(e) {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
+      nav.classList.remove("active");
+      icon.textContent = "☰";
+    }
+  });
+</script>
+</body>
+</html>
