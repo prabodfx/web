@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Cosmic Nexus</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0a0010 0%, #020003 100%);
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+
+        #matrix-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            mix-blend-mode: screen;
+            opacity: 0.3;
+        }
+
+        .matrix-digit {
+            position: absolute;
+            color: #00ff88;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00ff88;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-100vh); }
+            to { transform: translateY(100vh); }
+        }
+
+        .cyber-star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #9d00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #9d00ff,
+                        0 0 30px #9d00ff;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .hacker-grid {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .cyber-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #9d00ff;
+            font-size: 4em;
+            text-shadow: 0 0 20px #9d00ff;
+            animation: glitch 2s infinite;
+            text-align: center;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(-50%, -50%) skew(0deg); }
+            20% { transform: translate(-51%, -50%) skew(2deg); }
+            40% { transform: translate(-49%, -50%) skew(-1deg); }
+            60% { transform: translate(-50%, -51%) skew(0.5deg); }
+            80% { transform: translate(-50%, -49%) skew(-0.5deg); }
+            100% { transform: translate(-50%, -50%) skew(0deg); }
+        }
+
+        .scan-line {
+            position: fixed;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0, 255, 136, 0.5) 50%, 
+                transparent 100%);
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 10px #00ff88;
+            z-index: 3;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        .cyber-comet {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #9d00ff, #00ff88);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: comet linear infinite;
+        }
+
+        @keyframes comet {
+            0% { transform: translate(-100vw, -100vh); }
+            100% { transform: translate(200vw, 200vh); }
+        }
+
+        .terminal-text {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff88;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-title">AREA9.9</div>
+    <div class="hacker-grid"></div>
+    <div class="scan-line"></div>
+    <div id="matrix-container"></div>
+    <div class="terminal-text"></div>
+
+    <script>
+        // Generate matrix rain
+        function createMatrix() {
+            const container = document.getElementById('matrix-container');
+            const characters = '01';
+            const columns = Math.floor(window.innerWidth / 14);
+            
+            for(let i = 0; i < columns; i++) {
+                const digit = document.createElement('div');
+                digit.className = 'matrix-digit';
+                digit.style.left = `${i * 14}px`;
+                digit.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                digit.style.animationDelay = `${Math.random() * -5}s`;
+                digit.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+                container.appendChild(digit);
+            }
+        }
+
+        // Generate cyber stars
+        function createStars() {
+            const container = document.body;
+            for(let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'cyber-star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                container.appendChild(star);
+            }
+        }
+
+        // Generate comets
+        function createComets() {
+            for(let i = 0; i < 5; i++) {
+                const comet = document.createElement('div');
+                comet.className = 'cyber-comet';
+                comet.style.left = `${Math.random() * 100}vw`;
+                comet.style.top = `${Math.random() * 100}vh`;
+                comet.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                document.body.appendChild(comet);
+            }
+        }
+
+        // Terminal text effect
+        function terminalEffect() {
+            const texts = [
+                'INITIALIZING NEURAL NETWORK...',
+                'ACCESSING MAINFRAME...',
+                'CONNECTING TO SATELLITE...',
+                'DECRYPTING DATA STREAM...',
+                'ESTABLISHING QUANTUM LINK...'
+            ];
+            const element = document.querySelector('.terminal-text');
+            let currentText = '';
+            let currentIndex = 0;
+            let textIndex = 0;
+
+            function type() {
+                if(currentIndex < texts[textIndex].length) {
+                    currentText += texts[textIndex].charAt(currentIndex);
+                    element.textContent = currentText;
+                    currentIndex++;
+                    setTimeout(type, 50);
+                } else {
+                    setTimeout(erase, 2000);
+                }
+            }
+
+            function erase() {
+                if(currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    element.textContent = currentText;
+                    setTimeout(erase, 30);
+                } else {
+                    textIndex = (textIndex + 1) % texts.length;
+                    currentIndex = 0;
+                    setTimeout(type, 500);
+                }
+            }
+
+            type();
+        }
+
+        // Initialize all effects
+        window.addEventListener('DOMContentLoaded', () => {
+            createMatrix();
+            createStars();
+            createComets();
+            terminalEffect();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const matrixContainer = document.getElementById('matrix-container');
+            matrixContainer.innerHTML = '';
+            createMatrix();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Cyber Matrix</title>
+    <style>
+        :root {
+            --neon-cyan: #0ff;
+            --hacker-green: #0f0;
+            --deep-space: #000;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: var(--deep-space);
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .cyber-container {
+            position: relative;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+
+        .hex-grid {
+            position: absolute;
+            width: 200vmax;
+            height: 200vmax;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 6vmin 6vmin;
+            opacity: 0.3;
+            animation: gridRotate 40s linear infinite;
+        }
+
+        .core-pulse {
+            position: relative;
+            font-family: 'Courier New', monospace;
+            color: var(--hacker-green);
+            font-size: 8vw;
+            text-shadow: 0 0 3vw var(--hacker-green);
+            animation: glitch 3s infinite;
+            text-align: center;
+            padding: 0 5vw;
+            will-change: transform;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--neon-cyan) 50%, 
+                transparent 100%);
+            animation: scan 6s linear infinite;
+            box-shadow: 0 0 3vw var(--neon-cyan);
+            will-change: transform;
+        }
+
+        .matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.5;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes gridRotate {
+            0% { transform: rotate(0deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1.2); }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-0.5vw, 0.5vw); }
+            50% { transform: translate(0.5vw, -0.5vw); }
+            75% { transform: translate(-0.5vw, -0.5vw); }
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @media (orientation: portrait) {
+            .core-pulse { font-size: 6vw; }
+            .hex-grid { background-size: 8vmin 8vmin; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-container">
+        <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+        <div class="hex-grid"></div>
+        <div class="scan-line"></div>
+        <div class="core-pulse">SECURE_CHANNEL</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, columns;
+
+        function initMatrix() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            columns = Math.floor(width / 30);
+        }
+
+        const chars = '01';
+        const drops = Array(columns).fill(0);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#0f0';
+            ctx.font = '1.2rem monospace';
+
+            drops.forEach((drop, i) => {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * 30;
+                const y = drop * 20;
+                
+                ctx.fillText(char, x, y);
+                
+                if(y > height && Math.random() > 0.975) drops[i] = 0;
+                else drops[i]++;
+            });
+        }
+
+        let lastFrameTime = 0;
+        const frameInterval = 50;
+
+        function animate(timestamp) {
+            if(timestamp - lastFrameTime > frameInterval) {
+                drawMatrix();
+                lastFrameTime = timestamp;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initMatrix);
+        window.addEventListener('DOMContentLoaded', () => {
+            initMatrix();
+            animate(0);
+            setInterval(() => {
+                document.querySelector('.core-pulse').textContent = 
+                    Math.random() > 0.5 ? "SYSTEM_OK" : "ENCRYPTED";
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
