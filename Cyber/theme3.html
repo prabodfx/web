@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>Cyber Cosmic Nexus</title>
     <style>
         body {
@@ -11,6 +11,8 @@
             background: radial-gradient(ellipse at bottom, #0a0010 0%, #020003 100%);
             height: 100vh;
             font-family: 'Courier New', monospace;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
         }
 
         #matrix-container {
@@ -20,6 +22,7 @@
             z-index: 1;
             mix-blend-mode: screen;
             opacity: 0.3;
+            pointer-events: none;
         }
 
         .matrix-digit {
@@ -29,6 +32,7 @@
             text-shadow: 0 0 5px #00ff88;
             opacity: 0.7;
             animation: fall linear infinite;
+            will-change: transform;
         }
 
         @keyframes fall {
@@ -42,14 +46,14 @@
             height: 3px;
             background: #9d00ff;
             border-radius: 50%;
-            box-shadow: 0 0 15px #9d00ff,
-                        0 0 30px #9d00ff;
+            box-shadow: 0 0 15px #9d00ff;
             animation: pulse 2s infinite alternate;
+            will-change: transform, opacity;
         }
 
         @keyframes pulse {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1.2); }
         }
 
         .hacker-grid {
@@ -74,6 +78,16 @@
             text-shadow: 0 0 20px #9d00ff;
             animation: glitch 2s infinite;
             text-align: center;
+            will-change: transform;
+        }
+
+        @media (max-width: 768px) {
+            .cyber-title {
+                font-size: 2.8em;
+            }
+            .matrix-digit {
+                font-size: 12px;
+            }
         }
 
         @keyframes glitch {
@@ -87,20 +101,30 @@
 
         .scan-line {
             position: fixed;
+            top: 0;
             width: 100%;
             height: 2px;
             background: linear-gradient(to bottom, 
                 transparent 0%, 
-                rgba(0, 255, 136, 0.5) 50%, 
+                rgba(0, 255, 136, 0.9) 50%, 
                 transparent 100%);
             animation: scan 4s linear infinite;
-            box-shadow: 0 0 10px #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.8), 
+                        0 0 20px rgba(0, 255, 136, 0.6), 
+                        0 0 30px rgba(0, 255, 136, 0.4);
+            filter: blur(0.3px); /* Slight blur for a smoother glow */
+            will-change: top;
             z-index: 3;
+            pointer-events: none; /* Avoid interfering with UI */
         }
 
         @keyframes scan {
-            0% { top: -10%; }
-            100% { top: 110%; }
+            0% {
+                top: 0%;
+            }
+            100% {
+                top: 100%;
+            }
         }
 
         .cyber-comet {
@@ -111,6 +135,7 @@
             border-radius: 50%;
             filter: blur(1px);
             animation: comet linear infinite;
+            will-change: transform;
         }
 
         @keyframes comet {
@@ -126,6 +151,7 @@
             font-size: 12px;
             text-shadow: 0 0 5px #00ff88;
             white-space: pre;
+            will-change: contents;
         }
     </style>
 </head>
@@ -137,49 +163,77 @@
     <div class="terminal-text"></div>
 
     <script>
-        // Generate matrix rain
+        // Performance optimizations
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        let resizeTimeout;
+
+        // Optimized Matrix Rain
         function createMatrix() {
             const container = document.getElementById('matrix-container');
-            const characters = '01';
-            const columns = Math.floor(window.innerWidth / 14);
+            const columnWidth = isMobile ? 22 : 16;
+            const columns = Math.floor(window.innerWidth / columnWidth);
+            const existingDigits = container.children;
             
+            // Reuse existing elements
+            while(existingDigits.length > columns) {
+                container.removeChild(existingDigits[existingDigits.length - 1]);
+            }
+
             for(let i = 0; i < columns; i++) {
-                const digit = document.createElement('div');
+                const digit = existingDigits[i] || document.createElement('div');
                 digit.className = 'matrix-digit';
-                digit.style.left = `${i * 14}px`;
-                digit.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                digit.style.animationDelay = `${Math.random() * -5}s`;
-                digit.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
-                container.appendChild(digit);
+                digit.style.cssText = `
+                    left: ${i * columnWidth}px;
+                    animation-duration: ${Math.random() * 3 + 2}s;
+                    animation-delay: ${Math.random() * -5}s;
+                `;
+                if(!existingDigits[i]) {
+                    digit.textContent = Math.random() > 0.5 ? '0' : '1';
+                    container.appendChild(digit);
+                }
             }
         }
 
-        // Generate cyber stars
+        // Optimized Stars Creation
         function createStars() {
             const container = document.body;
-            for(let i = 0; i < 200; i++) {
+            const starCount = isMobile ? 100 : 200;
+            const existingStars = document.querySelectorAll('.cyber-star');
+            
+            if(existingStars.length >= starCount) return;
+
+            for(let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'cyber-star';
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.top = `${Math.random() * 100}vh`;
-                star.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                star.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    animation-duration: ${Math.random() * 2 + 1}s;
+                `;
                 container.appendChild(star);
             }
         }
 
-        // Generate comets
+        // Comet Trails Optimized
         function createComets() {
-            for(let i = 0; i < 5; i++) {
+            const cometCount = isMobile ? 3 : 5;
+            const existingComets = document.querySelectorAll('.cyber-comet');
+            
+            if(existingComets.length >= cometCount) return;
+
+            for(let i = 0; i < cometCount; i++) {
                 const comet = document.createElement('div');
                 comet.className = 'cyber-comet';
-                comet.style.left = `${Math.random() * 100}vw`;
-                comet.style.top = `${Math.random() * 100}vh`;
-                comet.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                comet.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    animation-duration: ${Math.random() * 10 + 5}s;
+                `;
                 document.body.appendChild(comet);
             }
         }
 
-        // Terminal text effect
+        // Terminal Animation with RAF
         function terminalEffect() {
             const texts = [
                 'INITIALIZING NEURAL NETWORK...',
@@ -192,47 +246,77 @@
             let currentText = '';
             let currentIndex = 0;
             let textIndex = 0;
+            let lastFrame = 0;
 
-            function type() {
-                if(currentIndex < texts[textIndex].length) {
-                    currentText += texts[textIndex].charAt(currentIndex);
-                    element.textContent = currentText;
-                    currentIndex++;
-                    setTimeout(type, 50);
-                } else {
-                    setTimeout(erase, 2000);
+            function type(timestamp) {
+                if(!lastFrame) lastFrame = timestamp;
+                const delta = timestamp - lastFrame;
+
+                if(delta > 50) {
+                    if(currentIndex < texts[textIndex].length) {
+                        currentText += texts[textIndex].charAt(currentIndex);
+                        element.textContent = currentText;
+                        currentIndex++;
+                    } else {
+                        lastFrame = 0;
+                        requestAnimationFrame(erase);
+                        return;
+                    }
+                    lastFrame = timestamp;
                 }
+                requestAnimationFrame(type);
             }
 
-            function erase() {
-                if(currentText.length > 0) {
-                    currentText = currentText.slice(0, -1);
-                    element.textContent = currentText;
-                    setTimeout(erase, 30);
-                } else {
-                    textIndex = (textIndex + 1) % texts.length;
-                    currentIndex = 0;
-                    setTimeout(type, 500);
+            function erase(timestamp) {
+                if(!lastFrame) lastFrame = timestamp;
+                const delta = timestamp - lastFrame;
+
+                if(delta > 30) {
+                    if(currentText.length > 0) {
+                        currentText = currentText.slice(0, -1);
+                        element.textContent = currentText;
+                    } else {
+                        textIndex = (textIndex + 1) % texts.length;
+                        currentIndex = 0;
+                        lastFrame = 0;
+                        requestAnimationFrame(type);
+                        return;
+                    }
+                    lastFrame = timestamp;
                 }
+                requestAnimationFrame(erase);
             }
 
-            type();
+            requestAnimationFrame(type);
         }
 
-        // Initialize all effects
+        // Throttled Resize Handler
+        function handleResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                createMatrix();
+                createStars();
+                createComets();
+            }, 200);
+        }
+
+        // Initialize
         window.addEventListener('DOMContentLoaded', () => {
             createMatrix();
             createStars();
             createComets();
             terminalEffect();
+            window.addEventListener('resize', handleResize);
         });
 
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            const matrixContainer = document.getElementById('matrix-container');
-            matrixContainer.innerHTML = '';
-            createMatrix();
-        });
+        // Prevent scrolling
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
