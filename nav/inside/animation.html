@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CSS Animation Skill</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -17,7 +17,10 @@
       position:fixed;
       top:0;left:0;
       width:100%;height:100%;
-      z-index:0
+      z-index:0;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
     }
     header{
       position:fixed;
@@ -29,7 +32,8 @@
       justify-content:space-between;
       align-items:center;
       padding:15px 20px;
-      backdrop-filter:blur(3px)
+      backdrop-filter:blur(3px);
+      transform: translateZ(0);
     }
     .header-title{
       font-size:clamp(1.2rem,4vw,1.4rem);
@@ -41,7 +45,8 @@
       position:relative;
       left:50%;
       transform:translateX(-50%);
-      white-space:nowrap
+      white-space:nowrap;
+      backface-visibility: hidden;
     }
     .nav-toggle{
       font-size:1.8rem;
@@ -62,7 +67,8 @@
       flex-direction:column;
       gap:12px;
       backdrop-filter:blur(8px);
-      z-index:9999
+      z-index:9999;
+      will-change: transform, opacity;
     }
     .nav-menu.show{display:flex}
     .nav-menu a{
@@ -99,6 +105,7 @@
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4);
       transform-style: preserve-3d;
+      will-change: transform, opacity;
     }
 
     .theme-card:nth-child(1) { animation-delay: 0.3s; }
@@ -113,12 +120,6 @@
         opacity: 1;
         transform: scale(1) translateY(0);
       }
-    }
-
-    .theme-card::before,
-    .theme-card::after {
-      pointer-events: none;
-      transition: 0.6s;
     }
 
     @media (min-width: 1025px) {
@@ -187,11 +188,11 @@
 
     @media (max-width: 1024px) {
       .theme-card {
-        transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.03);
-        box-shadow: 0 0 50px rgba(127, 63, 191, 0.4);
+        transform: none !important;
+        box-shadow: 0 0 30px rgba(127, 63, 191, 0.3);
+        animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
       }
 
-      /* ✅ Added neon border effect always visible on mobile/tablet */
       .theme-card::after {
         content: '';
         position: absolute;
@@ -212,7 +213,7 @@
           linear-gradient(#000 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
-        animation: borderGlow 2s linear infinite;
+        animation: borderGlowMobile 4s linear infinite;
         opacity: 1;
       }
 
@@ -232,6 +233,12 @@
     }
 
     @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes borderGlowMobile {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
@@ -268,7 +275,8 @@
       background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
       color: white;
       border: 2px solid rgba(255,255,255,0.3);
-      z-index: 2
+      z-index: 2;
+      backface-visibility: hidden;
     }
 
     .premium-btn::after {
@@ -350,15 +358,23 @@
       </div>
     </div>
   </div>
-  <script>
-    const canvas = document.getElementById('galaxy'), ctx = canvas.getContext('2d');
-    let stars = [], frame = 0;
-    let isMobile = window.innerWidth < 768;
 
+  <script>
+    const canvas = document.getElementById('galaxy'), 
+          ctx = canvas.getContext('2d');
+    let stars = [], lastFrameTime = 0;
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const STAR_COUNT = isMobile ? 80 : window.innerWidth < 768 ? 120 : 200;
+
+    // Optimized resize handler
+    let resizeTimeout;
     function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      createStars(STAR_COUNT);
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        createStars(STAR_COUNT);
+      }, 200);
     }
 
     function createStars(count) {
@@ -369,81 +385,68 @@
       }));
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Optimized draw function
+    function draw(timestamp) {
+      const timeSinceLastFrame = timestamp - lastFrameTime;
+      if (timeSinceLastFrame < 30) { // ~33fps cap
+        requestAnimationFrame(draw);
+        return;
+      }
+      lastFrameTime = timestamp;
+
       ctx.fillStyle = "rgba(10,0,25,.3)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const centerX = canvas.width / 2, 
+            centerY = canvas.height / 2,
+            maxZ = canvas.width;
 
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const maxZ = canvas.width;
-
-      for (let i = 0; i < stars.length; i++) {
-        let star = stars[i];
+      stars.forEach(star => {
         star.z -= 2;
         if (star.z <= 0) star.z = canvas.width;
-
+        
         const scale = maxZ / star.z;
         const px = (star.x - centerX) * scale + centerX;
         const py = (star.y - centerY) * scale + centerY;
-
+        
         if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
           const size = (1 - star.z / maxZ) * 2;
           ctx.beginPath();
           ctx.arc(px, py, size, 0, 2 * Math.PI);
           ctx.fillStyle = "rgba(200,100,255,.8)";
-          ctx.shadowColor = "rgba(200,100,255,.6)";
-          ctx.shadowBlur = 6;
           ctx.fill();
-          ctx.shadowBlur = 0;
         }
-      }
+      });
+
+      requestAnimationFrame(draw);
     }
 
-    let animationFrameId;
-    function animate() {
-      draw();
-      if (isMobile) {
-        setTimeout(() => {
-          animationFrameId = requestAnimationFrame(animate);
-        }, 1000 / 30); // 30 FPS on mobile
-      } else {
-        animationFrameId = requestAnimationFrame(animate);
-      }
-    }
-
-    const STAR_COUNT = isMobile ? 100 : 250;
-
-    // Optimize resize with debounce
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        isMobile = window.innerWidth < 768;
-        resize();
-      }, 200);
-    }, { passive: true });
-
+    // Initialize
     resize();
-    animate();
+    requestAnimationFrame(draw);
 
-    // Nav menu toggle
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-    navToggle.addEventListener('click', () => {
+    // Navigation logic
+    const navToggle = document.getElementById('navToggle'), 
+          navMenu = document.getElementById('navMenu');
+
+    function toggleMenu() {
       navMenu.classList.toggle('show');
       navToggle.textContent = navMenu.classList.contains('show') ? '✖' : '☰';
-    });
+    }
 
+    navToggle.addEventListener('click', toggleMenu);
     document.addEventListener('click', e => {
       if (!navMenu.contains(e.target) && e.target !== navToggle) {
         navMenu.classList.remove('show');
         navToggle.textContent = '☰';
       }
-    }, { passive: true });
+    });
 
-    // Card tilt only for desktop
-    if (window.innerWidth >= 1025) {
+    // Optimized resize listener
+    window.addEventListener('resize', resize);
+
+    // Conditional card interactions
+    if (!isMobile) {
       document.querySelectorAll('.theme-card').forEach(card => {
         const rect = card.getBoundingClientRect();
         card.addEventListener('mousemove', (e) => {
@@ -453,13 +456,24 @@
           const centerY = rect.height / 2;
           const rotateY = (x - centerX) / 25;
           const rotateX = (centerY - y) / 25;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+          card.style.transform = `
+            perspective(1000px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            scale(1.03)
+          `;
         });
+
         card.addEventListener('mouseleave', () => {
           card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
         });
       });
     }
+
+    // Improve touch scrolling
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: true });
   </script>
 </body>
 </html>
