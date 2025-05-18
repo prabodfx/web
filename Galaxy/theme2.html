@@ -1,125 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Area 9.9</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle at center, #0e001b, #000);
-    }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-
-    .center-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: #e0caff;
-      font-size: 2.8em;
-      font-weight: 600;
-      text-shadow:
-        0 0 10px rgba(180, 100, 255, 0.6),
-        0 0 20px rgba(180, 100, 255, 0.4),
-        0 0 30px rgba(180, 100, 255, 0.3);
-      z-index: 1;
-      padding: 0 20px;
-      opacity: 0;
-      animation: fadeInFloat 3s ease-out forwards;
-    }
-
-    @keyframes fadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -60%);
-      }
-      100% {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-      }
-    }
-  </style>
-</head>
-<body>
-  <canvas id="galaxy"></canvas>
-  <div class="center-text">WELCOME TO <br> Area 9.9</div>
-
-  <script>
-    const canvas = document.getElementById('galaxy');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    function createStars(count) {
-      stars = [];
-      for (let i = 0; i < count; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          z: Math.random() * canvas.width
-        });
-      }
-    }
-
-    function drawStars() {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const focalLength = canvas.width;
-
-      ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for (let star of stars) {
-        star.z -= 2;
-
-        if (star.z <= 0) {
-          star.z = canvas.width;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Cyber Cosmic Nexus</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0a0010 0%, #020003 100%);
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        const k = focalLength / star.z;
-        const x = (star.x - cx) * k + cx;
-        const y = (star.y - cy) * k + cy;
+        #matrix-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            mix-blend-mode: screen;
+            opacity: 0.3;
+        }
 
-        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+        .matrix-digit {
+            position: absolute;
+            color: #00ff88;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00ff88;
+            opacity: 0.7;
+            animation: fall linear infinite;
+            transform: translateZ(0);
+        }
 
-        const size = (1 - star.z / canvas.width) * 2;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(200, 100, 255, 0.8)";
-        ctx.shadowColor = "rgba(200, 100, 255, 0.6)";
-        ctx.shadowBlur = 6;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
+        @keyframes fall {
+            from { transform: translateY(-100vh); }
+            to { transform: translateY(100vh); }
+        }
 
-    function animate() {
-      drawStars();
-      requestAnimationFrame(animate);
-    }
+        .cyber-star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #9d00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #9d00ff,
+                        0 0 30px #9d00ff;
+            animation: pulse 2s infinite alternate;
+            transform: translateZ(0);
+        }
 
-    createStars(500);
-    animate();
-  </script>
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .hacker-grid {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .cyber-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #9d00ff;
+            font-size: 4em;
+            text-shadow: 0 0 20px #9d00ff;
+            animation: glitch 2s infinite;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .cyber-title {
+                font-size: 2.8em;
+            }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(-50%, -50%) skew(0deg); }
+            20% { transform: translate(-51%, -50%) skew(2deg); }
+            40% { transform: translate(-49%, -50%) skew(-1deg); }
+            60% { transform: translate(-50%, -51%) skew(0.5deg); }
+            80% { transform: translate(-50%, -49%) skew(-0.5deg); }
+            100% { transform: translate(-50%, -50%) skew(0deg); }
+        }
+
+        .scan-line {
+            position: fixed;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0, 255, 136, 0.5) 50%, 
+                transparent 100%);
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 10px #00ff88;
+            z-index: 3;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        .cyber-comet {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #9d00ff, #00ff88);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: comet linear infinite;
+        }
+
+        @keyframes comet {
+            0% { transform: translate(-100vw, -100vh); }
+            100% { transform: translate(200vw, 200vh); }
+        }
+
+        .terminal-text {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff88;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-title">AREA9.9</div>
+    <div class="hacker-grid"></div>
+    <div class="scan-line"></div>
+    <div id="matrix-container"></div>
+    <div class="terminal-text"></div>
+
+    <script>
+        // Matrix Rain Effect
+        function createMatrix() {
+            const container = document.getElementById('matrix-container');
+            const characters = '01';
+            const columnWidth = window.innerWidth < 768 ? 18 : 14;
+            const columns = Math.floor(window.innerWidth / columnWidth);
+
+            container.innerHTML = '';
+            
+            for(let i = 0; i < columns; i++) {
+                const digit = document.createElement('div');
+                digit.className = 'matrix-digit';
+                digit.style.cssText = `
+                    left: ${i * columnWidth}px;
+                    animation-duration: ${Math.random() * 3 + 2}s;
+                    animation-delay: ${Math.random() * -5}s;
+                `;
+                digit.textContent = Math.random() > 0.5 ? '0' : '1';
+                container.appendChild(digit);
+            }
+        }
+
+        // Pulse Stars Creation
+        function createStars() {
+            const container = document.body;
+            for(let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'cyber-star';
+                star.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    animation-duration: ${Math.random() * 2 + 1}s;
+                `;
+                container.appendChild(star);
+            }
+        }
+
+        // Comet Trails
+        function createComets() {
+            for(let i = 0; i < 5; i++) {
+                const comet = document.createElement('div');
+                comet.className = 'cyber-comet';
+                comet.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    animation-duration: ${Math.random() * 10 + 5}s;
+                `;
+                document.body.appendChild(comet);
+            }
+        }
+
+        // Terminal Animation
+        function terminalEffect() {
+            const texts = [
+                'INITIALIZING NEURAL NETWORK...',
+                'ACCESSING MAINFRAME...',
+                'CONNECTING TO SATELLITE...',
+                'DECRYPTING DATA STREAM...',
+                'ESTABLISHING QUANTUM LINK...'
+            ];
+            const element = document.querySelector('.terminal-text');
+            let currentText = '';
+            let currentIndex = 0;
+            let textIndex = 0;
+
+            function type() {
+                if(currentIndex < texts[textIndex].length) {
+                    currentText += texts[textIndex].charAt(currentIndex);
+                    element.textContent = currentText;
+                    currentIndex++;
+                    setTimeout(type, 50);
+                } else {
+                    setTimeout(erase, 2000);
+                }
+            }
+
+            function erase() {
+                if(currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    element.textContent = currentText;
+                    setTimeout(erase, 30);
+                } else {
+                    textIndex = (textIndex + 1) % texts.length;
+                    currentIndex = 0;
+                    setTimeout(type, 500);
+                }
+            }
+
+            type();
+        }
+
+        // Initialize All Effects
+        window.addEventListener('DOMContentLoaded', () => {
+            createMatrix();
+            createStars();
+            createComets();
+            terminalEffect();
+        });
+
+        // Responsive Handling
+        window.addEventListener('resize', () => {
+            createMatrix();
+            document.querySelectorAll('.cyber-star, .cyber-comet').forEach(el => el.remove());
+            createStars();
+            createComets();
+        });
+    </script>
 </body>
 </html>
