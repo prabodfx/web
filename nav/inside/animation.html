@@ -388,7 +388,7 @@
       const centerY = canvas.height/2;
       
       stars.forEach(star => {
-        star.z -= star.z * 0.002 + 0.4;
+        star.z -= 2;
         if(star.z <= 0) star.z = canvas.width;
         
         const scale = canvas.width / star.z;
