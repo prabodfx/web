@@ -22,6 +22,7 @@
       transform: translateZ(0);
       backface-visibility: hidden;
       overscroll-behavior: none;
+      overflow-y: auto;
     }
     canvas {
       position: fixed;
@@ -312,7 +313,7 @@
   </div>
 
   <script>
-    // ======= FULL PAGE STARFIELD ANIMATION =======
+    // ======= ENHANCED STARFIELD ANIMATION =======
     const canvas = document.getElementById('galaxy');
     const ctx = canvas.getContext('2d');
     let stars = [], resizeTimer;
@@ -321,20 +322,20 @@
     const frameInterval = 16;
 
     const getStarCount = () => {
-      const base = window.innerWidth < 768 ? 80 : 
-                   window.innerWidth < 1024 ? 120 : 180;
-      return Math.min(base, 200);
+      const base = window.innerWidth < 768 ? 150 : 
+                   window.innerWidth < 1024 ? 220 : 300;
+      return Math.min(base, 350);
     };
 
     function init() {
-      // Set canvas to full document size
       canvas.width = document.documentElement.scrollWidth;
       canvas.height = document.documentElement.scrollHeight;
       
       stars = Array.from({length: getStarCount()}, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        z: Math.random() * canvas.width
+        z: Math.random() * canvas.width * 1.5,
+        speed: 0.3 + Math.random() * 0.2
       }));
       
       if (animationFrame) cancelAnimationFrame(animationFrame);
@@ -344,7 +345,7 @@
     function draw(timestamp) {
       if (!document.hidden) {
         if (timestamp - lastFrameTime > frameInterval) {
-          ctx.fillStyle = "rgba(10,0,25,.35)";
+          ctx.fillStyle = "rgba(10,0,25,.25)";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           const centerX = canvas.width/2;
@@ -352,17 +353,19 @@
           const scrollY = window.scrollY;
           
           stars.forEach(star => {
-            star.z -= star.z * 0.0015 + 0.2;
-            if(star.z <= 0) star.z = canvas.width;
+            star.z -= star.z * 0.0025 + star.speed;
+            if(star.z <= 0) {
+              star.z = canvas.width;
+              star.x = Math.random() * canvas.width;
+              star.y = Math.random() * canvas.height;
+            }
             
             const scale = canvas.width / star.z;
             const x = (star.x - centerX) * scale + centerX;
             const y = (star.y - centerY) * scale + centerY - scrollY;
             
-            if(y < -50 || y > canvas.height + 50) return;
-
             ctx.beginPath();
-            ctx.arc(x, y, Math.max(0.8, (1 - star.z/canvas.width) * 1.8), 0, Math.PI*2);
+            ctx.arc(x, y, Math.max(1.5, (1 - star.z/canvas.width) * 3), 0, Math.PI*2);
             ctx.fillStyle = `rgba(200,100,255,${0.9 - (star.z/canvas.width)*0.6})`;
             ctx.fill();
           });
@@ -376,6 +379,16 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(init, 300);
+    });
+
+    // ======= SCROLL CONTROL =======
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if(window.scrollY > maxScroll) {
+        window.scrollTo(0, maxScroll);
+      }
+      requestAnimationFrame(draw);
     });
 
     // ======= INTERACTIVITY =======
@@ -416,11 +429,6 @@
           card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
         });
       }
-    });
-
-    // Handle scroll and resize events
-    window.addEventListener('scroll', () => {
-      requestAnimationFrame(draw);
     });
 
     document.addEventListener('visibilitychange', () => {
