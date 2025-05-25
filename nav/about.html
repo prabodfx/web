@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>About - Prabod Saranga</title>
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap " rel="stylesheet">
   <style>
     :root {
       --main-color: #f00;
@@ -40,6 +40,9 @@
       max-width: 1200px;
       margin: auto;
       position: relative;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s ease-out;
     }
 
     .corner-name {
@@ -57,9 +60,29 @@
     }
 
     nav a {
-      color: #fff;
+      color: var(--text-color);
       text-decoration: none;
       font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--main-color);
+    }
+    nav a:hover::after {
+      width: 100%;
     }
 
     .menu-toggle {
@@ -70,6 +93,12 @@
       cursor: pointer;
       display: none;
       z-index: 1001;
+      transform: translateY(0); /* Base transform */
+      transition: transform 0.4s ease; /* Flip animation */
+    }
+
+    .menu-toggle.flip {
+      transform: rotate(180deg);
     }
 
     .mobile-nav {
@@ -88,7 +117,6 @@
 
     .mobile-nav.active {
       display: flex;
-      animation: fadeInUp 0.4s ease forwards;
     }
 
     .mobile-nav a {
@@ -104,7 +132,9 @@
       margin: 0rem auto 0;
       padding: 0rem 5% 1rem;
       text-align: justify;
-      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s ease-out;
     }
 
     .about-title {
@@ -121,20 +151,15 @@
       margin-bottom: 1rem;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     @media (max-width: 768px) {
       nav { display: none; }
-      .menu-toggle { display: block; }
+      .menu-toggle {
+        display: block;
+        z-index: 100000 !important;
+        position: fixed;
+        top: 0.6rem;
+        right: 1rem;
+      }
       .container {
         flex-direction: row;
         justify-content: space-between;
@@ -148,10 +173,9 @@
 <body>
 <canvas id="galaxy"></canvas>
 
-<div class="container">
+<div class="container" id="mainContainer">
   <div class="corner-name">Prabod Saranga</div>
-  <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
-    <nav>
+  <nav>
     <a href="../index.html">Home</a>
     <a href="about.html">About</a>
     <a href="skill.html">Skills</a>
@@ -159,6 +183,8 @@
     <a href="../soon/index.html">Contact</a>
   </nav>
 </div>
+
+<button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 
 <!-- Mobile nav menu -->
 <div class="mobile-nav" id="mobileNav">
@@ -169,7 +195,7 @@
   <a href="../soon/index.html">Contact</a>
 </div>
 
-<section class="about-section">
+<section class="about-section" id="aboutSection">
   <h1 class="about-title">About Me</h1>
   <p class="about-text">
     I'm <strong>Prabod Saranga</strong>, a passionate and creative web designer with a focus on building modern, elegant, and responsive digital experiences. I believe in the power of design to transform ideas into beautiful interfaces.
@@ -218,23 +244,76 @@
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize', resize);
-  resize();
-  draw();
+  function handleResize() {
+    resize();
 
-  function toggleMenu() {
+    // Close mobile menu if screen is now desktop
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
-    nav.classList.toggle("active");
-    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+    if (window.innerWidth > 768 && nav.classList.contains("active")) {
+      nav.classList.remove("active");
+      icon.textContent = "☰";
+    }
+  }
+
+  window.addEventListener('resize', handleResize);
+
+  // Start animations
+  let hasAnimated = false;
+
+  function animateElements() {
+    if (hasAnimated) return;
+
+    const container = document.getElementById("mainContainer");
+    const menuToggle = document.getElementById("menuIcon");
+    const aboutSection = document.getElementById("aboutSection");
+
+    // Step 1: Animate container
+    setTimeout(() => {
+      container.style.opacity = "1";
+      container.style.transform = "translateY(0)";
+    }, 200);
+
+    // Step 2: Animate menu toggle
+    setTimeout(() => {
+      menuToggle.style.opacity = "1";
+      menuToggle.style.transform = "translateY(0)";
+    }, 600);
+
+    // Step 3: Show about section
+    setTimeout(() => {
+      aboutSection.style.opacity = "1";
+      aboutSection.style.transform = "translateY(0)";
+      hasAnimated = true;
+    }, 500);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    resize();
+    draw();
+
+    // Delay animation start slightly for smoother render
+    setTimeout(animateElements, 100);
+  });
+
+  window.toggleMenu = function() {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    if (nav && icon) {
+      nav.classList.toggle("active");
+      icon.classList.toggle("flip");
+      icon.textContent = nav.classList.contains("active") ? "✖" : "☰"; // Toggle text content
+    }
   }
 
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
-    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
+    // Check if mobile nav is active AND click is outside nav and not on the icon itself
+    if (nav && icon && nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon && !icon.contains(e.target)) {
       nav.classList.remove("active");
-      icon.textContent = "☰";
+      icon.classList.remove("flip");
+      icon.textContent = "☰"; // Reset icon text
     }
   });
 </script>
