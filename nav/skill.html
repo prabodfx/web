@@ -57,9 +57,28 @@
     }
 
     nav a {
-      color: #fff;
+      color: var(--text-color);
       text-decoration: none;
       font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--main-color);
+    }
+    nav a:hover::after {
+      width: 100%;
     }
 
     .menu-toggle {
@@ -99,18 +118,27 @@
       text-decoration: none;
     }
 
-    /* Centered Feature Section */
-    .feature-section {
+    /* Full screen center wrapper */
+    .feature-wrapper {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .feature-section {
       display: flex;
       flex-direction: column;
       gap: 20px;
-      z-index: 1;
       width: 90%;
       max-width: 400px;
+      pointer-events: auto;
     }
 
     .feature-item {
@@ -125,6 +153,7 @@
       backdrop-filter: blur(10px);
       transition: all 0.3s ease;
       height: 56px;
+      cursor: pointer;
     }
 
     .feature-item:hover {
@@ -157,18 +186,15 @@
         max-width: 360px;
         gap: 18px;
       }
-
       .feature-item {
         padding: 10px 16px;
         height: 52px;
         gap: 14px;
       }
-
       .feature-icon {
         width: 26px;
         height: 26px;
       }
-
       .feature-label {
         font-size: 1rem;
       }
@@ -181,28 +207,23 @@
         flex-direction: row;
         justify-content: space-between;
       }
-
       .corner-name {
         margin-right: auto;
       }
-
       .feature-section {
         width: 80%;
         max-width: 280px;
         gap: 16px;
       }
-
       .feature-item {
         padding: 8px 14px;
         height: 48px;
         gap: 12px;
       }
-
       .feature-icon {
         width: 24px;
         height: 24px;
       }
-
       .feature-label {
         font-size: 0.95rem;
       }
@@ -218,6 +239,19 @@
         transform: translateY(0);
       }
     }
+
+    .container, .feature-wrapper {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 2s ease forwards;
+    }
+
+    .container {
+      animation-delay: 0.2s;
+    }
+    .feature-wrapper {
+      animation-delay: 0.5s;
+    }
   </style>
 </head>
 <body>
@@ -227,7 +261,7 @@
   <div class="corner-name">Prabod Saranga</div>
   <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
   <nav>
-    <a href="../index.html">Home</a>
+    <a href="index.html">Home</a>
     <a href="about.html">About</a>
     <a href="skill.html">Skills</a>
     <a href="../soon/index.html">Service</a>
@@ -235,28 +269,28 @@
   </nav>
 </div>
 
-<!-- Mobile nav menu -->
 <div class="mobile-nav" id="mobileNav">
-  <a href="../index.html">Home</a>
+  <a href="index.html">Home</a>
   <a href="about.html">About</a>
   <a href="skill.html">Skills</a>
   <a href="../soon/index.html">Service</a>
   <a href="../soon/index.html">Contact</a>
 </div>
 
-<!-- Center Premium Feature Section -->
-<div class="feature-section">
-  <div class="feature-item" onclick="location.href='inside/lightroom.html';" style="cursor:pointer;">
-    <img src="../res/skillicon/lightroom.webp" class="feature-icon" />
-    <span class="feature-label">Photo Editing</span>
-  </div>
-  <div class="feature-item" onclick="location.href='../soon/index.html';" style="cursor:pointer;">
-    <img src="../res/skillicon/capcut.webp" class="feature-icon" />
-    <span class="feature-label">Video Editing</span>
-  </div>
-  <div class="feature-item" onclick="location.href='inside/animation.html';" style="cursor:pointer;">
-    <img src="../res/skillicon/portfolio.webp" class="feature-icon" />
-    <span class="feature-label">Html Animations</span>
+<div class="feature-wrapper">
+  <div class="feature-section">
+    <div class="feature-item" onclick="location.href='inside/lightroom.html';">
+      <img src="../res/skillicon/lightroom.webp" class="feature-icon" />
+      <span class="feature-label">Photo Editing</span>
+    </div>
+    <div class="feature-item" onclick="location.href='../soon/index.html';">
+      <img src="../res/skillicon/capcut.webp" class="feature-icon" />
+      <span class="feature-label">Video Editing</span>
+    </div>
+    <div class="feature-item" onclick="location.href='inside/animation.html';">
+      <img src="../res/skillicon/portfolio.webp" class="feature-icon" />
+      <span class="feature-label">Html Animations</span>
+    </div>
   </div>
 </div>
 
