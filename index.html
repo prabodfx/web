@@ -145,6 +145,32 @@
       text-decoration: none;
     }
 
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--main-color);
+    }
+    nav a:hover::after {
+      width: 100%;
+    }
+
     .mobile-nav {
       display: none;
       flex-direction: column;
@@ -292,22 +318,34 @@
       border-radius: 6px;
       cursor: pointer;
       box-shadow: var(--main-glow);
-      transition: transform 0.3s ease !important;
-      transform: translateY(30px);
-      animation: fadeInUp 2s ease forwards;
-      animation-delay: 1.4s;
+      
+      /* Base transition for transform and box-shadow */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; 
+      
+      /* Initial state for fadeInUp animation */
+      opacity: 0; 
+      transform: translateY(30px); 
+      
+      /* Apply initial fadeInUp animation with its delay */
+      animation: fadeInUp 2s ease forwards 1.4s;
+      
+      /* Disable pointer events initially */
+      pointer-events: none;
     }
 
-    .cv-button.visible {
+    /* This class will be added via JS when fadeInUp is complete to start jiggle */
+    .cv-button.jiggle-active {
       animation: iconJiggle 2s ease infinite;
-      opacity: 100%;
+      /* Ensure transition remains active during jiggle */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
     .cv-button:hover {
-      animation: none !important;
-      transform: scale(1.05) !important;
+      animation: none !important; /* Stop any animation (including jiggle) on hover */
+      transform: scale(1.05) translateY(0) !important; /* Scale and ensure no vertical shift */
       box-shadow: var(--main-glow-hover) !important;
-      opacity: 100%;
+      /* Ensure transition is applied on hover */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
     @media (max-width: 768px) {
@@ -366,6 +404,9 @@
       color: red;
       position: relative;
       animation: glitchBase 1.7s infinite steps(1);
+      /* Optimize for performance */
+      will-change: transform, text-shadow, clip;
+      transform: translateZ(0); /* Force hardware acceleration */
     }
 
     .crazy-glitch::before,
@@ -377,6 +418,9 @@
       width: 100%;
       opacity: 0.8;
       clip: rect(0, 900px, 0, 0);
+      /* Optimize for performance */
+      will-change: transform, clip;
+      transform: translateZ(0); /* Force hardware acceleration */
     }
 
     .crazy-glitch::before {
@@ -393,31 +437,34 @@
 
     .glitch-glow {
       animation: glitchGlow 2.5s infinite ease-in-out;
+      /* Optimize for performance */
+      will-change: transform, text-shadow;
+      transform: translateZ(0); /* Force hardware acceleration */
     }
 
     @keyframes glitchBase {
-      0% { transform: scale(1); }
-      25% { transform: skewX(5deg) scale(1.03); }
-      50% { transform: scale(1.05); }
-      75% { transform: skewX(-3deg) scale(0.97); }
-      100% { transform: scale(1); }
+      0% { transform: scale(1) translateZ(0); }
+      25% { transform: skewX(5deg) scale(1.03) translateZ(0); }
+      50% { transform: scale(1.05) translateZ(0); }
+      75% { transform: skewX(-3deg) scale(0.97) translateZ(0); }
+      100% { transform: scale(1) translateZ(0); }
     }
 
     @keyframes glitchTop {
-      0% { clip: rect(0, 9999px, 0, 0); }
-      10% { clip: rect(5px, 9999px, 30px, 0); transform: translate(-2px, -1px); }
-      20% { clip: rect(30px, 9999px, 60px, 0); transform: translate(2px, 2px); }
-      60% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
-      80% { clip: rect(15px, 9999px, 45px, 0); transform: translate(-3px, 2px); }
-      100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
+      0% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0) translateZ(0); }
+      10% { clip: rect(5px, 9999px, 30px, 0); transform: translate(-2px, -1px) translateZ(0); }
+      20% { clip: rect(30px, 9999px, 60px, 0); transform: translate(2px, 2px) translateZ(0); }
+      60% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0) translateZ(0); }
+      80% { clip: rect(15px, 9999px, 45px, 0); transform: translate(-3px, 2px) translateZ(0); }
+      100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0) translateZ(0); }
     }
 
     @keyframes glitchBottom {
-      0% { clip: rect(0, 9999px, 0, 0); }
-      15% { clip: rect(10px, 9999px, 40px, 0); transform: translate(2px, 2px); }
-      35% { clip: rect(40px, 9999px, 70px, 0); transform: translate(-2px, -2px); }
-      75% { clip: rect(5px, 9999px, 25px, 0); transform: translate(1px, 1px); }
-      100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
+      0% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0) translateZ(0); }
+      15% { clip: rect(10px, 9999px, 40px, 0); transform: translate(2px, 2px) translateZ(0); }
+      35% { clip: rect(40px, 9999px, 70px, 0); transform: translate(-2px, -2px) translateZ(0); }
+      75% { clip: rect(5px, 9999px, 25px, 0); transform: translate(1px, 1px) translateZ(0); }
+      100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0) translateZ(0); }
     }
 
     @keyframes fadeInUp {
@@ -431,11 +478,11 @@
       }
     }
 
+    /* Initial state for elements that should animate in */
     .container,
     .text-area,
     .image-wrapper,
-    .social-icons,
-    .cv-button {
+    .social-icons {
       opacity: 0;
       transform: translateY(30px);
       animation: fadeInUp 2s ease forwards;
@@ -445,7 +492,6 @@
     .text-area { animation-delay: 0.5s; }
     .image-wrapper { animation-delay: 0.8s; }
     .social-icons { animation-delay: 1.1s; }
-    .cv-button { animation-delay: 1.4s; }
 
     .image-wrapper img {
       width: 100%;
@@ -486,7 +532,7 @@
 <section class="hero">
   <div class="text-area">
     <div class="main-title2">Hey I'm <span class="highlight glitch-glow">PRABOD</span></div>
-    <div class="main-title">I'm a&nbsp;&nbsp;<span class="highlight crazy-glitch" data-text="DESIGNER">DESIGNER</span></div>
+    <div class="main-title">I'm a  <span class="highlight crazy-glitch" data-text="DESIGNER">DESIGNER</span></div>
     <p class="description">I'm Prabod Saranga — I'm a passionate web designer focused on crafting clean, modern, and responsive websites. I specialize in photo editing — enhancing visuals with precision and emotion — and creative video editing.</p>
     <div class="social-icons">
       <a href="https://www.pinterest.com/prabodsarangaekanayaka/" target="_blank"><img src="res/icon/pinterest.svg" alt="Pinterest"></a>
@@ -539,9 +585,18 @@
     requestAnimationFrame(drawGalaxy);
   }
 
-  setTimeout(() => {
-    document.querySelector('.cv-button').classList.add('visible');
-  }, 3400);
+  // Get the CV button element
+  const cvButton = document.querySelector('.cv-button');
+
+  // Use animationend to trigger jiggle animation, enable pointer events, and ensure visibility after fadeInUp finishes
+  cvButton.addEventListener('animationend', (event) => {
+    if (event.animationName === 'fadeInUp') {
+      cvButton.classList.add('jiggle-active'); // Add the 'jiggle-active' class to start iconJiggle
+      cvButton.style.pointerEvents = 'auto';   // Enable pointer events after animation ends
+      cvButton.style.opacity = '1';           // Explicitly ensure opacity is 1
+    }
+  });
+
 
   // Inferno Animation
   const infernoCanvas = document.getElementById('infernoCanvas');
