@@ -23,21 +23,16 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-
-    /* Show canvas only on desktop */
-    @media (min-width: 769px) {
-      canvas#galaxy {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: -1;
-        background: #000;
-        will-change: transform;
-      }
+    canvas#galaxy {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: #000;
+      will-change: transform;
     }
-
     .container {
       position: fixed;
       top: 0;
@@ -47,7 +42,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem 5%;
-      background: rgba(255, 255, 255, 0);
+      background: rgba(0,0,0,0.4);
       z-index: 1000;
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
@@ -115,7 +110,7 @@
       left: 0;
       width: 100%;
       padding-top: 50px;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.9);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 1001;
@@ -244,6 +239,7 @@
       color: white;
       transform: scale(1.15);
     }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
@@ -257,6 +253,7 @@
       0%, 100% { opacity: 0.9; text-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
       50% { opacity: 1; text-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.3); }
     }
+
     @media (max-width: 768px) {
       nav { display: none; }
       .menu-toggle {
@@ -283,10 +280,7 @@
   </style>
 </head>
 <body>
-
-<!-- Canvas shown only on desktop -->
 <canvas id="galaxy"></canvas>
-
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
   <nav>
@@ -297,7 +291,6 @@
     <a href="contact.html" class="nav-item">Contact</a>
   </nav>
 </div>
-
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
   <a href="../index.html" class="nav-item">Home</a>
@@ -364,12 +357,14 @@
   const canvas = document.getElementById('galaxy');
   const ctx = canvas.getContext('2d');
   let w, h, stars = [];
+  let isMobile = window.innerWidth <= 768;
 
   function resize() {
-    if (!canvas) return;
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    stars = Array.from({ length: 400 }, () => ({
+    // Fewer stars on mobile
+    const starCount = isMobile ? 100 : 250;
+    stars = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       z: Math.random() * w
@@ -377,34 +372,38 @@
   }
 
   function draw() {
-    if (!canvas) return;
-    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillStyle = "rgba(10, 0, 25, 0.2)";
     ctx.fillRect(0, 0, w, h);
+
     const cx = w / 2, cy = h / 2;
+
     for (let s of stars) {
-      s.z -= 1.5;
+      s.z -= 1.2;
       if (s.z <= 0) s.z = w;
+
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
+
       if (x >= 0 && x < w && y >= 0 && y < h) {
-        const size = (1 - s.z / w) * 2;
+        const size = (1 - s.z / w) * 1.5;
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
         ctx.fill();
       }
     }
+
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize', resize);
-
-  // Only run canvas on desktop
-  if (window.innerWidth > 768) {
+  window.addEventListener('resize', () => {
+    isMobile = window.innerWidth <= 768;
     resize();
-    draw();
-  }
+  });
+
+  resize();
+  draw();
 
   function toggleMenu() {
     const nav = document.getElementById("mobileNav");
@@ -416,7 +415,7 @@
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
-    if (nav && nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
+    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
       nav.classList.remove("active");
       icon.textContent = "☰";
     }
