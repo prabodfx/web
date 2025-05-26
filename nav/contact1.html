@@ -63,8 +63,9 @@
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       z-index: 1;
-      opacity: 0; 
+      opacity: 1; 
       animation: fadeInUp 0.8s 0.2s ease-out forwards;
+      animation-fill-mode: forwards;
     }
 
     .contact-section {
@@ -291,6 +292,8 @@
       margin-right: auto;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      will-change: backdrop-filter;
+      transform: translateZ(0);
     }
 
     .contact-content-wrapper > .contact-form-main-card,
