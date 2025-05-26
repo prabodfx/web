@@ -202,7 +202,13 @@
 
     @media (max-width: 768px) {
       nav { display: none; }
-      .menu-toggle { display: block; }
+      .menu-toggle { 
+        display: block;
+        z-index: 100000 !important; /* Add !important */
+        position: fixed; /* Ensure it stays fixed */
+        top: 1rem;
+        right: 1rem; 
+      }
       .container {
         flex-direction: row;
         justify-content: space-between;
@@ -259,7 +265,6 @@
 
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
-  <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
   <nav>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
@@ -268,7 +273,7 @@
     <a href="contact.html">Contact</a>
   </nav>
 </div>
-
+<button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">Home</a>
   <a href="about.html">About</a>
