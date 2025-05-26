@@ -12,7 +12,6 @@
       --card-bg: rgba(255, 255, 255, 0.05);
       --card-hover: rgba(255, 255, 255, 0.1);
     }
-
     html, body {
       margin: 0;
       padding: 0;
@@ -24,7 +23,6 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-
     canvas#galaxy {
       position: fixed;
       top: 0;
@@ -33,9 +31,8 @@
       height: 100vh;
       z-index: -1;
       background: #000;
-      will-change: transform; /* Existing will-change for canvas */
+      will-change: transform;
     }
-
     .container {
       position: fixed;
       top: 0;
@@ -50,7 +47,6 @@
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
     }
-
     .corner-name {
       background: var(--main-color);
       padding: 8px 20px;
@@ -59,12 +55,10 @@
       box-shadow: var(--main-glow);
       margin-top: 1px;
     }
-
     nav {
       display: flex;
       gap: 2rem;
     }
-
     nav a {
       color: #fff;
       text-decoration: none;
@@ -73,7 +67,6 @@
       padding-bottom: 5px;
       transition: color 0.2s ease-out;
     }
-
     nav a::after {
       content: '';
       position: absolute;
@@ -84,27 +77,21 @@
       background-color: var(--main-color);
       transition: width 0.2s ease-out;
     }
-
     nav a:hover {
       color: var(--main-color);
     }
-
     nav a:hover::after {
       width: 100%;
     }
-
     .nav-item.active {
       color: red;
     }
-
     nav:hover .nav-item.active {
       color: white;
     }
-
     .nav-item:hover {
       color: red !important;
     }
-
     .menu-toggle {
       font-size: 1.8rem;
       background: none;
@@ -114,7 +101,6 @@
       display: none;
       z-index: 99990;
     }
-
     .mobile-nav {
       display: none;
       flex-direction: column;
@@ -129,12 +115,10 @@
       -webkit-backdrop-filter: blur(10px);
       z-index: 1001;
     }
-
     .mobile-nav.active {
       display: flex;
       animation: fadeInUp 0.4s ease forwards;
     }
-
     .mobile-nav a {
       margin: 12px 0;
       font-size: 1.2rem;
@@ -142,7 +126,6 @@
       color: white;
       text-decoration: none;
     }
-
     .services-section {
       margin-top: 4.5rem;
       margin-bottom: 40px;
@@ -150,13 +133,11 @@
       text-align: center;
       animation: fadeInUp 1s ease forwards;
     }
-
     .services-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 3rem;
     }
-
     .service-card {
       padding: 1.5rem;
       border-radius: 20px;
@@ -169,30 +150,25 @@
       flex-direction: column;
       align-items: center;
       text-align: left;
-      /* OPTIMIZATION: Enhanced will-change for service cards */
-      will-change: transform, box-shadow;
+      will-change: transform;
     }
-
     .service-card:hover {
       transform: translateY(-12px) scale(1.03);
       box-shadow: 0 15px 40px rgba(255, 0, 0, 0.4);
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 105, 180, 0.15));
     }
-
     .service-icon {
       width: 50px;
       height: 50px;
       margin-bottom: 1.5rem;
       flex-shrink: 0;
     }
-
     .service-title {
       font-size: 1.5rem;
       color: var(--main-color);
       margin-bottom: 1rem;
       font-weight: bold;
     }
-
     .premium-title {
       font-size: 3rem;
       text-align: center;
@@ -200,7 +176,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .gradient-text {
       background: linear-gradient(45deg, #ff0000, #ff6b6b, #ff0000);
       -webkit-background-clip: text;
@@ -211,7 +186,6 @@
       text-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
       animation: gradientFlow 3s ease infinite;
     }
-
     .glowing-text {
       color: #fff;
       text-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.6), 0 0 90px rgba(255, 0, 0, 0.4);
@@ -219,7 +193,6 @@
       letter-spacing: 4px;
       margin-top: -1.5rem;
     }
-
     .premium-subtitle {
       margin: -2rem auto 2.5rem;
       font-size: 1.2rem;
@@ -230,7 +203,6 @@
       text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
       animation: subtitleGlow 2s ease-in-out infinite;
     }
-
     .service-desc {
       font-size: 1rem;
       line-height: 1.6;
@@ -241,14 +213,12 @@
       position: relative;
       flex-grow: 1;
     }
-
     .service-desc li::before {
       content: "✦ ";
       color: var(--main-color);
       position: absolute;
       left: 0rem;
     }
-
     .hire-btn {
       background: linear-gradient(135deg, #ffffff, #f0f0f0);
       border: none;
@@ -263,14 +233,12 @@
       box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
       color: #333;
     }
-
     .hire-btn:hover {
       box-shadow: 0 8px 30px rgb(255, 0, 0);
       background: linear-gradient(135deg, #ef0909, #ff0000, #d60d0d);
       color: white;
       transform: scale(1.15);
     }
-
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -281,18 +249,15 @@
         transform: translateY(0);
       }
     }
-
     @keyframes gradientFlow {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     @keyframes subtitleGlow {
       0%, 100% { opacity: 0.9; text-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
       50% { opacity: 1; text-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.3); }
     }
-
     @media (max-width: 768px) {
       nav { display: none; }
       .menu-toggle {
@@ -320,7 +285,6 @@
 </head>
 <body>
 <canvas id="galaxy"></canvas>
-
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
   <nav>
@@ -331,7 +295,6 @@
     <a href="contact.html" class="nav-item">Contact</a>
   </nav>
 </div>
-
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
   <a href="../index.html" class="nav-item">Home</a>
@@ -340,7 +303,6 @@
   <a href="service.html" class="nav-item active">Service</a>
   <a href="contact.html" class="nav-item">Contact</a>
 </div>
-
 <section class="services-section">
   <h1 class="premium-title"><span class="gradient-text">My Services</span></h1>
   <p class="premium-subtitle">
@@ -400,14 +362,12 @@
   let w, h, stars = [];
   let isMobile = window.innerWidth <= 768;
 
-  // OPTIMIZATION: Cache DOM elements for menu toggle
-  const mobileNavElement = document.getElementById("mobileNav");
-  const menuIconElement = document.getElementById("menuIcon");
-
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    stars = Array.from({ length: isMobile ? 150 : 400 }, () => ({
+    // Reduced star count for better performance on mobile
+    const starCount = isMobile ? 100 : 300;
+    stars = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       z: Math.random() * w
@@ -415,52 +375,54 @@
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(10, 0, 25, 0.3)"; // Background trail
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
     ctx.fillRect(0, 0, w, h);
 
-    const cx = w / 2;
-    const cy = h / 2;
-
-    // OPTIMIZATION: Set star fillStyle once before the loop
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-
+    const cx = w / 2, cy = h / 2;
     for (let s of stars) {
       s.z -= 1.5;
       if (s.z <= 0) s.z = w;
-
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
 
       if (x >= 0 && x < w && y >= 0 && y < h) {
-        const size = (1 - s.z / w) * 2;
-        ctx.beginPath(); // beginPath is still needed for each distinct shape
+        const size = (1 - s.z / w) * 1.5; // Smaller max size
+        ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fill(); // fill will use the fillStyle set before the loop
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        ctx.fill();
       }
     }
     requestAnimationFrame(draw);
   }
 
+  // Debounced resize listener
+  let resizeTimeout;
   window.addEventListener('resize', () => {
-    isMobile = window.innerWidth <= 768;
-    resize();
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      isMobile = window.innerWidth <= 768;
+      resize();
+    }, 100);
   });
 
   resize();
   draw();
 
   function toggleMenu() {
-    // Use cached elements
-    mobileNavElement.classList.toggle("active");
-    menuIconElement.textContent = mobileNavElement.classList.contains("active") ? "✖" : "☰";
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    nav.classList.toggle("active");
+    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
   }
 
   document.addEventListener('click', function(e) {
-    // Use cached elements
-    if (mobileNavElement.classList.contains("active") && !mobileNavElement.contains(e.target) && e.target !== menuIconElement) {
-      mobileNavElement.classList.remove("active");
-      menuIconElement.textContent = "☰";
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
+      nav.classList.remove("active");
+      icon.textContent = "☰";
     }
   });
 </script>
