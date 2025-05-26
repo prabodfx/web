@@ -33,7 +33,7 @@
       height: 100vh;
       z-index: -1;
       background: #000;
-      will-change: transform;
+      will-change: transform; /* Existing will-change for canvas */
     }
 
     .container {
@@ -169,7 +169,8 @@
       flex-direction: column;
       align-items: center;
       text-align: left;
-      will-change: transform;
+      /* OPTIMIZATION: Enhanced will-change for service cards */
+      will-change: transform, box-shadow;
     }
 
     .service-card:hover {
@@ -399,6 +400,10 @@
   let w, h, stars = [];
   let isMobile = window.innerWidth <= 768;
 
+  // OPTIMIZATION: Cache DOM elements for menu toggle
+  const mobileNavElement = document.getElementById("mobileNav");
+  const menuIconElement = document.getElementById("menuIcon");
+
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
@@ -410,21 +415,28 @@
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)"; // Background trail
     ctx.fillRect(0, 0, w, h);
-    const cx = w / 2, cy = h / 2;
+
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // OPTIMIZATION: Set star fillStyle once before the loop
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+
     for (let s of stars) {
       s.z -= 1.5;
       if (s.z <= 0) s.z = w;
+
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
+
       if (x >= 0 && x < w && y >= 0 && y < h) {
         const size = (1 - s.z / w) * 2;
-        ctx.beginPath();
+        ctx.beginPath(); // beginPath is still needed for each distinct shape
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
-        ctx.fill();
+        ctx.fill(); // fill will use the fillStyle set before the loop
       }
     }
     requestAnimationFrame(draw);
@@ -439,18 +451,16 @@
   draw();
 
   function toggleMenu() {
-    const nav = document.getElementById("mobileNav");
-    const icon = document.getElementById("menuIcon");
-    nav.classList.toggle("active");
-    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+    // Use cached elements
+    mobileNavElement.classList.toggle("active");
+    menuIconElement.textContent = mobileNavElement.classList.contains("active") ? "✖" : "☰";
   }
 
   document.addEventListener('click', function(e) {
-    const nav = document.getElementById("mobileNav");
-    const icon = document.getElementById("menuIcon");
-    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
-      nav.classList.remove("active");
-      icon.textContent = "☰";
+    // Use cached elements
+    if (mobileNavElement.classList.contains("active") && !mobileNavElement.contains(e.target) && e.target !== menuIconElement) {
+      mobileNavElement.classList.remove("active");
+      menuIconElement.textContent = "☰";
     }
   });
 </script>
