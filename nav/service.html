@@ -32,6 +32,9 @@
       z-index: -1;
       background: #000;
       will-change: transform;
+      image-rendering: auto;
+      backface-visibility: hidden;
+      transform: translateZ(0);
     }
     .container {
       position: fixed;
@@ -365,8 +368,8 @@
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    // Reduced star count for better performance on mobile
-    const starCount = isMobile ? 100 : 300;
+    // Reduced star count for mobile
+    const starCount = isMobile ? 80 : 200;
     stars = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -375,7 +378,7 @@
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillStyle = "rgba(10, 0, 25, 0.2)";
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2, cy = h / 2;
@@ -387,24 +390,26 @@
       const y = (s.y - cy) * k + cy;
 
       if (x >= 0 && x < w && y >= 0 && y < h) {
-        const size = (1 - s.z / w) * 1.5; // Smaller max size
+        const size = (1 - s.z / w) * 1.5;
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
         ctx.fill();
       }
     }
     requestAnimationFrame(draw);
   }
 
-  // Debounced resize listener
-  let resizeTimeout;
+  let ticking = false;
   window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      isMobile = window.innerWidth <= 768;
-      resize();
-    }, 100);
+    isMobile = window.innerWidth <= 768;
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        resize();
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
 
   resize();
