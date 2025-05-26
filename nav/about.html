@@ -85,6 +85,26 @@
       width: 100%;
     }
 
+    .nav-item {
+      color: white;
+      margin: 0 20px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: red;
+    }
+
+    nav:hover .nav-item.active {
+      color: white;
+    }
+
+    .nav-item:hover {
+      color: red !important;
+    }
+
     .menu-toggle {
       font-size: 1.8rem;
       background: none;
@@ -176,23 +196,37 @@
 <div class="container" id="mainContainer">
   <div class="corner-name">Prabod Saranga</div>
   <nav>
-    <a href="../index.html">Home</a>
-    <a href="about.html"><font style="color:red;">About</a></font>
-    <a href="skill.html">Skills</a>
-    <a href="service.html">Service</a>
-    <a href="contact.html">Contact</a>
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="skill.html" class="nav-item active">Skill</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item">Contact</a>
   </nav>
 </div>
-
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
-
-<!-- Mobile nav menu -->
 <div class="mobile-nav" id="mobileNav">
-  <a href="../index.html">Home</a>
-  <a href="about.html"><font style="color:red;">About</a></font>
-  <a href="skill.html">Skills</a>
-  <a href="service.html">Service</a>
-  <a href="contact.html">Contact</a>
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="skill.html" class="nav-item active">Skill</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item">Contact</a>
+</div>>
+  <div class="corner-name">Prabod Saranga</div>
+  <nav>
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="skill.html" class="nav-item active">Skill</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item">Contact</a>
+  </nav>
+</div>
+<button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="skill.html" class="nav-item active">Skill</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item">Contact</a>
 </div>
 
 <section class="about-section" id="aboutSection">
