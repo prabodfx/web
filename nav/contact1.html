@@ -125,6 +125,26 @@
     nav a:hover::after {
       width: 100%;
     }
+
+    .nav-item {
+      color: white;
+      margin: 0 20px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: red;
+    }
+
+    nav:hover .nav-item.active {
+      color: white;
+    }
+
+    .nav-item:hover {
+      color: red !important;
+    }
     .menu-toggle {
       font-size: 1.8rem;
       background: none;
@@ -514,20 +534,20 @@
     Prabod Saranga
   </div>
   <nav>
-    <a href="../index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="skill.html">Skills</a>
-    <a href="service.html">Service</a>
-    <a href="contact.html"><font style="color:red;">Contact</a></font> 
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="skill.html" class="nav-item">Skill</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item active">Contact</a>
   </nav>
 </div>
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
-  <a href="../index.html">Home</a>
-  <a href="about.html">About</a>
-  <a href="skill.html">Skills</a>
-  <a href="service.html">Service</a>
-  <a href="contact.html"><font style="color:red;">Contact</a></font> 
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="skill.html" class="nav-item">Skill</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item active">Contact</a>
 </div>
 
 <div class="scroll-content-wrapper">
