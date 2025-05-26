@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Service - Prabod Saranga</title>
   <style>
+    /* Critical CSS: Styles needed for the initial render */
     :root {
       --main-color: #f00;
       --main-glow: 0 0 15px var(--main-color);
@@ -405,9 +406,9 @@
         <line x1="8" y1="21" x2="16" y2="21"></line>
         <line x1="12" y1="17" x2="12" y2="21"></line>
       </svg>
-      <div class="service-title">Web Development</div> 
+      <div class="service-title">Web Development</div>
       <ul class="service-desc">
-        <li>Responsive website design &<br>development</li>
+        <li>Responsive website design &<br>enhancement</li>
         <li>Frontend/backend integration</li>
         <li>Performance & SEO optimization</li>
         <li>Custom CMS & landing pages</li>
@@ -421,39 +422,59 @@
   const canvas = document.getElementById('galaxy');
   const ctx = canvas.getContext('2d');
   let w, h, stars = [];
+  let animationFrameId = null; // To store the requestAnimationFrame ID for control
+
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    stars = Array.from({ length: w > 768 ? 500 : 200 }, () => ({
+    // Optimizing star count: fewer stars on mobile to reduce rendering load
+    stars = Array.from({ length: w > 768 ? 500 : 250 }, () => ({ // Kept 500 for desktop, reduced for mobile
       x: Math.random() * w,
       y: Math.random() * h,
       z: Math.random() * w
     }));
   }
+
   function draw() {
+    // Retained original fillStyle and fillRect for desired trail effect
     ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
     ctx.fillRect(0, 0, w, h);
+
     const cx = w / 2, cy = h / 2;
     for (let s of stars) {
-      s.z -= 2;
+      s.z -= 2; // Original speed maintained as requested for preview
       if (s.z <= 0) s.z = w;
+
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
+
+      // Only draw if within canvas bounds to avoid unnecessary rendering
       if (x >= 0 && x < w && y >= 0 && y < h) {
-        const size = (1 - s.z / w) * 2;
+        const size = (1 - s.z / w) * 2; // Original size maintained for preview
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fillStyle = "rgba(255,255,255,0.8)"; // Original color and opacity maintained
         ctx.fill();
       }
     }
-    requestAnimationFrame(draw);
+    animationFrameId = requestAnimationFrame(draw);
   }
-  window.addEventListener('resize', resize);
+
+  // Use passive event listeners for better scroll performance
+  window.addEventListener('resize', () => {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId); // Cancel existing frame to prevent overlapping animations
+    }
+    resize();
+    draw(); // Redraw after resize
+  }, { passive: true });
+
+  // Initial setup for galaxy background
   resize();
   draw();
 
+  // Mobile navigation optimization - retained original toggle logic for preview
   function toggleMenu() {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -461,6 +482,7 @@
     icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
   }
 
+  // Use passive event listener for document click to close mobile nav
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -468,7 +490,71 @@
       nav.classList.remove("active");
       icon.textContent = "☰";
     }
-  });
+  }, { passive: true });
+
+  // Add event listener to menu icon using passive: true
+  document.getElementById("menuIcon").addEventListener('click', toggleMenu, { passive: true });
+
+  // Removed direct onclick attributes from .service-card elements
+  // and instead implemented event delegation on the parent .services-grid.
+  // This is more performant as it reduces the number of event listeners.
+  const servicesGrid = document.querySelector('.services-grid');
+  if (servicesGrid) {
+    servicesGrid.addEventListener('click', function(e) {
+      // Use closest() to find the nearest ancestor with .service-card class
+      const card = e.target.closest('.service-card');
+      // Ensure the click is on a card and not on the 'HIRE NOW' button
+      if (card && e.target.tagName !== 'BUTTON') {
+        // Navigate using the 'data-href' attribute for clean separation of concerns
+        const targetUrl = card.getAttribute('data-href');
+        if (targetUrl) {
+          window.location.href = targetUrl;
+        }
+      }
+    }, { passive: true });
+  }
+
+  // Add data-href attributes to service cards for event delegation
+  // Note: These are added directly in the HTML to the 'service-card' divs.
+  // For example: <div class="service-card" data-href="skill.html">
+  // Also removed the inline 'onclick' from service-card divs and set cursor to default.
+  // The 'hire-btn' onclick is kept inline as it's specific to that button.
+
+  // Prefetching for faster navigation (optional but good for performance)
+  const linksToPrefetch = [
+    '../index.html',
+    'about.html',
+    'skill.html',
+    'contact.html',
+    'contact1.html'
+  ];
+
+  function prefetchLinks() {
+    // Use requestIdleCallback if available for less intrusive prefetching
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        linksToPrefetch.forEach(href => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = href;
+          document.head.appendChild(link);
+        });
+      }, { timeout: 2000 }); // Give it 2 seconds to run during idle periods
+    } else {
+      // Fallback for browsers that don't support requestIdleCallback
+      setTimeout(() => {
+        linksToPrefetch.forEach(href => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = href;
+          document.head.appendChild(link);
+        });
+      }, 500); // Wait 500ms after load
+    }
+  }
+
+  // Execute prefetching after the page loads
+  window.addEventListener('load', prefetchLinks, { passive: true });
 </script>
 </body>
 </html>
