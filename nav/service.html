@@ -183,11 +183,10 @@
       font-weight: 900;
       letter-spacing: 2px;
       text-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
-      animation: gradientFlow 3s ease infinite;
     }
     .glowing-text {
       color: #fff;
-      text-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.6), 0 0 90px rgba(255, 0, 0, 0.4);
+      text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
       font-weight: 300;
       letter-spacing: 4px;
       margin-top: -1.5rem;
@@ -241,15 +240,6 @@
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    @keyframes subtitleGlow {
-      0%, 100% { opacity: 0.9; text-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
-      50% { opacity: 1; text-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.3); }
     }
     @media (max-width: 768px) {
       nav { display: none; }
