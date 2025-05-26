@@ -13,7 +13,7 @@
       --card-hover: rgba(255, 255, 255, 0.1);
     }
 
-    body, html {
+    html, body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -21,6 +21,8 @@
       color: #fff;
       overflow-x: hidden;
       height: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     canvas#galaxy {
@@ -31,6 +33,7 @@
       height: 100vh;
       z-index: -1;
       background: #000;
+      will-change: transform;
     }
 
     .container {
@@ -39,19 +42,19 @@
       left: 0;
       right: 0;
       display: flex;
-      backdrop-filter: blur(3px);
       justify-content: space-between;
       align-items: center;
       padding: 1rem 5%;
       background: rgba(255, 255, 255, 0);
       z-index: 1000;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
 
     .corner-name {
       background: var(--main-color);
       padding: 8px 20px;
       border-radius: 25px;
-      color: #fff;
       font-weight: bold;
       box-shadow: var(--main-glow);
       margin-top: 1px;
@@ -66,12 +69,28 @@
       color: #fff;
       text-decoration: none;
       font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.2s ease-out;
     }
 
-    .nav-item {
-      color: white;
-      text-decoration: none;
-      transition: color 0.3s ease;
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.2s ease-out;
+    }
+
+    nav a:hover {
+      color: var(--main-color);
+    }
+
+    nav a:hover::after {
+      width: 100%;
     }
 
     .nav-item.active {
@@ -107,33 +126,8 @@
       padding-top: 50px;
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       z-index: 1001;
-    }
-
-    nav a {
-      color: var(--text-color);
-      text-decoration: none;
-      font-weight: bold;
-      position: relative;
-      padding-bottom: 5px;
-      transition: color 0.3s ease;
-    }
-
-    nav a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background-color: var(--main-color);
-      transition: width 0.3s ease;
-    }
-    nav a:hover {
-      color: var(--main-color);
-    }
-    nav a:hover::after {
-      width: 100%;
     }
 
     .mobile-nav.active {
@@ -163,12 +157,11 @@
       gap: 3rem;
     }
 
-    /* PREMIUM CARD STYLES START HERE */
     .service-card {
       padding: 1.5rem;
       border-radius: 20px;
       box-shadow: 0 8px 25px rgba(255, 0, 0, 0.2);
-      transition: all 0.4s ease-in-out;
+      transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 105, 180, 0.05));
       backdrop-filter: blur(12px);
@@ -176,19 +169,20 @@
       flex-direction: column;
       align-items: center;
       text-align: left;
+      will-change: transform;
     }
 
     .service-card:hover {
       transform: translateY(-12px) scale(1.03);
       box-shadow: 0 15px 40px rgba(255, 0, 0, 0.4);
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 105, 180, 0.15));
-      backdrop-filter: blur(10px);
     }
 
     .service-icon {
       width: 50px;
       height: 50px;
       margin-bottom: 1.5rem;
+      flex-shrink: 0;
     }
 
     .service-title {
@@ -198,11 +192,9 @@
       font-weight: bold;
     }
 
-    /* New Premium Text Styles */
     .premium-title {
       font-size: 3rem;
       text-align: center;
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -221,12 +213,9 @@
 
     .glowing-text {
       color: #fff;
-      text-shadow: 0 0 30px rgba(255, 0, 0, 0.8),
-                   0 0 60px rgba(255, 0, 0, 0.6),
-                   0 0 90px rgba(255, 0, 0, 0.4);
+      text-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.6), 0 0 90px rgba(255, 0, 0, 0.4);
       font-weight: 300;
       letter-spacing: 4px;
-      position: relative;
       margin-top: -1.5rem;
     }
 
@@ -239,17 +228,6 @@
       color: transparent;
       text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
       animation: subtitleGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes subtitleGlow {
-      0%, 100% { opacity: 0.9; text-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
-      50% { opacity: 1; text-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.3); }
     }
 
     .service-desc {
@@ -278,23 +256,18 @@
       margin-top: 30px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.4s ease;
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
       color: #333;
     }
 
-    .hire-btn span {
-      position: relative;
-      z-index: 2;
-    }
-
     .hire-btn:hover {
       box-shadow: 0 8px 30px rgb(255, 0, 0);
       background: linear-gradient(135deg, #ef0909, #ff0000, #d60d0d);
       color: white;
-      scale: 1.15;
+      transform: scale(1.15);
     }
 
     @keyframes fadeInUp {
@@ -308,11 +281,21 @@
       }
     }
 
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes subtitleGlow {
+      0%, 100% { opacity: 0.9; text-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
+      50% { opacity: 1; text-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.3); }
+    }
+
     @media (max-width: 768px) {
       nav { display: none; }
       .menu-toggle {
         display: block;
-        z-index: 100000 !important;
         position: fixed;
         top: 7px;
         right: 1rem;
@@ -320,30 +303,23 @@
       .container {
         flex-direction: row;
         justify-content: space-between;
-        backdrop-filter: blur(3px);
       }
       .corner-name {
         margin-right: auto;
       }
-      .service-card {
-        min-height: auto;
-      }
-      .services-grid{
-        width: 80%;
+      .services-grid {
+        width: 85%;
         margin: 0 auto;
       }
       .premium-title {
-        font-size: 3rem;
-        margin-bottom: 50px;
-      }
-      .glowing-text {
-        letter-spacing: 0.5px
+        font-size: 2.5rem;
       }
     }
   </style>
 </head>
 <body>
 <canvas id="galaxy"></canvas>
+
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
   <nav>
@@ -354,6 +330,7 @@
     <a href="contact.html" class="nav-item">Contact</a>
   </nav>
 </div>
+
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
   <a href="../index.html" class="nav-item">Home</a>
@@ -362,10 +339,9 @@
   <a href="service.html" class="nav-item active">Service</a>
   <a href="contact.html" class="nav-item">Contact</a>
 </div>
+
 <section class="services-section">
-  <h1 class="premium-title">
-    <span class="gradient-text">My Services</span>
-  </h1>
+  <h1 class="premium-title"><span class="gradient-text">My Services</span></h1>
   <p class="premium-subtitle">
     <span class="glowing-text">Crafting digital excellence through innovative solutions. Discover my exclusive offerings:</span>
   </p>
@@ -419,17 +395,14 @@
 
 <script>
   const canvas = document.getElementById('galaxy');
-  const ctx = canvas.getContext('2d', { willReadFrequently: false }); //
+  const ctx = canvas.getContext('2d');
   let w, h, stars = [];
-  let animationFrameId = null;
+  let isMobile = window.innerWidth <= 768;
 
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-
-    // Reduce star count significantly for mobile while keeping enough for the effect
-    const numStars = w > 768 ? 400 : 80; // Changed from 500 to 400 (desktop) and 200 to 80 (mobile)
-    stars = Array.from({ length: numStars }, () => ({
+    stars = Array.from({ length: isMobile ? 150 : 400 }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       z: Math.random() * w
@@ -437,24 +410,16 @@
   }
 
   function draw() {
-    // Optimized drawing for performance:
-    // Instead of completely clearing and redrawing, use a highly transparent overlay
-    // This maintains the trail effect while reducing redraw cost per frame.
-    ctx.fillStyle = "rgba(10, 0, 25, 0.1)"; // Less opaque to reduce blending cost, still provides trail
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
     ctx.fillRect(0, 0, w, h);
-
     const cx = w / 2, cy = h / 2;
-    for (let i = 0; i < stars.length; i++) { // Using traditional for loop for slight performance gain
-      const s = stars[i];
-      s.z -= 2;
+    for (let s of stars) {
+      s.z -= 1.5;
       if (s.z <= 0) s.z = w;
-
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
-
-      // Conditional drawing for elements visible on screen
-      if (x >= -2 && x < w + 2 && y >= -2 && y < h + 2) { // Add small buffer for partial visibility
+      if (x >= 0 && x < w && y >= 0 && y < h) {
         const size = (1 - s.z / w) * 2;
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
@@ -462,19 +427,14 @@
         ctx.fill();
       }
     }
-    animationFrameId = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
 
-  // Use passive event listeners for 'resize' and control animation frames
   window.addEventListener('resize', () => {
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-    }
+    isMobile = window.innerWidth <= 768;
     resize();
-    draw();
-  }, { passive: true });
+  });
 
-  // Initial setup for galaxy background
   resize();
   draw();
 
@@ -485,7 +445,6 @@
     icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
   }
 
-  // Use passive event listeners for better mobile responsiveness
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -493,56 +452,7 @@
       nav.classList.remove("active");
       icon.textContent = "☰";
     }
-  }, { passive: true });
-
-  document.getElementById("menuIcon").addEventListener('click', toggleMenu, { passive: true });
-
-  // Event delegation for service cards, using data-href
-  const servicesGrid = document.querySelector('.services-grid');
-  if (servicesGrid) {
-    servicesGrid.addEventListener('click', function(e) {
-      const card = e.target.closest('.service-card');
-      if (card && e.target.tagName !== 'BUTTON') {
-        const targetUrl = card.getAttribute('onclick').replace("location.href='", "").replace("';", ""); // Extract URL from inline onclick
-        if (targetUrl) {
-          location.href = targetUrl; // Use location.href for navigation
-        }
-      }
-    }, { passive: true });
-  }
-
-  // Prefetching for faster navigation (optional but good for performance)
-  const linksToPrefetch = [
-    '../index.html',
-    'about.html',
-    'skill.html',
-    'contact.html',
-    'contact1.html'
-  ];
-
-  function prefetchLinks() {
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        linksToPrefetch.forEach(href => {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.href = href;
-          document.head.appendChild(link);
-        });
-      }, { timeout: 2000 });
-    } else {
-      setTimeout(() => {
-        linksToPrefetch.forEach(href => {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.href = href;
-          document.head.appendChild(link);
-        });
-      }, 500);
-    }
-  }
-
-  window.addEventListener('load', prefetchLinks, { passive: true });
+  });
 </script>
 </body>
 </html>
