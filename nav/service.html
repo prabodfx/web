@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Service - Prabod Saranga</title>
   <style>
-    /* Critical CSS: Styles needed for the initial render */
     :root {
       --main-color: #f00;
       --main-glow: 0 0 15px var(--main-color);
@@ -420,15 +419,17 @@
 
 <script>
   const canvas = document.getElementById('galaxy');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: false }); //
   let w, h, stars = [];
-  let animationFrameId = null; // To store the requestAnimationFrame ID for control
+  let animationFrameId = null;
 
   function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    // Optimizing star count: fewer stars on mobile to reduce rendering load
-    stars = Array.from({ length: w > 768 ? 500 : 250 }, () => ({ // Kept 500 for desktop, reduced for mobile
+
+    // Reduce star count significantly for mobile while keeping enough for the effect
+    const numStars = w > 768 ? 400 : 80; // Changed from 500 to 400 (desktop) and 200 to 80 (mobile)
+    stars = Array.from({ length: numStars }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       z: Math.random() * w
@@ -436,45 +437,47 @@
   }
 
   function draw() {
-    // Retained original fillStyle and fillRect for desired trail effect
-    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    // Optimized drawing for performance:
+    // Instead of completely clearing and redrawing, use a highly transparent overlay
+    // This maintains the trail effect while reducing redraw cost per frame.
+    ctx.fillStyle = "rgba(10, 0, 25, 0.1)"; // Less opaque to reduce blending cost, still provides trail
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2, cy = h / 2;
-    for (let s of stars) {
-      s.z -= 2; // Original speed maintained as requested for preview
+    for (let i = 0; i < stars.length; i++) { // Using traditional for loop for slight performance gain
+      const s = stars[i];
+      s.z -= 2;
       if (s.z <= 0) s.z = w;
 
       const k = w / s.z;
       const x = (s.x - cx) * k + cx;
       const y = (s.y - cy) * k + cy;
 
-      // Only draw if within canvas bounds to avoid unnecessary rendering
-      if (x >= 0 && x < w && y >= 0 && y < h) {
-        const size = (1 - s.z / w) * 2; // Original size maintained for preview
+      // Conditional drawing for elements visible on screen
+      if (x >= -2 && x < w + 2 && y >= -2 && y < h + 2) { // Add small buffer for partial visibility
+        const size = (1 - s.z / w) * 2;
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255,0.8)"; // Original color and opacity maintained
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
         ctx.fill();
       }
     }
     animationFrameId = requestAnimationFrame(draw);
   }
 
-  // Use passive event listeners for better scroll performance
+  // Use passive event listeners for 'resize' and control animation frames
   window.addEventListener('resize', () => {
     if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId); // Cancel existing frame to prevent overlapping animations
+      cancelAnimationFrame(animationFrameId);
     }
     resize();
-    draw(); // Redraw after resize
+    draw();
   }, { passive: true });
 
   // Initial setup for galaxy background
   resize();
   draw();
 
-  // Mobile navigation optimization - retained original toggle logic for preview
   function toggleMenu() {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -482,7 +485,7 @@
     icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
   }
 
-  // Use passive event listener for document click to close mobile nav
+  // Use passive event listeners for better mobile responsiveness
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -492,33 +495,21 @@
     }
   }, { passive: true });
 
-  // Add event listener to menu icon using passive: true
   document.getElementById("menuIcon").addEventListener('click', toggleMenu, { passive: true });
 
-  // Removed direct onclick attributes from .service-card elements
-  // and instead implemented event delegation on the parent .services-grid.
-  // This is more performant as it reduces the number of event listeners.
+  // Event delegation for service cards, using data-href
   const servicesGrid = document.querySelector('.services-grid');
   if (servicesGrid) {
     servicesGrid.addEventListener('click', function(e) {
-      // Use closest() to find the nearest ancestor with .service-card class
       const card = e.target.closest('.service-card');
-      // Ensure the click is on a card and not on the 'HIRE NOW' button
       if (card && e.target.tagName !== 'BUTTON') {
-        // Navigate using the 'data-href' attribute for clean separation of concerns
-        const targetUrl = card.getAttribute('data-href');
+        const targetUrl = card.getAttribute('onclick').replace("location.href='", "").replace("';", ""); // Extract URL from inline onclick
         if (targetUrl) {
-          window.location.href = targetUrl;
+          location.href = targetUrl; // Use location.href for navigation
         }
       }
     }, { passive: true });
   }
-
-  // Add data-href attributes to service cards for event delegation
-  // Note: These are added directly in the HTML to the 'service-card' divs.
-  // For example: <div class="service-card" data-href="skill.html">
-  // Also removed the inline 'onclick' from service-card divs and set cursor to default.
-  // The 'hire-btn' onclick is kept inline as it's specific to that button.
 
   // Prefetching for faster navigation (optional but good for performance)
   const linksToPrefetch = [
@@ -530,7 +521,6 @@
   ];
 
   function prefetchLinks() {
-    // Use requestIdleCallback if available for less intrusive prefetching
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
         linksToPrefetch.forEach(href => {
@@ -539,9 +529,8 @@
           link.href = href;
           document.head.appendChild(link);
         });
-      }, { timeout: 2000 }); // Give it 2 seconds to run during idle periods
+      }, { timeout: 2000 });
     } else {
-      // Fallback for browsers that don't support requestIdleCallback
       setTimeout(() => {
         linksToPrefetch.forEach(href => {
           const link = document.createElement('link');
@@ -549,11 +538,10 @@
           link.href = href;
           document.head.appendChild(link);
         });
-      }, 500); // Wait 500ms after load
+      }, 500);
     }
   }
 
-  // Execute prefetching after the page loads
   window.addEventListener('load', prefetchLinks, { passive: true });
 </script>
 </body>
