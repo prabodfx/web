@@ -79,9 +79,16 @@
       }
     }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
       height: 100%;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       overflow-x: hidden;
       background: transparent;
       color: #fff;
@@ -132,6 +139,125 @@
       cursor: pointer;
       display: none;
       z-index: 1001;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(20px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .modal-overlay.fade-out {
+      animation: fadeOut 0.3s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    .modal-card {
+      width: 90%;
+      max-width: 360px;
+      padding: 36px 28px 30px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255, 0, 0, 0.16), rgba(90, 0, 0, 0.14));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 20px 40px rgba(255, 0, 0, 0.25),
+        0 0 0 1px rgb(255, 0, 0);
+      border: 1px solid rgb(255, 0, 0);
+      backdrop-filter: blur(28px);
+      text-align: center;
+      color: white;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .modal-card:hover {
+      transform: scale(1.015);
+      box-shadow:
+        inset 0 1px 0 rgb(255, 0, 0),
+        0 28px 60px rgba(255, 0, 0, 0.443);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 26px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .close-btn:hover {
+      opacity: 1;
+    }
+
+    .modal-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      background: linear-gradient(to right, #ff4c4c, #ff0000);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-text {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 28px;
+      line-height: 1.6;
+      padding: 0 10px;
+    }
+
+    .ok-btn {
+      padding: 13px 36px;
+      background: white;
+      color: #cc0000;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 0, 0, 0.25);
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .ok-btn:hover {
+      background: #fff2f2;
+      transform: scale(1.06);
+    }
+
+    @media (max-width: 400px) {
+      .modal-card {
+        padding: 30px 22px 24px;
+        border-radius: 22px;
+      }
+
+      .modal-title {
+        font-size: 24px;
+      }
+
+      .modal-text {
+        font-size: 15px;
+      }
     }
 
     nav {
@@ -336,33 +462,24 @@
       border-radius: 6px;
       cursor: pointer;
       box-shadow: var(--main-glow);
-      
-      /* Base transition for transform and box-shadow */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
-      
-      /* Initial state for fadeInUp animation */
       opacity: 0; 
       transform: translateY(30px); 
       
-      /* Apply initial fadeInUp animation with its delay */
-      animation: fadeInUp 2s ease forwards 1.4s;
-      
-      /* Disable pointer events initially */
+
+      animation: fadeInUp 2s ease forwards 1.4s;     
       pointer-events: none;
     }
 
-    /* This class will be added via JS when fadeInUp is complete to start jiggle */
     .cv-button.jiggle-active {
       animation: iconJiggle 2s ease infinite;
-      /* Ensure transition remains active during jiggle */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
     .cv-button:hover {
-      animation: none !important; /* Stop any animation (including jiggle) on hover */
-      transform: scale(1.05) translateY(0) !important; /* Scale and ensure no vertical shift */
+      animation: none !important; 
+      transform: scale(1.05) translateY(0) !important; 
       box-shadow: var(--main-glow-hover) !important;
-      /* Ensure transition is applied on hover */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
@@ -370,8 +487,8 @@
       nav { display: none; }
       .menu-toggle { 
         display: block;
-        z-index: 100000 !important; /* Add !important */
-        position: fixed; /* Ensure it stays fixed */
+        z-index: 100000 !important; 
+        position: fixed;
         top: 0.6rem;
         right: 1rem;
        }
@@ -455,9 +572,8 @@
 
     .glitch-glow {
       animation: glitchGlow 2.5s infinite ease-in-out;
-      /* Optimize for performance */
       will-change: transform, text-shadow;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0);
     }
 
     @keyframes glitchBase {
@@ -496,7 +612,6 @@
       }
     }
 
-    /* Initial state for elements that should animate in */
     .container,
     .text-area,
     .image-wrapper,
@@ -528,6 +643,33 @@
   </style>
 </head>
 <body>
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="close-btn" onclick="closeModal()">&times;</div>
+      <div class="modal-title">WELCOME</div><br>
+      <div class="modal-text">
+        Texts and Some Things on this Website <br>
+        allow you to Secretly go to other pages <br>
+        without using Navigations. ✨
+      </div>
+      <br>
+      <button class="ok-btn" onclick="closeModal()">Got it</button>
+    </div>
+  </div>
+
+  <script>
+    function closeModal() {
+      const overlay = document.querySelector('.modal-overlay');
+      overlay.classList.add('fade-out');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 300);
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === "Escape") closeModal();
+    });
+  </script>
 <canvas id="galaxy"></canvas>
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
