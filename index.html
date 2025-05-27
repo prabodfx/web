@@ -254,11 +254,13 @@
       .modal-title {
         font-size: 24px;
         font-weight: 1000;
-        background: var(--main-color);
+        background: linear-gradient(to right, #ffffff, #000000);
         color: #fff;
-        padding: 8px 20px;
+        padding: 8px 10px;
         border-radius: 25px;
-        box-shadow: var(--main-glow);    
+        box-shadow: var(--main-glow);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: var(--main-color);
       }
 
       .modal-text {
