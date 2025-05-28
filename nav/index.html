@@ -108,6 +108,7 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 1rem 5%;
+      padding-bottom: 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -327,7 +328,7 @@
     }
 
     .cv-button {
-      margin-top: 2rem;
+      margin-top: 2.4rem;
       padding: 0.8rem 2rem;
       font-size: 1rem;
       background: var(--main-color);
@@ -336,33 +337,21 @@
       border-radius: 6px;
       cursor: pointer;
       box-shadow: var(--main-glow);
-      
-      /* Base transition for transform and box-shadow */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
-      
-      /* Initial state for fadeInUp animation */
       opacity: 0; 
       transform: translateY(30px); 
-      
-      /* Apply initial fadeInUp animation with its delay */
       animation: fadeInUp 2s ease forwards 1.4s;
-      
-      /* Disable pointer events initially */
       pointer-events: none;
     }
-
-    /* This class will be added via JS when fadeInUp is complete to start jiggle */
     .cv-button.jiggle-active {
       animation: iconJiggle 2s ease infinite;
-      /* Ensure transition remains active during jiggle */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
     .cv-button:hover {
-      animation: none !important; /* Stop any animation (including jiggle) on hover */
-      transform: scale(1.05) translateY(0) !important; /* Scale and ensure no vertical shift */
+      animation: none !important;
+      transform: scale(1.05) translateY(0) !important;
       box-shadow: var(--main-glow-hover) !important;
-      /* Ensure transition is applied on hover */
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
@@ -370,8 +359,8 @@
       nav { display: none; }
       .menu-toggle { 
         display: block;
-        z-index: 100000 !important; /* Add !important */
-        position: fixed; /* Ensure it stays fixed */
+        z-index: 100000 !important; 
+        position: fixed;
         top: 0.6rem;
         right: 1rem;
        }
@@ -422,9 +411,8 @@
       color: red;
       position: relative;
       animation: glitchBase 1.7s infinite steps(1);
-      /* Optimize for performance */
       will-change: transform, text-shadow, clip;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0); 
     }
 
     .crazy-glitch::before,
@@ -436,9 +424,8 @@
       width: 100%;
       opacity: 0.8;
       clip: rect(0, 900px, 0, 0);
-      /* Optimize for performance */
       will-change: transform, clip;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0); 
     }
 
     .crazy-glitch::before {
@@ -455,9 +442,8 @@
 
     .glitch-glow {
       animation: glitchGlow 2.5s infinite ease-in-out;
-      /* Optimize for performance */
       will-change: transform, text-shadow;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0); 
     }
 
     @keyframes glitchBase {
@@ -496,7 +482,6 @@
       }
     }
 
-    /* Initial state for elements that should animate in */
     .container,
     .text-area,
     .image-wrapper,
