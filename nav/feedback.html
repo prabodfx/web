@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* Root variables for consistent theming */
     :root {
       --main-color: #f00;
       --main-glow: 0 0 15px var(--main-color);
@@ -18,32 +17,29 @@
       --border-color: rgba(255, 255, 255, 0.1);
       --text-color: #e0e0e0;
       --heading-color: #ffffff;
-      --secondary-text-color: #c0c0c0; /* Lighter grey for subtle text */
+      --secondary-text-color: #c0c0c0; 
     }
 
-    /* Base body and HTML styles */
     body, html {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
       color: var(--text-color);
-      overflow: hidden; /* Prevent body scroll, content handled by wrapper */
+      overflow: hidden; 
       height: 100%;
-      background: #0c0c14; /* Dark background for space theme */
+      background: #0c0c14; 
     }
 
-    /* Galaxy background canvas styles */
     canvas#galaxy {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: -1; /* Behind other content */
+      z-index: -1; 
       background: #000;
     }
 
-    /* Main container for header */
     .container {
       display: flex;
       justify-content: space-between;
@@ -56,24 +52,23 @@
       top: 0;
       left: 0;
       z-index: 100;
-      background: rgba(0, 0, 0, 0); /* Transparent background */
+      background: rgba(0, 0, 0, 0); 
       box-sizing: border-box;
       height: 4rem;
     }
 
-    /* Wrapper for scrollable content */
     .scroll-content-wrapper {
       position: absolute;
-      top: 3.8rem; /* Below the header */
+      top: 3.8rem; 
       left: 0;
       right: 0;
       bottom: 0;
-      overflow-y: auto; /* Enable vertical scrolling */
-      overflow-x: hidden; /* Hide horizontal scrollbar */
-      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+      overflow-y: auto; 
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; 
       z-index: 1;
       opacity: 1;
-      animation: fadeInUp 0.8s 0.2s ease-out forwards; /* Fade in animation */
+      animation: fadeInUp 0.8s 0.2s ease-out forwards; 
       animation-fill-mode: forwards;
     }
 
@@ -92,16 +87,14 @@
         background: var(--main-glow-hover);
     }
 
-    /* Feedback section layout */
     .feedback-section {
       padding: 0rem 1% 0;
       text-align: center;
       max-width: 1400px;
       margin: 0 auto;
-      padding-bottom: 50px; /* Add some padding at the bottom for scroll */
+      padding-bottom: 50px;
     }
 
-    /* Section title styling */
     .section-title {
       font-family: 'Poppins', sans-serif;
       font-size: 2.5rem;
@@ -112,17 +105,15 @@
       animation: fadeInUp 0.5s 0.3s ease-out forwards;
     }
 
-    /* Container for feedback cards */
     .cards-container {
-      display: flex; /* Changed to flex for horizontal layout */
+      display: flex; 
       justify-content: center;
       gap: 2rem;
-      flex-wrap: wrap; /* Allow cards to wrap to next line */
+      flex-wrap: wrap; 
       width: 100%;
-      align-items: flex-start; /* Aligns items to the start of the cross axis, preventing vertical stretching */
+      align-items: flex-start; 
     }
 
-    /* Individual feedback card styling */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -141,10 +132,9 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 250px; /* Added to help prevent layout shifts during loading */
+      min-height: 250px; 
     }
 
-    /* Glowing effect on card hover */
     .card::before {
       content: '';
       position: absolute;
@@ -162,15 +152,13 @@
       opacity: 1;
     }
 
-    /* Animation delays for dynamically loaded cards */
-    .card { animation-delay: 0.5s; } /* Default delay, can be overridden by specific elements */
+    .card { animation-delay: 0.5s; }
 
     .card:hover {
       transform: translateY(-10px);
       box-shadow: var(--main-glow-hover);
     }
 
-    /* Card header layout */
     .card-header {
       display: flex;
       align-items: center;
@@ -178,7 +166,6 @@
       text-align: left;
     }
 
-    /* Profile Icon Styles */
     .profile-icon {
         width: 50px;
         height: 50px;
@@ -200,12 +187,10 @@
         width: 30px;
         height: 30px;
     }
-    /* Color classes for different genders/roles */
-    .profile-icon.male-color { color: #60a5fa; } /* Blue */
-    .profile-icon.female-color { color: #f472b6; } /* Pink */
-    .profile-icon.admin-color { color: #34d399; } /* Green */
-    .profile-icon.default-color { color: #9ca3af; } /* Gray */
-
+    .profile-icon.male-color { color: #60a5fa; } 
+    .profile-icon.female-color { color: #f472b6; } 
+    .profile-icon.admin-color { color: #34d399; } 
+    .profile-icon.default-color { color: #9ca3af; } 
     .user-info {
       flex: 1;
     }
@@ -229,7 +214,6 @@
       margin-bottom: 1.5rem;
       position: relative;
       padding-left: 15px;
-      /* Removed flex-grow: 1 to ensure height is content-based */
     }
 
     .feedback-text::before {
@@ -237,7 +221,7 @@
       position: absolute;
       left: 0;
       top: 0;
-      height: 100%; /* This will now match the content height of .feedback-text */
+      height: 100%; 
       width: 4px;
       background: var(--main-color);
       border-radius: 2px;
@@ -290,9 +274,8 @@
       left: 100%;
     }
 
-    /* Admin Reply Section */
     .admin-comments-section {
-        max-height: 0; /* Initially hidden */
+        max-height: 0; 
         overflow: hidden;
         transition: max-height 0.5s ease-out, padding-top 0.5s ease-out, border-top 0.5s ease-out;
         padding-top: 0;
@@ -300,7 +283,7 @@
         text-align: left;
     }
     .admin-comments-section.visible {
-        max-height: 500px; /* Adjust as needed for content, larger than expected content */
+        max-height: 500px; 
         padding-top: 1rem;
         border-top: 1px dashed rgba(255, 255, 255, 0.1);
     }
@@ -313,7 +296,7 @@
         letter-spacing: 1px;
     }
     .admin-comment-card {
-        background: rgba(255, 255, 255, 0.08); /* Slightly different background */
+        background: rgba(255, 255, 255, 0.08); 
         border-radius: 8px;
         padding: 10px 15px;
         margin-bottom: 10px;
@@ -322,11 +305,11 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     .admin-comment-card .profile-icon {
-        width: 32px; /* Smaller icon for admin comments */
+        width: 32px; 
         height: 32px;
         flex-shrink: 0;
         margin-right: 8px;
-        background-color: rgba(255, 255, 255, 0.15); /* Slightly brighter background */
+        background-color: rgba(255, 255, 255, 0.15); 
     }
     .admin-comment-content {
         flex-grow: 1;
@@ -354,10 +337,9 @@
         color: var(--secondary-text-color);
         font-size: 1.2rem;
         margin-top: 50px;
-        display: none; /* Hidden by default, shown by JS if no feedback */
+        display: none; 
     }
 
-    /* Rate Us Card Specific Styles */
     .rate-us-overlay {
         position: fixed;
         top: 0;
@@ -367,7 +349,7 @@
         background: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(5px);
         z-index: 10000;
-        display: none; /* Hidden by default, shown by JS */
+        display: none; 
         justify-content: center;
         align-items: center;
     }
@@ -393,7 +375,6 @@
       animation: fadeInPop 0.5s forwards;
     }
 
-    /* Keyframe animation for rate us card pop-in */
     @keyframes fadeInPop {
         from {
             opacity: 0;
@@ -415,40 +396,38 @@
 
     .rate-us-card .stars-interactive {
       display: flex;
-      flex-direction: row-reverse; /* This places data-value 1 on the left visually */
+      flex-direction: row-reverse; 
       justify-content: center;
       font-size: 2.2rem;
       margin-bottom: 1.5rem;
     }
 
     .rate-us-card .stars-interactive .fas {
-      color: #555; /* Default color */
+      color: #555; 
       cursor: pointer;
       transition: color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Stars that are "active" (selected rating) */
     .rate-us-card .stars-interactive .fas.active {
       color: gold;
     }
 
-    /* All stars from the hovered one (inclusive) to the right (visually) should be gold */
     .rate-us-card .stars-interactive .fas:hover,
     .rate-us-card .stars-interactive .fas:hover ~ .fas {
       color: gold;
       transform: scale(1.1);
     }
 
-    /* When the container is not hovered, only active stars should retain color */
     .rate-us-card .stars-interactive:not(:hover) .fas.active {
         color: gold;
-        transform: scale(1); /* No scale on active when not hovered, if desired */
+        transform: scale(1);
     }
+
     .rate-us-card .stars-interactive:not(:hover) .fas:not(.active) {
         color: #555;
         transform: scale(1);
     }
-    /* Ensure the active stars to the right (visually, i.e., lower data-value) are also gold */
+
     .rate-us-card .stars-interactive:not(:hover) .fas.active ~ .fas {
         color: gold;
         transform: scale(1);
@@ -486,7 +465,6 @@
         cursor: not-allowed;
     }
 
-    /* Corner name styling */
     .corner-name {
       background: var(--main-color);
       padding: 8px 20px;
@@ -503,7 +481,6 @@
       transform: translateY(-2px);
     }
 
-    /* Navigation styling */
     nav {
       display: flex;
       gap: 2rem;
@@ -517,7 +494,7 @@
       transition: color 0.3s ease;
       opacity: 0;
     }
-    /* Animation delays for individual nav items */
+
     nav a:nth-child(1) { animation: fadeInUp 0.5s 0.4s ease-out forwards; }
     nav a:nth-child(2) { animation: fadeInUp 0.5s 0.5s ease-out forwards; }
     nav a:nth-child(3) { animation: fadeInUp 0.5s 0.6s ease-out forwards; }
@@ -560,19 +537,17 @@
       color: red !important;
     }
 
-    /* Mobile menu toggle button */
     .menu-toggle {
       font-size: 1.8rem;
       background: none;
       border: none;
       color: inherit;
       cursor: pointer;
-      display: none; /* Hidden on desktop */
+      display: none; 
       z-index: 1001;
       transition: transform 0.4s ease, box-shadow 0.3s ease;
     }
 
-    /* Mobile navigation menu */
     .mobile-nav {
       display: none;
       flex-direction: column;
@@ -586,8 +561,8 @@
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(10px);
       z-index: 1000;
-      transform: translateX(100%); /* Start off-screen */
-      transition: transform 0.4s ease-out; /* Smooth slide */
+      transform: translateX(100%); 
+      transition: transform 0.4s ease-out; 
     }
     .mobile-nav.active {
       display: flex;
@@ -608,7 +583,6 @@
         transform: rotate(180deg);
     }
 
-    /* General fade-in-up animation */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -620,18 +594,17 @@
       }
     }
 
-    /* Skeleton Loader Styles */
     .skeleton-card {
-        background: rgba(255, 255, 255, 0.03); /* Slightly darker for contrast */
+        background: rgba(255, 255, 255, 0.03); 
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 15px;
         padding: 1.5rem;
         max-width: 320px;
         width: 100%;
-        min-height: 250px; /* Match actual card height to prevent layout shifts */
+        min-height: 250px; 
         position: relative;
         overflow: hidden;
-        animation: pulse-bg 1.5s infinite ease-in-out; /* Pulsing animation */
+        animation: pulse-bg 1.5s infinite ease-in-out; 
     }
 
     .skeleton-card-header {
@@ -700,7 +673,6 @@
         width: 100%;
     }
 
-    /* Pulsing background animation for skeletons */
     @keyframes pulse-bg {
         0% {
             background-color: rgba(255, 255, 255, 0.03);
@@ -713,11 +685,10 @@
         }
     }
 
-    /* Media queries for responsiveness */
     @media (max-width: 768px) {
-      nav { display: none; } /* Hide desktop nav */
+      nav { display: none; } 
       .menu-toggle {
-        display: block; /* Show mobile toggle */
+        display: block; 
         z-index: 100000 !important;
         position: fixed;
         top: 0.6rem;
@@ -729,18 +700,18 @@
       }
 
       .rate-us-card {
-        max-width: 80%; /* Adjusted for better fit on small screens */
-        max-height: fit-content; /* Allow height to adjust */
-        padding: 1.5rem; /* Slightly less padding */
+        max-width: 80%;
+        max-height: fit-content; 
+        padding: 1.5rem; 
       }
       .rate-us-card .rate-title {
-        font-size: 1.8rem; /* Adjusted font size */
+        font-size: 1.8rem; 
       }
       .rate-us-card .stars-interactive {
-          font-size: 1.8rem; /* Smaller stars for mobile */
+          font-size: 1.8rem; 
       }
       .rate-us-card .action-btn {
-          padding: 8px 15px; /* Smaller buttons */
+          padding: 8px 15px;
           max-width: 120px;
       }
       .corner-name {
@@ -759,17 +730,17 @@
         align-items: center;
       }
 
-      .card, .skeleton-card { /* Apply to skeleton cards too */
+      .card, .skeleton-card { 
         max-width: 70%;
-        min-height: auto; /* Allow height to adjust for content */
+        min-height: auto; 
       }
     }
     @media (max-width: 480px) {
         .section-title {
             font-size: 1.8rem;
-            margin-bottom: 2rem;
+            margin-top: 0;
         }
-        .card, .skeleton-card { /* Apply to skeleton cards too */
+        .card, .skeleton-card {
             padding: 1rem;
         }
         .name {
@@ -879,11 +850,10 @@
 </div>
 
 <script type="module">
-  // Firebase SDK imports
+  // Firebase SDK 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
   import { getFirestore, collection, query, orderBy, getDocs, addDoc, serverTimestamp, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-  // Your Firebase Configuration (replace with your actual Firebase config)
   const firebaseConfig = {
       apiKey: "AIzaSyCuEHBo1bBN1GZ8F3awXp2csXAqP4cDQFA",
       authDomain: "feedback-da745.firebaseapp.com",
@@ -894,12 +864,10 @@
       measurementId: "G-1VM7BBYELF"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const APP_ID_FROM_FIREBASE = firebaseConfig.appId; // Use the appId from your config
+  const APP_ID_FROM_FIREBASE = firebaseConfig.appId; 
 
-  // Get references to DOM elements
   const feedbackListContainer = document.getElementById('feedbackList');
   const noFeedbackMessage = document.getElementById('noFeedbackMessage');
   const loadingFeedbackMessage = document.getElementById('loadingFeedbackMessage');
@@ -909,34 +877,26 @@
   const rateUsOkBtn = document.getElementById('rateUsOkBtn');
   const rateUsCloseBtn = document.getElementById('rateUsCloseBtn');
 
-  let currentRating = 0; // Stores the selected star rating
-  let isSubmitting = false; // Flag to prevent multiple submissions
-  let isLoadingFeedback = false; // Flag to prevent multiple feedback fetches
+  let currentRating = 0; 
+  let isSubmitting = false; 
+  let isLoadingFeedback = false; 
 
-  // Define a key for local storage to track if feedback has been submitted for the session
   const FEEDBACK_SUBMITTED_KEY = 'feedbackSubmittedForSession';
 
-  // Function to parse URL parameters
   function getUrlParameter(name) {
       name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
       var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
       var results = regex.exec(location.search);
-      // Fix: Check if results is null before accessing its elements
       return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   }
 
-  // Get data from URL parameters
   const userNameFromURL = getUrlParameter('name');
   const userFeedbackFromURL = getUrlParameter('feedback');
   const userGenderFromURL = getUrlParameter('gender');
-
-  // Determine if we have valid initial data from the URL to show the rating pop-up
   const hasValidInitialData = (userNameFromURL !== '' && userFeedbackFromURL !== '');
 
-  // Function to generate SVG icons or image based on type (male, female, admin)
   function getProfileIconHtml(type, imageUrl = null) {
       if (imageUrl) {
-          // Use the provided image URL for profile icon, with a fallback placeholder image
           return `<div class="profile-icon"><img src="${imageUrl}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cccccc/000000?text=Admin';" alt="${type} icon"></div>`;
       }
       let svg = '';
@@ -957,26 +917,24 @@
       return `<div class="profile-icon ${colorClass}">${svg}</div>`;
   }
 
-  // Function to fetch and display feedback from Firestore
   async function fetchAndDisplayFeedbacks() {
       if (isLoadingFeedback) {
           console.log("Feedback fetch already in progress. Skipping.");
-          return; // Prevent concurrent fetches
+          return;
       }
       isLoadingFeedback = true;
-      feedbackListContainer.innerHTML = ''; // Clear existing content (including skeletons)
+      feedbackListContainer.innerHTML = ''; 
       
-      // Re-add skeleton cards while fetching new data
-      addSkeletonCards(3); // Add 3 skeleton cards as placeholders
+      addSkeletonCards(3);
 
-      noFeedbackMessage.style.display = 'none'; // Hide no feedback message
+      noFeedbackMessage.style.display = 'none';
 
       try {
           const feedbacksCollectionRef = collection(db, `/artifacts/${APP_ID_FROM_FIREBASE}/public/data/feedbacks`);
           const q = query(feedbacksCollectionRef, orderBy('timestamp', 'desc'));
           const querySnapshot = await getDocs(q);
 
-          feedbackListContainer.innerHTML = ''; // Clear skeletons once data is fetched
+          feedbackListContainer.innerHTML = ''; 
 
           if (querySnapshot.empty) {
               noFeedbackMessage.style.display = 'block';
@@ -988,20 +946,20 @@
           querySnapshot.forEach((doc) => {
               const feedbackData = doc.data();
               const feedbackCard = document.createElement('div');
-              feedbackCard.classList.add('card'); // Add 'card' class for styling
+              feedbackCard.classList.add('card');
 
               const userName = feedbackData.userName || 'Anonymous';
               const timestampDate = feedbackData.timestamp && feedbackData.timestamp.toDate ? feedbackData.timestamp.toDate() : null;
               
               let formattedDateTime = 'N/A';
               if (timestampDate) {
-                  // Format date as MM/DD/YYYY
+  
                   const datePart = timestampDate.toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit'
                   });
-                  // Format time as HH:MM AM/PM
+
                   const timePart = timestampDate.toLocaleTimeString('en-US', {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -1010,16 +968,14 @@
                   formattedDateTime = `${datePart}, ${timePart}`;
               }
 
-              const rating = feedbackData.rating || 0; // Get rating from Firestore document, default to 0 if not present
+              const rating = feedbackData.rating || 0; 
               const starsHtml = Array(rating).fill('<i class="fas fa-star"></i>').join('');
-
-              // Construct HTML for admin comments if they exist
               const adminCommentsHtml = feedbackData.comments && feedbackData.comments.length > 0 ? `
                   <div class="admin-comments-section" id="adminReplySection-${doc.id}">
                       <h4>Admin Comments</h4>
                       ${feedbackData.comments.map(comment => {
                           const adminTimestampDate = comment.timestamp && comment.timestamp.toDate ? comment.timestamp.toDate() : null;
-                          let formattedAdminDateTime = ''; // Default to empty string if no timestamp
+                          let formattedAdminDateTime = ''; 
                           if (adminTimestampDate) {
                               const adminDatePart = adminTimestampDate.toLocaleDateString('en-US', {
                                   year: 'numeric',
@@ -1051,7 +1007,6 @@
                   </div>
               `;
 
-              // Populate the feedback card with data
               feedbackCard.innerHTML = `
                 <div class="card-header">
                     ${getProfileIconHtml(feedbackData.gender)}
@@ -1068,7 +1023,6 @@
               feedbackListContainer.appendChild(feedbackCard);
           });
 
-          // Attach event listeners for reply buttons AFTER all cards are added
           document.querySelectorAll('.reply-btn').forEach(button => {
             button.addEventListener('click', (event) => {
               const feedbackId = event.target.dataset.feedbackId;
@@ -1084,11 +1038,10 @@
           console.error("Error fetching feedback:", error);
           feedbackListContainer.innerHTML = `<p class="no-feedback-message" style="display: block; color: red;">Error loading feedback. Please try again.</p>`;
       } finally {
-          isLoadingFeedback = false; // Reset loading flag
+          isLoadingFeedback = false; 
       }
   }
 
-  // Function to add skeleton cards to the container
   function addSkeletonCards(count) {
       for (let i = 0; i < count; i++) {
           const skeletonCard = document.createElement('div');
@@ -1110,7 +1063,6 @@
   }
 
 
-  // Galaxy background animation
   const canvas = document.getElementById('galaxy');
   const ctx = canvas.getContext('2d');
   let w, h, stars = [];
@@ -1148,7 +1100,6 @@
   resizeGalaxy();
   drawGalaxy();
 
-  // Mobile navigation toggle
   let menuOpenedWhenVerySmall = false;
   const verySmallBreakpoint = 480;
 
@@ -1173,7 +1124,7 @@
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
-    // Check if the clicked element is outside the nav and not the menu icon itself or its child
+
     if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon && !icon.contains(e.target)) {
       nav.classList.remove("active");
       icon.classList.remove("flip");
@@ -1185,7 +1136,7 @@
   window.addEventListener('resize', function() {
       const mobileNav = document.getElementById("mobileNav");
       const menuIcon = document.getElementById("menuIcon");
-      const desktopBreakpoint = 768; // Standard breakpoint for desktop nav
+      const desktopBreakpoint = 480;
       const currentWidth = window.innerWidth;
 
       function closeMobileNav() {
@@ -1200,22 +1151,19 @@
       }
 
       if (mobileNav.classList.contains("active")) {
-          // If resizing to desktop view, close mobile nav
           if (currentWidth > desktopBreakpoint) {
               closeMobileNav();
           }
       }
-      // Reset flag if mobile nav is not active
       if (!mobileNav.classList.contains("active")) {
           menuOpenedWhenVerySmall = false;
       }
   });
 
-  // Interactive stars for "Rate Us" card
+
   if (rateStarsContainer) {
     const stars = rateStarsContainer.querySelectorAll('.fas.fa-star');
 
-    // Attach click and hover listeners to stars
     stars.forEach(star => {
       star.addEventListener('click', () => {
         currentRating = parseInt(star.dataset.value);
@@ -1224,38 +1172,33 @@
 
       star.addEventListener('mouseover', () => {
         const hoverValue = parseInt(star.dataset.value);
-        highlightStars(hoverValue, true); // Pass true for hover state
+        highlightStars(hoverValue, true); 
       });
 
       star.addEventListener('mouseout', () => {
-        highlightStars(currentRating); // Revert to selected rating or none
+        highlightStars(currentRating);
       });
     });
 
-    // Function to highlight stars based on rating or hover state
     function highlightStars(rating, isHover = false) {
       stars.forEach(star => {
         const starValue = parseInt(star.dataset.value);
-        // If hovering, highlight from the hovered star down to 1
-        // If not hovering, highlight from the selected currentRating down to 1
         star.classList.toggle('active', starValue <= rating);
       });
     }
   }
 
-  // Function to submit the rating along with initial data from URL
-  window.submitRatingWithUserData = async function(overrideRating = 0) { // Added overrideRating for 1-star default
+  window.submitRatingWithUserData = async function(overrideRating = 0) { 
       if (isSubmitting) {
           console.log("Submission already in progress. Please wait.");
-          return; // Prevent multiple submissions
+          return;
       }
 
       const ratingToSubmit = overrideRating > 0 ? overrideRating : currentRating;
 
-      // If no valid data from URL, and it's not a forced 1-star override, prevent submission
       if (!hasValidInitialData && overrideRating === 0) {
           console.error("Cannot submit feedback: No valid initial data from URL and no rating selected.");
-          return; // Prevent submission
+          return;
       }
 
       if (ratingToSubmit === 0) {
@@ -1263,70 +1206,59 @@
           return;
       }
 
-      isSubmitting = true; // Set submission flag
-      rateUsOkBtn.disabled = true; // Disable buttons
+      isSubmitting = true; 
+      rateUsOkBtn.disabled = true; 
       rateUsCloseBtn.disabled = true;
 
       try {
           const feedbacksCollectionRef = collection(db, `/artifacts/${APP_ID_FROM_FIREBASE}/public/data/feedbacks`);
-
-          // Check if feedback from this user with this text already exists
           const existingFeedbackQuery = query(
               feedbacksCollectionRef,
               where('userName', '==', userNameFromURL),
               where('text', '==', userFeedbackFromURL)
-              // Consider adding 'where('gender', '==', userGenderFromURL)' if gender is also part of uniqueness
           );
           const existingFeedbackSnapshot = await getDocs(existingFeedbackQuery);
 
           if (!existingFeedbackSnapshot.empty) {
-              // Feedback already exists, update it
               const existingDoc = existingFeedbackSnapshot.docs[0];
               await updateDoc(doc(db, `/artifacts/${APP_ID_FROM_FIREBASE}/public/data/feedbacks`, existingDoc.id), {
                   rating: ratingToSubmit,
-                  timestamp: serverTimestamp(), // Update timestamp as well
+                  timestamp: serverTimestamp(), 
               });
               console.log("Existing feedback updated successfully in Firebase:", existingDoc.id);
           } else {
-              // No existing feedback, add a new one
               await addDoc(feedbacksCollectionRef, {
-                  userName: userNameFromURL, // Use data from URL
-                  text: userFeedbackFromURL, // Use data from URL
-                  gender: userGenderFromURL, // Use data from URL
+                  userName: userNameFromURL, 
+                  text: userFeedbackFromURL, 
+                  gender: userGenderFromURL, 
                   rating: ratingToSubmit,
                   timestamp: serverTimestamp(),
               });
               console.log("New feedback submitted successfully to Firebase.");
           }
 
-          // Set the flag in local storage to indicate feedback has been submitted
           localStorage.setItem(FEEDBACK_SUBMITTED_KEY, 'true');
 
-          currentRating = 0; // Reset rating
+          currentRating = 0;
           if (rateStarsContainer) {
               const stars = rateStarsContainer.querySelectorAll('.fas.fa-star');
               stars.forEach(star => star.classList.remove('active'));
           }
-          closeRateCard(false); // Close without triggering 1-star default again
-          await fetchAndDisplayFeedbacks(); // Refresh feedback list after successful submission
+          closeRateCard(false); 
+          await fetchAndDisplayFeedbacks(); 
       } catch (error) {
           console.error("Error submitting/updating feedback to Firebase:", error);
       } finally {
-          isSubmitting = false; // Reset submission flag
-          rateUsOkBtn.disabled = false; // Re-enable buttons
+          isSubmitting = false; 
+          rateUsOkBtn.disabled = false; 
           rateUsCloseBtn.disabled = false;
       }
   };
 
-  // Function to close the "Rate Us" card
-  // The 'isCloseAction' parameter is true if called by the Close button
   window.closeRateCard = function(isCloseAction = false) {
     if (isCloseAction && currentRating === 0 && hasValidInitialData) {
-      // If user clicks close, no rating was selected, AND initial data was provided,
-      // then automatically submit a 1-star rating.
       submitRatingWithUserData(1);
     } else {
-        // Otherwise, just hide the overlay and reset state.
         if (rateUsOverlay) {
             rateUsOverlay.style.display = 'none';
             currentRating = 0;
@@ -1335,34 +1267,27 @@
                 stars.forEach(star => star.classList.remove('active'));
             }
         }
-        // If no valid initial data, and user just closed (or it wasn't shown), don't submit anything
         if (!hasValidInitialData && isCloseAction) {
             console.log("No valid initial data from URL, not submitting 1-star on close.");
         }
-        // Always refresh feedback list after closing, regardless of submission
         fetchAndDisplayFeedbacks();
     }
   };
 
-  // Event listener for when the DOM content is fully loaded
   document.addEventListener('DOMContentLoaded', async () => {
-    resizeGalaxy(); // Initialize galaxy background
-    drawGalaxy(); // Start galaxy animation
+    resizeGalaxy(); 
+    drawGalaxy(); 
 
-    // Check local storage flag before showing the "Rate Us" card
     const feedbackAlreadySubmitted = localStorage.getItem(FEEDBACK_SUBMITTED_KEY) === 'true';
 
-    // Show the "Rate Us" card on load ONLY if initial data was provided via URL
-    // AND feedback has NOT already been submitted for this session.
     if (rateUsOverlay && rateUsCard && hasValidInitialData && !feedbackAlreadySubmitted) {
-      rateUsOverlay.style.display = 'flex'; // Show the overlay
+      rateUsOverlay.style.display = 'flex'; 
     } else if (feedbackAlreadySubmitted) {
         console.log("Feedback already submitted for this session. 'Rate Us' card will not be shown.");
     } else if (!hasValidInitialData) {
         console.log("No valid initial feedback data provided via URL. 'Rate Us' card will not be shown automatically.");
     }
 
-    // Initial fetch and display of feedbacks (will show skeletons first)
     await fetchAndDisplayFeedbacks();
   });
 </script>
