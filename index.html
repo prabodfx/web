@@ -17,6 +17,9 @@
       --main-color: #f00;
       --main-glow: 0 0 15px var(--main-color);
       --main-glow-hover: 0 0 30px var(--main-color);
+      --green-color: #00ff00;
+      --green-glow: 0 0 15px var(--green-color);
+      --green-glow-hover: 0 0 30px var(--green-color);
     }
 
     @keyframes imagePulse {
@@ -682,15 +685,38 @@
         text-align: center;
         color: white;
         position: relative;
-        border: 1px solid var(--main-color);
+        border: 1px solid var(--main-color); /* Default to red */
         animation: fadeIn 0.4s ease-in-out;
     }
+
+    .access-modal-card.access-granted {
+        border: 1px solid var(--green-color);
+        background: linear-gradient(145deg, rgba(0, 255, 0, 0.16), rgba(0, 90, 0, 0.14));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 20px 40px rgba(0, 255, 0, 0.25),
+            0 0 0 1px rgb(0, 255, 0);
+    }
+
+    .access-modal-card.access-denied {
+        border: 1px solid var(--main-color);
+        background: linear-gradient(145deg, rgba(255, 0, 0, 0.16), rgba(90, 0, 0, 0.14));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 20px 40px rgba(255, 0, 0, 0.25),
+            0 0 0 1px rgb(255, 0, 0);
+    }
+
 
     .access-modal-title {
         font-size: 2em;
         font-weight: bold;
-        color: var(--main-color);
+        color: var(--main-color); /* Default to red */
         margin-bottom: 15px;
+    }
+
+    .access-modal-title.access-granted {
+        color: var(--green-color);
     }
 
     .access-modal-text {
@@ -701,24 +727,36 @@
 
     .access-modal-button {
         padding: 10px 25px;
-        background: var(--main-color);
+        background: var(--main-color); 
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-size: 1em;
         transition: background 0.3s ease;
+        display: block; 
+        margin: 0 auto; 
     }
 
     .access-modal-button:hover {
-        background: #ff3333;
+        background: #ff0000;
+        box-shadow: 0 10px 10px rgba(255, 0, 0, 0.5);
+        scale: 1.05;
+    }
+
+    .access-modal-button.access-granted {
+        background: var(--green-color);
+    }
+
+    .access-modal-button.access-granted:hover {
+        background: #00cc00;
     }
 
     .access-modal-close-btn {
         position: absolute;
         top: 10px;
         right: 15px;
-        font-size: 1.5em;
+        font-size: 2em; /* Increased size */
         color: white;
         cursor: pointer;
     }
@@ -744,7 +782,7 @@
       <div class="access-modal-close-btn" onclick="closeAccessModal()">×</div>
       <div class="access-modal-title" id="accessModalTitle"></div>
       <div class="access-modal-text" id="accessModalText"></div>
-      <button class="access-modal-button" onclick="https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📌">ADMIN</button>
+      <button class="access-modal-button" id="accessModalButton"></button>
     </div>
   </div>
 
@@ -757,13 +795,38 @@
       }, 300);
     }
 
-    function showAccessModal(title, text) {
+    function showAccessModal(title, text, isGranted) {
         const accessModalOverlay = document.getElementById('accessModalOverlay');
+        const accessModalCard = accessModalOverlay.querySelector('.access-modal-card');
         const accessModalTitle = document.getElementById('accessModalTitle');
         const accessModalText = document.getElementById('accessModalText');
+        const accessModalButton = document.getElementById('accessModalButton');
 
         accessModalTitle.textContent = title;
         accessModalText.innerHTML = text; 
+        
+        // Reset classes
+        accessModalCard.classList.remove('access-granted', 'access-denied');
+        accessModalTitle.classList.remove('access-granted');
+        accessModalButton.classList.remove('access-granted');
+
+        if (isGranted) {
+            accessModalCard.classList.add('access-granted');
+            accessModalTitle.classList.add('access-granted');
+            accessModalButton.style.display = 'none'; // Hide the button for Access Granted
+            
+            // Automatically redirect after a short delay
+            setTimeout(() => {
+                window.location.href = 'https://github.com/prabodfx/cv/raw/main/Prabod%20CV.pdf'; // REPLACE THIS WITH YOUR DESIRED REDIRECTION URL
+            }, 1500); // 1.5 seconds delay
+            
+        } else {
+            accessModalCard.classList.add('access-denied');
+            accessModalButton.style.display = 'block'; // Ensure button is visible for Access Denied
+            accessModalButton.textContent = 'ADMIN';
+            accessModalButton.onclick = () => window.location.href = 'https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📌'; // Redirect for Access Denied
+        }
+
         accessModalOverlay.classList.add('show');
     }
 
@@ -817,7 +880,7 @@
       <a href="https://www.youtube.com/channel/UCMs5MpxhmgEVHzNUApwvSLw" target="_blank"><img src="res/icon/youtube.svg" alt="YouTube"></a>
       <a href="https://x.com/prabodfx" target="_blank"><img src="res/icon/x.svg" alt="X"></a>
     </div>
-    <a href="https://github.com/prabodfx/cv/raw/main/Prabod%20CV.pdf" target="_blank" style="text-decoration:none;"> 
+    <a style="text-decoration:none;"> 
       <button class="cv-button" id="cvDownloadButton">Download CV</button>
     </a>
   </div>
@@ -828,7 +891,7 @@
 </section>
 
 <script type="module">
-  // SDK eke Functions
+  // SDK Functions
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
   import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
@@ -875,10 +938,9 @@
   document.getElementById('cvDownloadButton').addEventListener('click', (event) => {
     const user = auth.currentUser;
     if (user && AUTHORIZED_UIDS.includes(user.uid)) {
-      showAccessModal('Access Granted', 'You have access to download the CV.<br>Downloading The CV...');
-
+      showAccessModal('Access Granted', 'You have access to download the CV.<br>Redirecting...', true); // true for access granted
     } else {
-      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br><br>Please Contact The Admin.');
+      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br><br>Please Contact The Admin.', false); // false for access denied
       event.preventDefault(); 
     }
   });
