@@ -673,8 +673,8 @@
     }
 
     .access-modal-card {
-        width: 90%;
-        max-width: 400px;
+        width: 65%;
+        max-width: 450px;
         padding: 30px;
         border-radius: 15px;
         background: #1a1a1a;
@@ -744,7 +744,7 @@
       <div class="access-modal-close-btn" onclick="closeAccessModal()">×</div>
       <div class="access-modal-title" id="accessModalTitle"></div>
       <div class="access-modal-text" id="accessModalText"></div>
-      <button class="access-modal-button" onclick="closeAccessModal()">OK</button>
+      <button class="access-modal-button" onclick="https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📌">ADMIN</button>
     </div>
   </div>
 
@@ -778,6 +778,14 @@
         closeAccessModal();
       }
     });
+    
+    // Define toggleMenu in the global scope
+    window.toggleMenu = function() {
+      const nav = document.getElementById("mobileNav");
+      const icon = document.getElementById("menuIcon");
+      nav.classList.toggle("active");
+      icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+    }
   </script>
 <canvas id="galaxy"></canvas>
 <div class="container">
@@ -870,7 +878,7 @@
       showAccessModal('Access Granted', 'You have access to download the CV.<br>Downloading The CV...');
 
     } else {
-      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br>Please Contact The Admin.');
+      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br><br>Please Contact The Admin.');
       event.preventDefault(); 
     }
   });
@@ -1037,13 +1045,6 @@
   resizeGalaxy();
   drawGalaxy();
   drawInferno();
-
-  function toggleMenu() {
-    const nav = document.getElementById("mobileNav");
-    const icon = document.getElementById("menuIcon");
-    nav.classList.toggle("active");
-    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
-  }
 
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
