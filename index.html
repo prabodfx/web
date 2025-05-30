@@ -550,9 +550,8 @@
       color: red;
       position: relative;
       animation: glitchBase 1.7s infinite steps(1);
-      /* Optimize for performance */
       will-change: transform, text-shadow, clip;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0); 
     }
 
     .crazy-glitch::before,
@@ -564,9 +563,8 @@
       width: 100%;
       opacity: 0.8;
       clip: rect(0, 900px, 0, 0);
-      /* Optimize for performance */
       will-change: transform, clip;
-      transform: translateZ(0); /* Force hardware acceleration */
+      transform: translateZ(0);
     }
 
     .crazy-glitch::before {
@@ -652,7 +650,6 @@
       opacity: 1;
     }
 
-    /* New styles for the custom alert modal */
     #accessModalOverlay {
         position: fixed;
         top: 0;
@@ -664,7 +661,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1000001; /* Higher than other modals */
+        z-index: 1000001; 
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -766,7 +763,7 @@
         const accessModalText = document.getElementById('accessModalText');
 
         accessModalTitle.textContent = title;
-        accessModalText.innerHTML = text; // Use innerHTML for line breaks
+        accessModalText.innerHTML = text; 
         accessModalOverlay.classList.add('show');
     }
 
@@ -812,7 +809,8 @@
       <a href="https://www.youtube.com/channel/UCMs5MpxhmgEVHzNUApwvSLw" target="_blank"><img src="res/icon/youtube.svg" alt="YouTube"></a>
       <a href="https://x.com/prabodfx" target="_blank"><img src="res/icon/x.svg" alt="X"></a>
     </div>
-    <a href="https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📜" style="text-decoration:none;"> <button class="cv-button" id="cvDownloadButton">Download CV</button>
+    <a href="feedback.html" target="_blank" style="text-decoration:none;"> 
+      <button class="cv-button" id="cvDownloadButton">Download CV</button>
     </a>
   </div>
   <div class="image-wrapper">
@@ -822,12 +820,11 @@
 </section>
 
 <script type="module">
-  // Import the functions you need from the SDKs you need
+  // SDK eke Functions
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js"; // <-- THIS IS CRUCIAL!
+  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-  // Your web app's Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCuEHBo1bBN1GZ8F3awXp2csXAqP4cDQFA",
     authDomain: "feedback-da745.firebaseapp.com",
@@ -838,26 +835,25 @@
     measurementId: "G-1VM7BBYELF"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-  const auth = getAuth(app); // <-- GET THE AUTH INSTANCE HERE!
+  const auth = getAuth(app);
 
-  // --- UPDATED: Define an array of authorized UIDs ---
   const AUTHORIZED_UIDS = [
-    '0WSkrKPXKiPlnyTuuT8IhBYuWc92',     // Your original "before project" UID
-    '3QRBVTi3YJQIlsYwb54tLe38qdN2'      // Your new UID you want to add
+    '0WSkrKPXKiPlnyTuuT8IhBYuWc92',     
+    'HTLavvWLDZg5Rl8VwuXhJhJ1cu63',
+    '3QRBVTi3YJQIlsYwb54tLe38qdN2'      
   ];
 
-  // Listen for auth state changes
-  onAuthStateChanged(auth, (user) => { // <-- LISTEN FOR AUTH STATE CHANGES
+
+  onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is signed in
+
       console.log("User is signed in:", user.uid);
     } else {
-      // User is signed out, try to sign in anonymously
+
       console.log("No user signed in. Signing in anonymously...");
-      signInAnonymously(auth) // <-- SIGN IN ANONYMOUSLY
+      signInAnonymously(auth)
         .then(() => {
           console.log("Anonymous user signed in.");
         })
@@ -867,13 +863,14 @@
     }
   });
 
-  document.getElementById('cvDownloadButton').addEventListener('click', () => {
-    const user = auth.currentUser; // <-- THIS GETS THE CURRENTLY AUTHENTICATED USER
-    // --- UPDATED: Check if the user is authenticated AND their UID is in the authorized list ---
+  document.getElementById('cvDownloadButton').addEventListener('click', (event) => {
+    const user = auth.currentUser;
     if (user && AUTHORIZED_UIDS.includes(user.uid)) {
-      showAccessModal('Access Granted', 'You have access to download the CV.<br>Please contact Prabod for the download link.');
+      showAccessModal('Access Granted', 'You have access to download the CV.<br>Downloading The CV...');
+
     } else {
-      showAccessModal('Access Denied', 'You do not have permission to download the CV.<br>Only authorized users can access this content.');
+      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br>Please Contact The Admin.');
+      event.preventDefault(); 
     }
   });
 
@@ -911,20 +908,18 @@
     requestAnimationFrame(drawGalaxy);
   }
 
-  // Get the CV button element
   const cvButton = document.querySelector('.cv-button');
 
-  // Use animationend to trigger jiggle animation, enable pointer events, and ensure visibility after fadeInUp finishes
+
   cvButton.addEventListener('animationend', (event) => {
     if (event.animationName === 'fadeInUp') {
-      cvButton.classList.add('jiggle-active'); // Add the 'jiggle-active' class to start iconJiggle
-      cvButton.style.pointerEvents = 'auto';   // Enable pointer events after animation ends
-      cvButton.style.opacity = '1';           // Explicitly ensure opacity is 1
+      cvButton.classList.add('jiggle-active'); 
+      cvButton.style.pointerEvents = 'auto';   
+      cvButton.style.opacity = '1';           
     }
   });
 
 
-  // Inferno Animation
   const infernoCanvas = document.getElementById('infernoCanvas');
   const ctxInferno = infernoCanvas.getContext('2d');
   const imgWrapper = document.querySelector('.image-wrapper');
@@ -1023,7 +1018,6 @@
     cx = baseSize / 2;
     cy = baseSize / 2;
 
-    // Auto close mobile nav on desktop
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
     if (window.innerWidth > 768 && nav.classList.contains("active")) {
@@ -1050,7 +1044,6 @@
     icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
   }
 
-  // Close mobile menu on outside click
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -1060,7 +1053,6 @@
     }
   });
 
-  // Glitch Text
   const glitchText = document.querySelector('.crazy-glitch');
   const titles = ["DESIGNER", "EDITOR", "DEVELOPER"];
   let index = 0;
