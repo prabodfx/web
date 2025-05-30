@@ -653,12 +653,86 @@
     .image-wrapper img[src] {
       opacity: 1;
     }
+
+    /* New styles for the custom alert modal */
+    #accessModalOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000001; /* Higher than other modals */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    #accessModalOverlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .access-modal-card {
+        width: 90%;
+        max-width: 400px;
+        padding: 30px;
+        border-radius: 15px;
+        background: #1a1a1a;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        color: white;
+        position: relative;
+        border: 1px solid var(--main-color);
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .access-modal-title {
+        font-size: 2em;
+        font-weight: bold;
+        color: var(--main-color);
+        margin-bottom: 15px;
+    }
+
+    .access-modal-text {
+        font-size: 1.1em;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
+
+    .access-modal-button {
+        padding: 10px 25px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.3s ease;
+    }
+
+    .access-modal-button:hover {
+        background: #ff3333;
+    }
+
+    .access-modal-close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        color: white;
+        cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="modal-overlay">
     <div class="modal-card">
-      <div class="close-btn" onclick="closeModal()">&times;</div>
+      <div class="close-btn" onclick="closeModal()">×</div>
       <div class="modal-title">WELCOME</div><br>
       <div class="modal-text">
         Texts and Some Things on this Website <br>
@@ -667,6 +741,15 @@
       </div>
       <br>
       <button class="ok-btn" onclick="closeModal()">Got it</button>
+    </div>
+  </div>
+
+  <div id="accessModalOverlay">
+    <div class="access-modal-card">
+      <div class="access-modal-close-btn" onclick="closeAccessModal()">×</div>
+      <div class="access-modal-title" id="accessModalTitle"></div>
+      <div class="access-modal-text" id="accessModalText"></div>
+      <button class="access-modal-button" onclick="closeAccessModal()">OK</button>
     </div>
   </div>
 
@@ -679,8 +762,26 @@
       }, 300);
     }
 
+    function showAccessModal(title, text) {
+        const accessModalOverlay = document.getElementById('accessModalOverlay');
+        const accessModalTitle = document.getElementById('accessModalTitle');
+        const accessModalText = document.getElementById('accessModalText');
+
+        accessModalTitle.textContent = title;
+        accessModalText.innerHTML = text; // Use innerHTML for line breaks
+        accessModalOverlay.classList.add('show');
+    }
+
+    function closeAccessModal() {
+        const accessModalOverlay = document.getElementById('accessModalOverlay');
+        accessModalOverlay.classList.remove('show');
+    }
+
     document.addEventListener('keydown', function(event) {
-      if (event.key === "Escape") closeModal();
+      if (event.key === "Escape") {
+        closeModal();
+        closeAccessModal();
+      }
     });
   </script>
 <canvas id="galaxy"></canvas>
@@ -713,8 +814,7 @@
       <a href="https://www.youtube.com/channel/UCMs5MpxhmgEVHzNUApwvSLw" target="_blank"><img src="res/icon/youtube.svg" alt="YouTube"></a>
       <a href="https://x.com/prabodfx" target="_blank"><img src="res/icon/x.svg" alt="X"></a>
     </div>
-    <a href="https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📜" style="text-decoration:none;">
-      <button class="cv-button">Download CV</button>
+    <a href="#" style="text-decoration:none;"> <button class="cv-button" id="cvDownloadButton">Download CV</button>
     </a>
   </div>
   <div class="image-wrapper">
@@ -723,7 +823,57 @@
   </div>
 </section>
 
-<script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
+  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js"; // <-- THIS IS CRUCIAL!
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuEHBo1bBN1GZ8F3awXp2csXAqP4cDQFA",
+    authDomain: "feedback-da745.firebaseapp.com",
+    projectId: "feedback-da745",
+    storageBucket: "feedback-da745.firebasestorage.app",
+    messagingSenderId: "1090923781039",
+    appId: "1:1090923781039:web:ebc26d77f78fe9a132ad5a",
+    measurementId: "G-1VM7BBYELF"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app); // <-- GET THE AUTH INSTANCE HERE!
+
+  const AUTHORIZED_UID = '5IyZoGmLaKYfNlaCrS5XxyiqqaJ2'; // Ensure this matches the admin UID in your Firestore rules
+
+  // Listen for auth state changes
+  onAuthStateChanged(auth, (user) => { // <-- LISTEN FOR AUTH STATE CHANGES
+    if (user) {
+      // User is signed in
+      console.log("User is signed in:", user.uid);
+    } else {
+      // User is signed out, try to sign in anonymously
+      console.log("No user signed in. Signing in anonymously...");
+      signInAnonymously(auth) // <-- SIGN IN ANONYMOUSLY
+        .then(() => {
+          console.log("Anonymous user signed in.");
+        })
+        .catch((error) => {
+          console.error("Error signing in anonymously:", error);
+        });
+    }
+  });
+
+  document.getElementById('cvDownloadButton').addEventListener('click', () => {
+    const user = auth.currentUser; // <-- THIS GETS THE CURRENTLY AUTHENTICATED USER
+    if (user && user.uid === AUTHORIZED_UID) {
+      showAccessModal('Access Granted', 'You have access to download the CV.<br>Please contact Prabod for the download link.');
+    } else {
+      showAccessModal('Access Denied', 'You do not have permission to download the CV.<br>Only authorized users can access this content.');
+    }
+  });
+
   const galaxyCanvas = document.getElementById('galaxy'), ctxGalaxy = galaxyCanvas.getContext('2d');
   let stars = [], w, h;
 
