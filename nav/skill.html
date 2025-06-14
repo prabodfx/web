@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skills - Prabod Saranga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-color: #f00;
+      --main-glow: 0 0 15px var(--main-color);
+      --main-glow-hover: 0 0 30px var(--main-color);
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: transparent;
+      color: #fff;
+      overflow-x: hidden;
+      height: 100%;
+    }
+
+    canvas#galaxy {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: #000;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      max-width: 1200px;
+      margin: auto;
+      position: relative;
+    }
+
+    .corner-name {
+      background: var(--main-color);
+      padding: 8px 20px;
+      border-radius: 25px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: var(--main-glow);
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--main-color);
+    }
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .nav-item {
+      color: white;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: red;
+    }
+
+    nav:hover .nav-item.active {
+      color: white;
+    }
+
+    .nav-item:hover {
+      color: red !important;
+    }
+
+    .menu-toggle {
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      display: none;
+      z-index: 1001;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding-top: 60px;
+      padding-bottom: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+
+    .mobile-nav.active {
+      display: flex;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .mobile-nav a {
+      margin: 10px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Full screen center wrapper */
+    .feature-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .feature-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 90%;
+      max-width: 400px;
+      pointer-events: auto;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 10px 20px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      height: 56px;
+      cursor: pointer;
+    }
+
+    .feature-item:hover {
+      color: #000;
+      background: rgba(255, 0, 0, 0.9);
+      box-shadow: 0 0 25px rgb(255, 0, 0);
+    }
+
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .feature-icon2 {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    .feature-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1;
+    }
+
+    @media (max-width: 1024px) {
+      .feature-section {
+        max-width: 360px;
+        gap: 18px;
+      }
+      .feature-item {
+        padding: 10px 16px;
+        height: 52px;
+        gap: 14px;
+      }
+      .feature-icon {
+        width: 26px;
+        height: 26px;
+      }
+      .feature-label {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .menu-toggle { 
+        display: block;
+        z-index: 100000 !important; /* Add !important */
+        position: fixed; /* Ensure it stays fixed */
+        top: 0.6rem;
+        right: 1rem; 
+      }
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .corner-name {
+        margin-right: auto;
+      }
+      .feature-section {
+        width: 80%;
+        max-width: 280px;
+        gap: 16px;
+      }
+      .feature-item {
+        padding: 8px 14px;
+        height: 48px;
+        gap: 12px;
+      }
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+      }
+      .feature-label {
+        font-size: 0.95rem;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container, .feature-wrapper {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 2s ease forwards;
+    }
+
+    .container {
+      animation-delay: 0.2s;
+    }
+    .feature-wrapper {
+      animation-delay: 0.5s;
+    }
+  </style>
+</head>
+<body>
+<canvas id="galaxy"></canvas>
+
+<div class="container">
+  <div class="corner-name" onclick="location.href='service.html' pointer:'default';">Prabod Saranga</div>
+  <nav>
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="skill.html" class="nav-item active">Skill</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item">Contact</a>
+  </nav>
+</div>
+<button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="skill.html" class="nav-item active">Skill</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item">Contact</a>
+</div>
+
+<div class="feature-wrapper">
+  <div class="feature-section">
+    <div class="feature-item" onclick="location.href='inside/lightroom.html';">
+      <img src="../res/skillicon/lightroom.webp" class="feature-icon" />
+      <span class="feature-label">Photo Editing</span>
+    </div>
+    <div class="feature-item" onclick="location.href='../soon/index.html';">
+      <img src="../res/skillicon/capcut.webp" class="feature-icon" />
+      <span class="feature-label">Video Editing</span>
+    </div>
+    <div class="feature-item" onclick="location.href='inside/animation.html';">
+      <img src="../res/skillicon/portfolio.webp" class="feature-icon" />
+      <span class="feature-label">Html Animations</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('galaxy');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars = [];
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: w > 768 ? 500 : 200 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      z: Math.random() * w
+    }));
+  }
+
+  function draw() {
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2;
+    for (let s of stars) {
+      s.z -= 2;
+      if (s.z <= 0) s.z = w;
+      const k = w / s.z;
+      const x = (s.x - cx) * k + cx;
+      const y = (s.y - cy) * k + cy;
+      if (x >= 0 && x < w && y >= 0 && y < h) {
+        const size = (1 - s.z / w) * 2;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+
+  function toggleMenu() {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    nav.classList.toggle("active");
+    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+  }
+
+  document.addEventListener('click', function(e) {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon) {
+      nav.classList.remove("active");
+      icon.textContent = "☰";
+    }
+  });
+</script>
+</body>
+</html>

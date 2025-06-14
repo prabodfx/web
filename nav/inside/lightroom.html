@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Photo Editing Skill</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins :wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    *,:after,:before{box-sizing:border-box;margin:0;padding:0}html,body{font-family:Poppins,sans-serif;height:100%;overflow-x:hidden;background:radial-gradient(circle at center,#0e001b,#000)}canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}header{position:fixed;top:0;left:0;width:100%;height:70px;z-index:9999;display:flex;justify-content:space-between;align-items:center;padding:15px 20px;backdrop-filter:blur(3px)}.header-title{font-size:clamp(1.2rem,4vw,1.4rem);font-weight:700;margin-top:10px;background:rgba(255,255,255,.85);padding:12px 30px;border-radius:30px;position:relative;left:50%;transform:translateX(-50%);white-space:nowrap}.nav-toggle{font-size:1.8rem;color:#fff;cursor:pointer;background:0;border:0}.nav-menu{position:fixed;top:65px;right:20px;width:220px;background:rgba(255,255,255,.728);border-radius:15px;padding:15px 20px;display:none;flex-direction:column;gap:12px;backdrop-filter:blur(8px);z-index:9999}.nav-menu.show{display:flex}.nav-menu a{color:#000;text-decoration:none;font-weight:600;font-size:1.3rem;padding:15px 0;text-align:center}.foreground{position:relative;z-index:1;padding-top:80px;min-height:100vh}.container-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));justify-content:center;justify-items:center;gap:40px;width:100%;padding:20px;max-width:1440px;margin:0 auto}.comparison-card{width:350px;height:500px;background:transparent;backdrop-filter: blur(20px);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.12);overflow:hidden;position:relative;transition:transform .3s ease}.comparison-card:hover{transform:translateY(-5px)}.image-compare{position:relative;width:100%;height:100%}.image-compare img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;user-select:none;pointer-events:none}.before-image{clip-path:inset(0 50% 0 0);transition:clip-path .4s ease}.compare-handle{position:absolute;top:50%;left:50%;width:48px;height:48px;background:#fff;border:3px solid #2c3e50;border-radius:50%;transform:translate(-50%,-50%);cursor:ew-resize;z-index:10;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.15)}.compare-handle::after{content:"<>";font-size:1.2rem;color:#2c3e50}.image-labels{position:absolute;top:20px;left:20px;right:20px;display:flex;justify-content:space-between;z-index:10;pointer-events:none}.image-labels span{background:rgba(255,255,255,.7);padding:6px 12px;border-radius:6px;font-weight:600;color:#2c3e50;font-size:.95rem;opacity:1;transition:opacity .3s ease}.image-labels span.hidden{opacity:0}.divider-line{position:absolute;top:0;bottom:0;width:2px;background:#2c3e50;z-index:5}@media (max-width:699px){.container-row{gap:30px;padding:10px}.nav-menu{backdrop-filter:blur(8px)}.header-title{padding:12px 30px}}@media (max-width:480px){.container-row{gap:25px;grid-template-columns:1fr}.comparison-card{width:100%;max-width:350px}.header-title{padding:12px 25px}.compare-handle{top:85%!important;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-title" onclick="location.href='animation.html'" style="cursor: default;">Swipe Left or Right</div>
+    <button class="nav-toggle" id="navToggle">☰</button>
+    <nav class="nav-menu" id="navMenu">
+       <a href="../index.html">Home</a><a href="../about.html">About</a><a href="../skill.html">Skill</a><a href="../service.html">Service</a><a href="../contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <canvas id="galaxy"></canvas>
+  <div class="foreground">
+    <div class="container-row">
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after.webp" class="after-image">
+          <img src="../../res/images/before.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after2.webp" class="after-image">
+          <img src="../../res/images/before2.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after3.webp" class="after-image">
+          <img src="../../res/images/before3.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after4.webp" class="after-image">
+          <img src="../../res/images/before4.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after5.webp" class="after-image">
+          <img src="../../res/images/before5.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <div class="image-compare">
+          <img src="../../res/images/after6.webp" class="after-image">
+          <img src="../../res/images/before6.webp" class="before-image">
+          <div class="divider-line"></div>
+          <div class="compare-handle"></div>
+          <div class="image-labels"><span>Before</span><span>After</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('galaxy'), ctx = canvas.getContext('2d');
+    let stars = [], frame = 0;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function createStars(count) {
+      stars = Array.from({length: count}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        z: Math.random() * canvas.width
+      }));
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(10,0,25,.3)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2, centerY = canvas.height / 2, maxZ = canvas.width;
+
+      stars.forEach(star => {
+        star.z -= 2;
+        if (star.z <= 0) star.z = canvas.width;
+
+        const scale = maxZ / star.z;
+        const px = (star.x - centerX) * scale + centerX;
+        const py = (star.y - centerY) * scale + centerY;
+
+        if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+          const size = (1 - star.z / maxZ) * 2;
+          ctx.beginPath();
+          ctx.arc(px, py, size, 0, 2 * Math.PI);
+          ctx.fillStyle = "rgba(200,100,255,.8)";
+          ctx.shadowColor = "rgba(200,100,255,.6)";
+          ctx.shadowBlur = 6;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      });
+
+      frame++;
+    }
+
+    function animate() {
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    // Mobile Optimization: fewer stars
+    const STAR_COUNT = window.innerWidth < 768 ? 150 : 250;
+
+    resize();
+    createStars(STAR_COUNT);
+    animate();
+
+    // Navigation Toggle
+    const navToggle = document.getElementById('navToggle'), navMenu = document.getElementById('navMenu');
+    function toggleMenu() { navMenu.classList.toggle('show'); navToggle.textContent = navMenu.classList.contains('show') ? '✖' : '☰'; }
+    navToggle.addEventListener('click', toggleMenu);
+    document.addEventListener('click', e => {
+      if (!navMenu.contains(e.target) && e.target !== navToggle) {
+        navMenu.classList.remove('show');
+        navToggle.textContent = '☰';
+      }
+    });
+
+    // Image Comparer Class
+    class ImageComparer {
+      constructor(container) {
+        this.container = container;
+        this.handle = container.querySelector('.compare-handle');
+        this.divider = container.querySelector('.divider-line');
+        this.beforeImage = container.querySelector('.before-image');
+        this.labels = container.querySelectorAll('.image-labels span');
+        this.isDragging = false;
+        this.init();
+      }
+
+      init() {
+        this.handle.addEventListener('mousedown', this.startDrag.bind(this));
+        document.addEventListener('mouseup', this.stopDrag.bind(this));
+        document.addEventListener('mousemove', this.drag.bind(this));
+
+        this.handle.addEventListener('touchstart', e => {
+          e.preventDefault();
+          this.startDrag();
+          this.drag(e.touches[0]);
+        });
+        document.addEventListener('touchend', this.stopDrag.bind(this));
+        document.addEventListener('touchmove', e => {
+          e.preventDefault();
+          this.drag(e.touches[0]);
+        });
+
+        this.updateSlider(50);
+      }
+
+      startDrag() {
+        this.isDragging = true;
+        this.rect = this.container.getBoundingClientRect();
+        [this.handle, this.divider, this.beforeImage].forEach(el => el.style.transition = 'none');
+      }
+
+      stopDrag() {
+        this.isDragging = false;
+        [this.handle, this.divider, this.beforeImage].forEach(el => el.style.transition = '');
+      }
+
+      drag(e) {
+        if (!this.isDragging) return;
+        const clientX = e.clientX || e.touches?.[0]?.clientX;
+        const percent = ((clientX - this.rect.left) / this.rect.width * 100).toFixed(2);
+        this.updateSlider(percent);
+      }
+
+      updateSlider(percent) {
+        const clamped = Math.min(Math.max(percent, 0), 100);
+        this.beforeImage.style.clipPath = `inset(0 ${100 - clamped}% 0 0)`;
+        this.handle.style.left = this.divider.style.left = `${clamped}%`;
+        this.labels.forEach((el, i) => el.classList.toggle('hidden', (clamped <= 25 && i === 0) || (clamped >= 77 && i === 1)));
+      }
+    }
+
+    const comparers = [];
+    document.querySelectorAll('.image-compare').forEach(el => comparers.push(new ImageComparer(el)));
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resize();
+        createStars(window.innerWidth < 768 ? 150 : 250);
+        comparers.forEach(c => {
+          c.rect = c.container.getBoundingClientRect();
+          c.updateSlider(parseFloat(c.handle.style.left) || 50);
+        });
+      }, 100);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact - Prabod Saranga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-color: #f00;
+      --main-glow: 0 0 15px var(--main-color);
+      --main-glow-hover: 0 0 30px var(--main-color);
+      --whatsapp-glow: 0 0 15px #39FF14;
+      --card-bg: rgba(211, 211, 211, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-color: #e0e0e0;
+      --heading-color: #ffffff;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text-color);
+      overflow: hidden; 
+      height: 100%;
+    }
+    canvas#galaxy {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1; 
+      background: #000; 
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      position: fixed; 
+      top: 0;
+      left: 0;
+      z-index: 100; 
+      background: rgba(0, 0, 0, 0);
+      box-sizing: border-box;
+      height: 4rem;
+    }
+
+    .scroll-content-wrapper {
+      position: absolute;
+      top: 3.8rem;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      z-index: 1;
+      opacity: 1; 
+      animation: fadeInUp 0.8s 0.2s ease-out forwards;
+      animation-fill-mode: forwards;
+    }
+
+    .contact-section {
+      margin: 0 auto 2rem;
+      padding: 2.5rem 5%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .corner-name {
+      background: var(--main-color);
+      padding: 8px 20px;
+      border-radius: 25px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: var(--main-glow);
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeInUp 0.5s 0.3s ease-out forwards;
+    }
+    .corner-name:hover {
+      box-shadow: var(--main-glow-hover);
+      transform: translateY(-2px);
+    }
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: bold;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+      opacity: 0;
+    }
+    nav a:nth-child(1) { animation: fadeInUp 0.5s 0.4s ease-out forwards; }
+    nav a:nth-child(2) { animation: fadeInUp 0.5s 0.5s ease-out forwards; }
+    nav a:nth-child(3) { animation: fadeInUp 0.5s 0.6s ease-out forwards; }
+    nav a:nth-child(4) { animation: fadeInUp 0.5s 0.7s ease-out forwards; }
+    nav a:nth-child(5) { animation: fadeInUp 0.5s 0.8s ease-out forwards; }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--main-color);
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--main-color);
+    }
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .nav-item {
+      color: white;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: red;
+    }
+
+    nav:hover .nav-item.active {
+      color: white;
+    }
+
+    .nav-item:hover {
+      color: red !important;
+    }
+    .menu-toggle {
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      display: none;
+      z-index: 1001;
+      transition: transform 0.4s ease, box-shadow 0.3s ease;
+    }
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 0;
+      padding-top: 60px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+    .mobile-nav.active {
+      display: flex;
+      transform: translateX(0);
+    }
+    .mobile-nav a {
+      margin: 10px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .mobile-nav a:hover {
+      color: var(--main-color);
+    }
+
+    .contact-section h1 {
+      margin-bottom: 2rem;
+      margin-top: -3rem;
+      opacity: 0; /* Make it invisible initially */
+      animation:
+        fadeInUp 0.6s 0.5s ease-out forwards, /* Original translateY animation */
+        contactMeFadeIn 1s 0.5s ease-out forwards; /* New opacity animation */
+      font-size: 3em;
+      font-weight: bold;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(45deg, #ff6b6b, #ff0000, #8b0000);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.3);
+      display: inline-block;
+      text-shadow: 0 0 25px rgba(255, 0, 0, 0.557);
+      animation: gradient-shift 3s ease infinite, contactMeFadeIn 1s 0.5s ease-out forwards, fadeInUp 0.6s 0.5s ease-out forwards; /* Combined animations */
+    }
+
+    @keyframes contactMeFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .contact-form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .contact-form label {
+      text-align: left;
+      font-weight: bold;
+      color: var(--heading-color);
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: var(--main-color);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), var(--main-glow);
+    }
+    .contact-form textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    .contact-form button {
+      background: var(--main-color);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+    .contact-form button:hover {
+      background: var(--main-color);
+      box-shadow: var(--main-glow-hover);
+      transform: translateY(-3px);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .contact-content-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3rem;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .contact-card, .contact-form-main-card {
+      background: var(--card-bg); /* This will be the consistent color */
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      box-sizing: border-box;
+      flex-grow: 1;
+      flex-shrink: 1;
+      max-width: 500px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      will-change: backdrop-filter;
+      transform: translateZ(0);
+      animation: fadeInUp 0.6s 0.7s ease-out forwards; /* Only keep the fade-in animation */
+    }
+
+    /* Removed @keyframes cardBackgroundAnimation entirely */
+
+    .contact-content-wrapper > .contact-form-main-card,
+    .contact-content-wrapper > .info-feedback-cards-container {
+        opacity: 0;
+        animation: fadeInUp 0.6s 0.7s ease-out forwards; /* Removed cardBackgroundAnimation */
+    }
+
+    .contact-card.info-card {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .contact-card.info-card h3 {
+      margin-bottom: 0.8rem;
+      margin-top: 0;
+    }
+    .info-feedback-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex-grow: 1;
+      flex-shrink: 1;
+      max-width: 500px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .info-feedback-cards-container > .contact-card {
+        opacity: 0; /* Start hidden */
+    }
+    .info-feedback-cards-container > .contact-card:nth-child(1) { animation: fadeInUp 0.5s 0.9s ease-out forwards; } /* Removed cardBackgroundAnimation */
+    .info-feedback-cards-container > .contact-card:nth-child(2) { animation: fadeInUp 0.5s 1.0s ease-out forwards; } /* Removed cardBackgroundAnimation */
+    .info-feedback-cards-container > .contact-card:nth-child(3) { animation: fadeInUp 0.5s 1.1s ease-out forwards; } /* Removed cardBackgroundAnimation */
+
+
+    .contact-card.feedback-card {
+      text-align: center;
+    }
+    .feedback-form {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .feedback-form input[type="text"],
+    .feedback-form textarea {
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: var(--text-color);
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+      font-size: 1rem;
+    }
+    .feedback-form input[type="text"]::placeholder,
+    .feedback-form textarea::placeholder {
+      text-align: left;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+    .feedback-form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    .gender-options {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .gender-options label {
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+    .gender-options input[type="radio"] {
+      margin-right: 5px;
+    }
+
+    @media (max-width: 991px) {
+      .contact-form-main-card,
+      .info-feedback-cards-container {
+        width: 100%;
+        flex-basis: 100%;
+      }
+      .contact-section h1 {
+        font-size: 2.5rem;
+        margin-top: -2rem;
+      }
+    }
+    @media (min-width: 992px) {
+      .contact-content-wrapper > .contact-form-main-card,
+      .contact-content-wrapper > .info-feedback-cards-container {
+        width: auto;
+        flex-basis: 0;
+        flex-grow: 1;
+      }
+    }
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .menu-toggle {
+        display: block;                     
+        z-index: 100000 !important;
+        position: fixed;
+        top: 0.6rem;
+        right: 1rem;
+      }
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .corner-name {
+        margin-right: auto;
+      }
+      .scroll-content-wrapper {
+        top: 3.5rem;
+      }
+      .contact-section {
+        padding: 1.5rem;
+      }
+      .contact-section h1 {
+        font-size: 2.2rem;
+        margin-top: 0rem;
+      }
+      .contact-content-wrapper {
+        gap: 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .contact-section h1 {
+        font-size: 1.8rem;
+      }
+      .contact-section p {
+        font-size: 1rem;
+      }
+      .contact-form button {
+        font-size: 1rem;
+        padding: 12px 25px;
+      }
+      .contact-section {
+        padding: 1rem 15px;
+      }
+      .contact-card.info-card {
+        padding: 1.5rem;
+      }
+      .contact-card.info-card h3 {
+        font-size: 1.1rem;
+      }
+    }
+
+    .contact-button {
+      width: 70%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .contact-card.info-card .contact-button {
+      margin-top: 0.5rem;
+      padding: 10px;
+      min-width: 150px;
+    }
+    .feedback-form .contact-button {
+      width: auto;
+      padding: 12px 25px;
+      font-size: 1rem;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+    }
+    .menu-toggle.flip {
+      transform: rotate(180deg);
+    }
+    .contact-button[style*="#25D366"] {
+      box-shadow: 0 0 5px #25D366;
+    }
+    .contact-button[style*="#25D366"]:hover {
+      box-shadow: 0 0 20px #39FF14;
+      transform: translateY(-3px);
+    }
+    .contact-form button[type="submit"],
+    .contact-button[style*="var(--main-color)"] {
+      box-shadow: 0 0 5px var(--main-color);
+    }
+    .contact-form button[type="submit"]:hover,
+    .contact-button[style*="var(--main-color)"]:hover {
+      box-shadow: var(--main-glow-hover);
+      transform: translateY(-3px);
+    }
+
+    #messageBox {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      z-index: 1002;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    #messageBox button {
+      background: var(--main-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<canvas id="galaxy"></canvas>
+<div class="container">
+  <div class="corner-name" onclick="location.href='feedback.html'" style="cursor: default;">
+    Prabod Saranga
+  </div>
+  <nav>
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="skill.html" class="nav-item">Skill</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item active">Contact</a>
+  </nav>
+</div>
+<button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="skill.html" class="nav-item">Skill</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item active">Contact</a>
+</div>
+<div class="scroll-content-wrapper">
+  <main class="contact-section">
+    <h1>Contact Me</h1>
+    <div class="contact-content-wrapper">
+      <div class="contact-card contact-form-main-card">
+        <form class="contact-form" action="https://formspree.io/f/xjkwdeqw" method="POST" id="contactForm">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="Zeus Riordan" required>
+          <label for="email">Your Email</label>
+          <input type="email" id="email" name="email" placeholder="zeus@example.com" required>
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="Short Inquiry" required>
+          <label for="message">Your Message</label>
+          <textarea id="message" name="message" placeholder="Hello Prabod, I'd like to discuss..." required></textarea>
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+      <div class="info-feedback-cards-container">
+        <div class="contact-card info-card">
+          <h3 style="color: var(--heading-color);">Mobile Number</h3>
+          <button class="contact-button" style="background: var(--main-color);" onclick="window.location.href='tel:0740463381'">
+            <i class="fas fa-phone-alt"></i> &nbsp;<b>Call Now</b>
+          </button>
+        </div>
+        <div class="contact-card info-card">
+          <h3 style="color: var(--heading-color);">WhatsApp</h3>
+          <button class="contact-button" style="background: #25D366;" onclick="window.open('https://wa.me/94740463381', '_blank')">
+            <i class="fab fa-whatsapp"></i> <b>Message on WhatsApp</b>
+          </button>
+        </div>
+        <div class="contact-card feedback-card">
+          <h3 style="color: var(--heading-color); margin-bottom: 1rem;">Say something about my portfolio</h3>
+          <form class="feedback-form" id="userFeedbackForm">
+            <input type="text" id="feedbackUserName" placeholder="Your Name" required>
+            <div class="gender-options">
+              <label>
+                <input type="radio" name="gender" value="male" id="feedbackUserGenderMale" required> Male
+              </label>
+              <label>
+                <input type="radio" name="gender" value="female" id="feedbackUserGenderFemale"> Female
+              </label>
+            </div>
+            <textarea id="feedbackText" placeholder="Your feedback..." required></textarea>
+            <button type="submit" class="contact-button" style="background: var(--main-color);">
+              <b>Submit Feedback</b>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="messageBox">
+  <p id="messageText"></p>
+  <button onclick="hideMessage()">OK</button>
+</div>
+
+<script type="module">
+  const canvas = document.getElementById('galaxy');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars = [];
+  function resizeGalaxy() { 
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: w > 768 ? 500 : 200 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      z: Math.random() * w
+    }));
+  }
+  function drawGalaxy() { 
+    ctx.fillStyle = "rgba(10, 0, 25, 0.3)";
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2;
+    const cy = h / 2;
+    for (let s of stars) {
+      s.z -= 1;
+      if (s.z <= 0) s.z = w;
+      const k = w / s.z;
+      const x = (s.x - cx) * k + cx;
+      const y = (s.y - cy) * k + cy;
+      if (x >= 0 && x < w && y >= 0 && y < h) {
+        const size = (1 - s.z / w) * 2.5;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(drawGalaxy);
+  }
+  window.addEventListener('resize', resizeGalaxy);
+  resizeGalaxy();
+  drawGalaxy();
+
+  let menuOpenedWhenVerySmall = false;
+  const verySmallBreakpoint = 480; 
+
+  window.toggleMenu = function() {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    nav.classList.toggle("active");
+    icon.classList.toggle("flip");
+    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+
+    if (nav.classList.contains("active")) { 
+      if (window.innerWidth <= verySmallBreakpoint) {
+        menuOpenedWhenVerySmall = true;
+      } else {
+        menuOpenedWhenVerySmall = false; 
+      }
+    } else { 
+      menuOpenedWhenVerySmall = false;
+    }
+  };
+
+  document.addEventListener('click', function(e) {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    if (nav.classList.contains("active") && !nav.contains(e.target) && e.target !== icon && !icon.contains(e.target)) {
+      nav.classList.remove("active");
+      icon.classList.remove("flip");
+      icon.textContent = "☰";
+      menuOpenedWhenVerySmall = false; 
+    }
+  });
+
+  window.showMessage = function(messageContent = 'Thank you for your message! I will get back to you soon.') {
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    messageText.textContent = messageContent;
+    messageBox.style.display = 'block';
+  };
+
+  window.hideMessage = function() {
+    const messageBox = document.getElementById('messageBox');
+    messageBox.style.display = 'none';
+  };
+
+  const userFeedbackForm = document.getElementById('userFeedbackForm');
+  const feedbackUserNameInput = document.getElementById('feedbackUserName');
+  const feedbackUserGenderMale = document.getElementById('feedbackUserGenderMale');
+  const feedbackUserGenderFemale = document.getElementById('feedbackUserGenderFemale');
+  const feedbackTextInput = document.getElementById('feedbackText');
+
+
+  if (userFeedbackForm) {
+    userFeedbackForm.addEventListener('submit', async (event) => {
+      event.preventDefault(); 
+
+      const userName = feedbackUserNameInput.value.trim();
+      let userGender = '';
+      if (feedbackUserGenderMale.checked) {
+        userGender = feedbackUserGenderMale.value;
+      } else if (feedbackUserGenderFemale.checked) {
+        userGender = feedbackUserGenderFemale.value;
+      }
+      const feedbackText = feedbackTextInput.value.trim();
+
+      if (!userName || !userGender || !feedbackText) {
+        showMessage("Please fill in all required fields (Name, Gender, Feedback).");
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.append('name', userName);
+      params.append('feedback', feedbackText);
+      params.append('gender', userGender);
+
+      showMessage('Thank you for your feedback! Redirecting to rating page...');
+      userFeedbackForm.reset(); 
+      setTimeout(() => {
+        hideMessage();
+        window.location.href = `feedback.html?${params.toString()}`;
+      }, 1500); 
+    });
+  } else {
+    console.error("Feedback form with ID 'userFeedbackForm' not found.");
+  }
+
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) { 
+    contactForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+          showMessage('Thank you for your message! I will get back to you soon.');
+          form.reset();
+        } else {
+          const data = await response.json().catch(() => ({})); 
+          if (data.errors) {
+            showMessage('There was an error sending your message. Please check your inputs.');
+            console.error('Formspree errors:', data.errors);
+          } else {
+            showMessage('There was an unexpected error. Please try again.');
+            console.error('Form submission error:', response.statusText, data);
+          }
+        }
+      } catch (error) {
+        showMessage('Network error. Please check your internet connection and try again.');
+        console.error('Fetch error:', error);
+      }
+    });
+  }
+
+  window.addEventListener('resize', function() {
+      const mobileNav = document.getElementById("mobileNav");
+      const menuIcon = document.getElementById("menuIcon");
+      const desktopBreakpoint = 480;
+      const currentWidth = window.innerWidth;
+
+      function closeMobileNav() {
+          if (mobileNav.classList.contains("active")) {
+            mobileNav.classList.remove("active");
+            if (menuIcon) {
+                menuIcon.classList.remove("flip");
+                menuIcon.textContent = "☰";
+            }
+            menuOpenedWhenVerySmall = false; 
+          }
+      }
+
+      if (mobileNav.classList.contains("active")) {
+          if (currentWidth > desktopBreakpoint) {
+              closeMobileNav();
+          }
+          else if (menuOpenedWhenVerySmall && currentWidth > verySmallBreakpoint) {
+              closeMobileNav();
+          }
+      }
+      if (!mobileNav.classList.contains("active")) {
+          menuOpenedWhenVerySmall = false;
+      }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    resizeGalaxy();
+    drawGalaxy();
+  });
+</script>
+</body>
+</html>

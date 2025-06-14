@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Pulse</title>
+    <style>
+        :root {
+            --neon-cyan: #0ff;
+            --hacker-green: #0f0;
+            --deep-space: #000;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--deep-space);
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cyber-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hex-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            left: -50%;
+            top: -50%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+            animation: gridRotate 20s linear infinite;
+            transform: translateZ(0);
+        }
+
+        .core-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--hacker-green);
+            font-size: clamp(2rem, 8vw, 4rem);
+            text-shadow: 0 0 15px var(--hacker-green);
+            white-space: nowrap;
+            z-index: 4;
+        }
+
+        .core-pulse::after {
+            content: '▋';
+            animation: cursor 1s infinite;
+            margin-left: 3px;
+            color: var(--hacker-green);
+            font-size: 0.7em;
+            vertical-align: text-top;
+        }
+
+        .binary-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+            gap: 10px;
+            padding: 20px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .binary-cell {
+            color: var(--hacker-green);
+            text-align: center;
+            animation: binaryFlicker 2s infinite;
+        }
+
+        .random-binary-string {
+            position: absolute;
+            color: var(--hacker-green);
+            font-size: clamp(0.6rem, 2vw, 1.5rem);
+            pointer-events: none;
+            user-select: none;
+            animation: floatBinary 3s forwards ease-out;
+            white-space: pre;
+            z-index: 3;
+        }
+
+        @keyframes floatBinary {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.8);
+            }
+        }
+
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 6px var(--neon-cyan), 0 0 12px var(--neon-cyan);
+            opacity: 0.6;
+            animation: dotFade 1.5s forwards ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes dotFade {
+            0% { opacity: 0.6; }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        /* Background animations */
+        @keyframes gridRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes binaryFlicker {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.05; }
+        }
+
+        @keyframes cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-container">
+        <div class="hex-grid"></div>
+        <a href="theme2.html" style="color: inherit; text-decoration: none;">
+            <div class="binary-grid" id="binaryGrid"></div>
+            <div class="core-pulse" id="corePulse"></div>
+        </a>
+    </div>
+
+    <script>
+        (function() {
+            // Binary grid initialization
+            const binaryGrid = document.getElementById('binaryGrid');
+            const chars = ['0', '1'];
+            const gridSize = 200;
+
+            for (let i = 0; i < gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'binary-cell';
+                cell.textContent = chars[Math.floor(Math.random() * chars.length)];
+                cell.style.animationDelay = `${Math.random() * 2}s`;
+                binaryGrid.appendChild(cell);
+            }
+
+            // Typewriter effect
+            const texts = ["SYSTEM_ACTIVE", "CORE_ACTIVE", "ACCESS_GRANTED"];
+            const pulseElement = document.getElementById('corePulse');
+            let currentText = 0;
+            let isDeleting = false;
+            let textIndex = 0;
+
+            function typeText() {
+                const current = texts[currentText];
+                if (isDeleting) {
+                    pulseElement.textContent = current.substring(0, textIndex--);
+                    if (textIndex === 0) {
+                        isDeleting = false;
+                        currentText = (currentText + 1) % texts.length;
+                        setTimeout(typeText, 1500);
+                    } else {
+                        setTimeout(typeText, 50);
+                    }
+                } else {
+                    pulseElement.textContent = current.substring(0, textIndex++);
+                    if (textIndex > current.length) {
+                        isDeleting = true;
+                        setTimeout(typeText, 1500);
+                    } else {
+                        setTimeout(typeText, 100 + Math.random() * 50);
+                    }
+                }
+            }
+
+            // Generate random binary string
+            function generateBinaryString(length = 6) {
+                return Array.from({ length }, () => Math.random() > 0.5 ? '1' : '0').join('');
+            }
+
+            // Spawn floating binary string
+            function spawnBinaryString() {
+                const containerRect = document.querySelector('.cyber-container').getBoundingClientRect();
+                const coreRect = pulseElement.getBoundingClientRect();
+
+                let x, y;
+
+                // Try to avoid spawning over the center text
+                do {
+                    x = Math.random() * window.innerWidth;
+                    y = Math.random() * window.innerHeight;
+                } while (
+                    x >= coreRect.left && x <= coreRect.right &&
+                    y >= coreRect.top && y <= coreRect.bottom
+                );
+
+                const binaryStr = document.createElement('div');
+                binaryStr.className = 'random-binary-string';
+                binaryStr.textContent = generateBinaryString(Math.floor(Math.random() * 4) + 4); // 4–8 digits
+                binaryStr.style.left = `${x}px`;
+                binaryStr.style.top = `${y}px`;
+                binaryStr.style.fontSize = `${Math.random() * 1.2 + 0.6}rem`; // 0.6rem to 1.8rem
+
+                document.body.appendChild(binaryStr);
+
+                setTimeout(() => binaryStr.remove(), 3000);
+            }
+
+            // Create fast fading dot
+            function createDot() {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+
+                dot.style.left = `${Math.random() * window.innerWidth}px`;
+                dot.style.top = `${Math.random() * window.innerHeight}px`;
+
+                document.body.appendChild(dot);
+
+                setTimeout(() => dot.remove(), 1500);
+            }
+
+            // Start animations
+            window.addEventListener('DOMContentLoaded', () => {
+                typeText();
+                setInterval(spawnBinaryString, 400);
+                setInterval(createDot, 150);
+            });
+        })();
+    </script>
+</body>
+</html>
