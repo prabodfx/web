@@ -284,8 +284,9 @@
     }
     .admin-comments-section.visible {
         max-height: 500px; 
-        padding-top: 1rem;
-        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        padding-top: 0.01rem;
+        border-top: 2px dashed rgb(255, 255, 255); 
+        margin-top: 2rem; 
     }
     .admin-comments-section h4 {
         color: var(--main-color);
@@ -305,8 +306,8 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     .admin-comment-card .profile-icon {
-        width: 32px; 
-        height: 32px;
+        width: 40px; 
+        height: 40px;
         flex-shrink: 0;
         margin-right: 8px;
         background-color: rgba(255, 255, 255, 0.15); 
@@ -318,11 +319,11 @@
     .admin-comment-content .admin-name {
         font-weight: bold;
         color: var(--heading-color);
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         margin-bottom: 2px;
     }
     .admin-comment-content .comment-text {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         line-height: 1.4;
         color: var(--text-color);
     }
@@ -336,8 +337,15 @@
         text-align: center;
         color: var(--secondary-text-color);
         font-size: 1.2rem;
-        margin-top: 50px;
+        margin-bottom: 50px;
         display: none; 
+    }
+    .no-admin-reply-message { 
+        text-align: center;
+        color: var(--secondary-text-color);
+        font-size: 0.9rem;
+        padding: 10px 0;
+        margin-bottom: 0;
     }
 
     .rate-us-overlay {
@@ -400,6 +408,7 @@
       justify-content: center;
       font-size: 2.2rem;
       margin-bottom: 1.5rem;
+      gap: 0.5rem; 
     }
 
     .rate-us-card .stars-interactive .fas {
@@ -972,7 +981,7 @@
               const starsHtml = Array(rating).fill('<i class="fas fa-star"></i>').join('');
               const adminCommentsHtml = feedbackData.comments && feedbackData.comments.length > 0 ? `
                   <div class="admin-comments-section" id="adminReplySection-${doc.id}">
-                      <h4>Admin Comments</h4>
+                      <h4>Admin Comment</h4>
                       ${feedbackData.comments.map(comment => {
                           const adminTimestampDate = comment.timestamp && comment.timestamp.toDate ? comment.timestamp.toDate() : null;
                           let formattedAdminDateTime = ''; 
@@ -993,7 +1002,7 @@
                               <div class="admin-comment-card">
                                   ${getProfileIconHtml('admin', comment.adminProfileImage || 'https://placehold.co/40x40/cccccc/000000?text=Admin')}
                                   <div class="admin-comment-content">
-                                      <span class="admin-name">${comment.adminName || 'Admin'}</span><br>
+                                      <span class="admin-name">PRABOD</span><br>
                                       <span class="comment-text">${comment.commentText}</span>
                                       <div class="comment-timestamp">${formattedAdminDateTime}</div>
                                   </div>
@@ -1015,7 +1024,7 @@
                         <div class="date-time">${formattedDateTime}</div>
                     </div>
                 </div>
-                <div class="feedback-text">${feedbackData.text}</div>
+                <div class="feedback-text">${feedbackData.text.replace(/\n/g, '<br>')}</div>
                 <div class="stars">${starsHtml}</div>
                 <button class="reply-btn" data-feedback-id="${doc.id}">Admin Reply</button>
                 ${adminCommentsHtml}
