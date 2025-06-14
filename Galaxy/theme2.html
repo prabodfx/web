@@ -1,163 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Finix 𝜷</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle at center, #0e001b, #000);
-    }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-
-    .center-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: #e0caff;
-      font-size: 3em;
-      font-weight: 600;
-      text-shadow:
-        0 0 10px rgba(180, 100, 255, 0.6),
-        0 0 20px rgba(180, 100, 255, 0.4),
-        0 0 30px rgba(180, 100, 255, 0.3);
-      z-index: 1;
-      padding: 0 20px;
-      opacity: 0;
-      animation: fadeInFloat 1.5s ease-out forwards;
-      white-space: nowrap;
-    }
-
-    @keyframes fadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -60%);
-      }
-      100% {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .center-text {
-        font-size: 2.5em;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .center-text {
-        font-size: 1.5em;
-      }
-    }
-  </style>
-</head>
-<body>
-  <canvas id="galaxy"></canvas>
-  <a href="../Galaxy/theme3.html" style="color: inherit; text-decoration: none;">
-    <div class="center-text">FINIX 𝜷</div>
-  </a>
-  <script>
-    const canvas = document.getElementById('galaxy');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let bufferCache;
-
-    function createBuffer() {
-      const buffer = document.createElement('canvas');
-      const bctx = buffer.getContext('2d');
-      const size = 32;
-      buffer.width = size;
-      buffer.height = size;
-      
-      const gradient = bctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-      gradient.addColorStop(0, 'rgba(200, 100, 255, 1)');
-      gradient.addColorStop(1, 'rgba(200, 100, 255, 0)');
-      
-      bctx.fillStyle = gradient;
-      bctx.beginPath();
-      bctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
-      bctx.fill();
-      
-      return buffer;
-    }
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      createStars(500);
-    }
-
-    function createStars(count) {
-      stars = [];
-      for (let i = 0; i < count; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          z: Math.random() * canvas.width
-        });
-      }
-    }
-
-    function drawStars() {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const focalLength = canvas.width;
-
-      ctx.fillStyle = "rgba(10, 0, 25, 0.2)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      if (!bufferCache) bufferCache = createBuffer();
-      
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        star.z -= 2;
-
-        if (star.z <= 0) {
-          star.z = canvas.width;
-          star.x = Math.random() * canvas.width;
-          star.y = Math.random() * canvas.height;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Cyber Cosmic Nexus</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0a0010 0%, #020003 100%);
+            height: 100svh;
+            font-family: 'Courier New', monospace;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        const k = focalLength / star.z;
-        const x = (star.x - cx) * k + cx;
-        const y = (star.y - cy) * k + cy;
-        
-        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+        #matrix-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            mix-blend-mode: screen;
+            opacity: 0.3;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
 
-        const size = (1 - star.z / canvas.width) * 3;
-        ctx.drawImage(
-          bufferCache,
-          x - size,
-          y - size,
-          size * 2,
-          size * 2
-        );
-      }
-    }
+        .matrix-digit {
+            position: absolute;
+            color: #00ff88;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00ff88;
+            opacity: 0.7;
+            animation: fall linear infinite;
+            will-change: transform;
+        }
 
-    function animate() {
-      drawStars();
-      requestAnimationFrame(animate);
-    }
+        @keyframes fall {
+            from { transform: translateY(-100svh); }
+            to { transform: translateY(100svh); }
+        }
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    animate();
-  </script>
+        .cyber-star {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #9d00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #9d00ff;
+            animation: pulse 2s infinite alternate;
+            will-change: transform, opacity;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .hacker-grid {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 2;
+            top: 0;
+            left: 0;
+        }
+
+        .cyber-title {
+            position: relative;
+            color: #9d00ff;
+            font-size: 4em;
+            text-shadow: 0 0 20px #9d00ff;
+            animation: glitch 2s infinite;
+            text-align: center;
+            will-change: transform;
+            z-index: 4;
+            max-width: 90vw;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .cyber-title {
+                font-size: 2.8em;
+            }
+            .matrix-digit {
+                font-size: 12px;
+            }
+        }
+
+        @keyframes glitch {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(2deg); }
+            40% { transform: skew(-1deg); }
+            60% { transform: skew(0.5deg); }
+            80% { transform: skew(-0.5deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom,
+                transparent 0%,
+                rgba(0, 255, 136, 0.9) 50%,
+                transparent 100%);
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.8),
+                        0 0 20px rgba(0, 255, 136, 0.6),
+                        0 0 30px rgba(0, 255, 136, 0.4);
+            filter: blur(0.3px);
+            will-change: top;
+            z-index: 3;
+            pointer-events: none;
+            left: 0;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0%;
+            }
+            100% {
+                top: 100%;
+            }
+        }
+
+        .cyber-comet {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #9d00ff, #00ff88);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: comet linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes comet {
+            0% { transform: translate(-100vw, -100svh); }
+            100% { transform: translate(200vw, 200svh); }
+        }
+
+        .terminal-text {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff88;
+            white-space: pre;
+            will-change: contents;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <a href="theme3.html" style="color: inherit; text-decoration: none; display: contents;">
+        <div class="content-wrapper">
+            <div class="cyber-title">AREA9.9</div>
+        </div>
+        <div class="hacker-grid"></div>
+        <div class="scan-line"></div>
+        <div id="matrix-container"></div>
+        <div class="terminal-text"></div>
+    </a>
+    <script>
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        let resizeTimeout;
+
+        function createMatrix() {
+            const container = document.getElementById('matrix-container');
+            const columnWidth = isMobile ? 22 : 16;
+            const columns = Math.floor(window.innerWidth / columnWidth);
+            const existingDigits = container.children;
+
+            while(existingDigits.length > columns) {
+                container.removeChild(existingDigits[existingDigits.length - 1]);
+            }
+
+            for(let i = 0; i < columns; i++) {
+                const digit = existingDigits[i] || document.createElement('div');
+                digit.className = 'matrix-digit';
+                digit.style.cssText = `
+                    left: ${i * columnWidth}px;
+                    animation-duration: ${Math.random() * 3 + 2}s;
+                    animation-delay: ${Math.random() * -5}s;
+                `;
+                if(!existingDigits[i]) {
+                    digit.textContent = Math.random() > 0.5 ? '0' : '1';
+                    container.appendChild(digit);
+                }
+            }
+        }
+
+        function createStars() {
+            const container = document.body;
+            const starCount = isMobile ? 100 : 200;
+            const existingStars = document.querySelectorAll('.cyber-star');
+
+            while(existingStars.length > starCount) {
+                container.removeChild(existingStars[existingStars.length - 1]);
+            }
+
+            for(let i = existingStars.length; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'cyber-star';
+                star.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}svh;
+                    animation-duration: ${Math.random() * 2 + 1}s;
+                `;
+                container.appendChild(star);
+            }
+        }
+
+        function createComets() {
+            const cometCount = isMobile ? 3 : 5;
+            const existingComets = document.querySelectorAll('.cyber-comet');
+
+            while(existingComets.length > cometCount) {
+                document.body.removeChild(existingComets[existingComets.length - 1]);
+            }
+
+            for(let i = existingComets.length; i < cometCount; i++) {
+                const comet = document.createElement('div');
+                comet.className = 'cyber-comet';
+                comet.style.cssText = `
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}svh;
+                    animation-duration: ${Math.random() * 10 + 5}s;
+                `;
+                document.body.appendChild(comet);
+            }
+        }
+
+        function terminalEffect() {
+            const texts = [
+                'INITIALIZING NEURAL NETWORK...',
+                'ACCESSING MAINFRAME...',
+                'CONNECTING TO SATELLITE...',
+                'DECRYPTING DATA STREAM...',
+                'ESTABLISHING QUANTUM LINK...'
+            ];
+            const element = document.querySelector('.terminal-text');
+            let currentText = '';
+            let currentIndex = 0;
+            let textIndex = 0;
+            let lastFrame = 0;
+
+            function type(timestamp) {
+                if(!lastFrame) lastFrame = timestamp;
+                const delta = timestamp - lastFrame;
+
+                if(delta > 50) {
+                    if(currentIndex < texts[textIndex].length) {
+                        currentText += texts[textIndex].charAt(currentIndex);
+                        element.textContent = currentText;
+                        currentIndex++;
+                    } else {
+                        lastFrame = 0;
+                        requestAnimationFrame(erase);
+                        return;
+                    }
+                    lastFrame = timestamp;
+                }
+                requestAnimationFrame(type);
+            }
+
+            function erase(timestamp) {
+                if(!lastFrame) lastFrame = timestamp;
+                const delta = timestamp - lastFrame;
+
+                if(delta > 30) {
+                    if(currentText.length > 0) {
+                        currentText = currentText.slice(0, -1);
+                        element.textContent = currentText;
+                    } else {
+                        textIndex = (textIndex + 1) % texts.length;
+                        currentIndex = 0;
+                        lastFrame = 0;
+                        requestAnimationFrame(type);
+                        return;
+                    }
+                    lastFrame = timestamp;
+                }
+                requestAnimationFrame(erase);
+            }
+
+            requestAnimationFrame(type);
+        }
+
+        function handleResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                createMatrix();
+                createStars();
+                createComets();
+            }, 200);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            createMatrix();
+            createStars();
+            createComets();
+            terminalEffect();
+            window.addEventListener('resize', handleResize);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
 </body>
 </html>
