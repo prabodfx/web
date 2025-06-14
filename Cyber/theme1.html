@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>Cyber Pulse</title>
     <style>
         :root {
@@ -13,19 +13,26 @@
 
         body {
             margin: 0;
-            min-height: 100vh;
+            height: 100svh;
             background: var(--deep-space);
             overflow: hidden;
-            display: grid;
-            place-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-family: 'Courier New', monospace;
+            touch-action: none;
         }
 
         .cyber-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .hex-grid {
@@ -34,7 +41,7 @@
             height: 200%;
             left: -50%;
             top: -50%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 40px 40px;
@@ -44,15 +51,15 @@
         }
 
         .core-pulse {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
             color: var(--hacker-green);
             font-size: clamp(2rem, 8vw, 4rem);
             text-shadow: 0 0 15px var(--hacker-green);
             white-space: nowrap;
             z-index: 4;
+            max-width: 90vw;
+            box-sizing: border-box;
+            text-align: center;
         }
 
         .core-pulse::after {
@@ -65,7 +72,7 @@
         }
 
         .binary-grid {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -86,7 +93,7 @@
         }
 
         .random-binary-string {
-            position: absolute;
+            position: fixed;
             color: var(--hacker-green);
             font-size: clamp(0.6rem, 2vw, 1.5rem);
             pointer-events: none;
@@ -108,7 +115,7 @@
         }
 
         .dot {
-            position: absolute;
+            position: fixed;
             width: 4px;
             height: 4px;
             border-radius: 50%;
@@ -124,7 +131,6 @@
             100% { opacity: 0; transform: scale(0.5); }
         }
 
-        /* Background animations */
         @keyframes gridRotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -144,7 +150,7 @@
 <body>
     <div class="cyber-container">
         <div class="hex-grid"></div>
-        <a href="theme2.html" style="color: inherit; text-decoration: none;">
+        <a href="theme2.html" style="color: inherit; text-decoration: none; display: contents;">
             <div class="binary-grid" id="binaryGrid"></div>
             <div class="core-pulse" id="corePulse"></div>
         </a>
@@ -152,7 +158,6 @@
 
     <script>
         (function() {
-            // Binary grid initialization
             const binaryGrid = document.getElementById('binaryGrid');
             const chars = ['0', '1'];
             const gridSize = 200;
@@ -165,7 +170,6 @@
                 binaryGrid.appendChild(cell);
             }
 
-            // Typewriter effect
             const texts = ["SYSTEM_ACTIVE", "CORE_ACTIVE", "ACCESS_GRANTED"];
             const pulseElement = document.getElementById('corePulse');
             let currentText = 0;
@@ -194,19 +198,16 @@
                 }
             }
 
-            // Generate random binary string
             function generateBinaryString(length = 6) {
                 return Array.from({ length }, () => Math.random() > 0.5 ? '1' : '0').join('');
             }
 
-            // Spawn floating binary string
             function spawnBinaryString() {
                 const containerRect = document.querySelector('.cyber-container').getBoundingClientRect();
                 const coreRect = pulseElement.getBoundingClientRect();
 
                 let x, y;
 
-                // Try to avoid spawning over the center text
                 do {
                     x = Math.random() * window.innerWidth;
                     y = Math.random() * window.innerHeight;
@@ -217,17 +218,16 @@
 
                 const binaryStr = document.createElement('div');
                 binaryStr.className = 'random-binary-string';
-                binaryStr.textContent = generateBinaryString(Math.floor(Math.random() * 4) + 4); // 4–8 digits
+                binaryStr.textContent = generateBinaryString(Math.floor(Math.random() * 4) + 4);
                 binaryStr.style.left = `${x}px`;
                 binaryStr.style.top = `${y}px`;
-                binaryStr.style.fontSize = `${Math.random() * 1.2 + 0.6}rem`; // 0.6rem to 1.8rem
+                binaryStr.style.fontSize = `${Math.random() * 1.2 + 0.6}rem`;
 
                 document.body.appendChild(binaryStr);
 
                 setTimeout(() => binaryStr.remove(), 3000);
             }
 
-            // Create fast fading dot
             function createDot() {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
@@ -240,7 +240,6 @@
                 setTimeout(() => dot.remove(), 1500);
             }
 
-            // Start animations
             window.addEventListener('DOMContentLoaded', () => {
                 typeText();
                 setInterval(spawnBinaryString, 400);
