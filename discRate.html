@@ -11,10 +11,10 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Dark blue background */
+            background-color: #0f172a;
         }
         .gradient-bg {
-            background-image: linear-gradient(to right, #6d28d9, #9333ea); /* Purple gradient */
+            background-image: linear-gradient(to right, #6d28d9, #9333ea);
         }
     </style>
 </head>
@@ -69,7 +69,6 @@
     </div>
 
     <script>
-        // Get references to all the necessary DOM elements
         const setPriceInput = document.getElementById('set-price');
         const gvPriceInput = document.getElementById('gv-price');
         const calculateButton = document.getElementById('calculate-button');
@@ -78,24 +77,19 @@
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
 
-        // Added code to automatically focus on the first input field when the page loads
         document.addEventListener('DOMContentLoaded', (event) => {
             if (setPriceInput) {
                 setPriceInput.focus();
             }
         });
         
-        // This function encapsulates the core calculation logic
         function calculateRate() {
-            // Get the values from the input fields
             const a = parseFloat(setPriceInput.value);
             const b = parseFloat(gvPriceInput.value);
 
-            // Hide previous results and messages
             resultContainer.style.display = 'none';
             messageBox.style.display = 'none';
 
-            // Input validation
             if (isNaN(a) || a === null || a === '') {
                 showMessage("Please enter a value for the Seted Price.", true);
                 setPriceInput.focus();
@@ -114,19 +108,15 @@
                 return;
             }
 
-            // Perform the calculation
             const x = ((a - b) / a) * 100;
             
-            // Display the result with two decimal places
             const calculatedResult = x.toFixed(2);
             resultElement.textContent = calculatedResult;
             resultContainer.style.display = 'block';
 
-            // Automatically copy the value to the clipboard
             copyToClipboard(calculatedResult);
         }
 
-        // Function to display an error or success message
         function showMessage(text, isError = false) {
             messageText.textContent = text;
             messageBox.style.display = 'block';
@@ -137,35 +127,29 @@
                 messageBox.classList.add('bg-green-700');
                 messageBox.classList.remove('bg-red-800');
             }
-            // Hide the message after 5 seconds
             setTimeout(() => {
                 messageBox.style.display = 'none';
             }, 5000);
         }
 
-        // Function to copy text to the clipboard
         function copyToClipboard(text) {
-            // Create a temporary input element to hold the text
             const tempInput = document.createElement('input');
             tempInput.value = text;
             document.body.appendChild(tempInput);
             
-            // Select the text and copy it
             tempInput.select();
             document.execCommand('copy');
             
-            // Remove the temporary input
             document.body.removeChild(tempInput);
             
             showMessage("Rate copied to clipboard!", false);
         }
 
-        // Event listeners for keyboard and click actions
         calculateButton.addEventListener('click', calculateRate);
 
         setPriceInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Prevents form submission
+                event.preventDefault();
                 if (setPriceInput.value && gvPriceInput.value) {
                     calculateRate();
                 } else {
@@ -176,7 +160,7 @@
 
         gvPriceInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Prevents form submission
+                event.preventDefault();
                 calculateRate();
             }
         });
