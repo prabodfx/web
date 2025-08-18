@@ -39,16 +39,14 @@
           <div>
             <label for="from" class="block text-sm font-medium text-slate-300 mb-2 text-left">From</label>
             <div class="relative">
-              <input id="from" type="text" placeholder="YYYY/MM/DD"
-                autocomplete="off" aria-label="From date"
+              <input id="from" type="date" placeholder="YYYY-MM-DD or MM-DD or MMDD" autocomplete="off" aria-label="From date"
                 class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white">
             </div>
           </div>
           <div>
             <label for="to" class="block text-sm font-medium text-slate-300 mb-2 text-left">To</label>
             <div class="relative">
-              <input id="to" type="text" placeholder="YYYY/MM/DD"
-                autocomplete="off" aria-label="To date"
+              <input id="to" type="date" placeholder="YYYY-MM-DD or MM-DD or MMDD" autocomplete="off" aria-label="To date"
                 class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white">
             </div>
           </div>
@@ -81,7 +79,7 @@
           <div class="text-red-500 text-sm mt-1" id="error" style="display:none"></div>
           <div class="text-slate-500 text-xs mt-3">
             <span id="example" class="inline-flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-800 transition-colors">
-              Example: 0819 → 2025/08/19 = <div class="text-slate-400 text-sm" id="explain">7683 days</div>
+              Example: 0819 → 2004-08-06 = <div class="text-slate-400 text-sm" id="explain">7683 days</div>
             </span>
           </div>
         </div>
@@ -112,36 +110,37 @@
       el.status.style.background = ok ? 'linear-gradient(90deg, #22c55e, #a3e635)' : 'linear-gradient(90deg, #ef4444, #f43f5e)';
     }
 
-    // Auto format typed numbers into valid YYYY/MM/DD
+    // Auto format typed numbers into valid YYYY-MM-DD
     function autoFormatDate(input) {
       let v = input.value.replace(/\D/g, ""); // only numbers
       const today = new Date();
-
       if (v.length === 4) {
         // MMDD -> current year
-        input.value = `${today.getFullYear()}/${v.slice(0,2)}/${v.slice(2,4)}`;
+        input.value = `${today.getFullYear()}-${v.slice(0,2)}-${v.slice(2,4)}`;
       } else if (v.length === 8) {
         // YYYYMMDD
-        input.value = `${v.slice(0,4)}/${v.slice(4,6)}/${v.slice(6,8)}`;
-      } else {
-        // Insert slashes while typing YYYY/MM/DD
-        if (v.length > 4 && v.length <= 6) {
-          input.value = v.slice(0,4) + "/" + v.slice(4);
-        } else if (v.length > 6) {
-          input.value = v.slice(0,4) + "/" + v.slice(4,6) + "/" + v.slice(6,8);
-        } else {
-          input.value = v;
-        }
+        input.value = `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`;
+      }
+      // If they typed "MM-DD" with dashes
+      if (/^\d{2}-\d{2}$/.test(input.value)) {
+        input.value = `${today.getFullYear()}-${input.value}`;
       }
     }
 
     function parseDateInput(v) {
       if (!v) return null;
-      const parts = v.split("/").map(Number);
+      const today = new Date();
+      let y, m, d;
+      const parts = v.split("-").map(Number);
       if (parts.length === 3) {
-        return { y: parts[0], m: parts[1], d: parts[2] };
+        [y, m, d] = parts;
+      } else if (parts.length === 2) {
+        y = today.getFullYear();
+        [m, d] = parts;
+      } else {
+        return null;
       }
-      return null;
+      return { y, m, d };
     }
 
     function inclusiveDays(a, b) {
@@ -182,7 +181,7 @@
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
       const dd = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}/${mm}/${dd}`;
+      const todayStr = `${yyyy}-${mm}-${dd}`;
 
       if (el.from.value && !el.to.value) {
         el.to.value = todayStr;
@@ -206,7 +205,7 @@
     el.example.addEventListener('click', () => {
       el.from.value = '0819'; // MMDD typing
       autoFormatDate(el.from);
-      el.to.value = '2004/08/06';
+      el.to.value = '2004-08-06';
       render();
     });
   </script>
