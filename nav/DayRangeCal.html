@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title>Day Range Count | Prabodfx</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,10 @@
       }
     }
   </script>
+  <style>
+    /* Avoid iOS auto-zoom on focus */
+    input { font-size: 16px; }
+  </style>
 </head>
 <body class="bg-slate-900 text-white font-inter min-h-screen p-4">
 
@@ -30,7 +34,7 @@
           Day Range Count
         </h1>
         <p class="text-slate-400 text-sm sm:text-base">
-          Calculate the number of days between two dates.
+          Type numbers only. Mobile shows number keypad. Enter both dates ➜ keyboard closes automatically.
         </p>
       </section>
   
@@ -39,17 +43,20 @@
           <div>
             <label for="from" class="block text-sm font-medium text-slate-300 mb-2 text-left">From</label>
             <div class="relative">
-              <input id="from" type="date" placeholder="YYYY-MM-DD or MM-DD or MMDD" autocomplete="off" aria-label="From date"
-                inputmode="numeric"
-                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white">
+              <!-- Use text + inputmode to force numeric keypad on mobile -->
+              <input id="from" type="text" inputmode="numeric" pattern="\\d*" enterkeyhint="next" autocomplete="off" aria-label="From date"
+                placeholder="MMDD or YYYYMMDD"
+                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white"
+                maxlength="10">
             </div>
           </div>
           <div>
             <label for="to" class="block text-sm font-medium text-slate-300 mb-2 text-left">To</label>
             <div class="relative">
-              <input id="to" type="date" placeholder="YYYY-MM-DD or MM-DD or MMDD" autocomplete="off" aria-label="To date"
-                inputmode="numeric"
-                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white">
+              <input id="to" type="text" inputmode="numeric" pattern="\\d*" enterkeyhint="done" autocomplete="off" aria-label="To date"
+                placeholder="MMDD or YYYYMMDD"
+                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white"
+                maxlength="10">
             </div>
           </div>
         </div>
@@ -112,37 +119,21 @@
       el.status.style.background = ok ? 'linear-gradient(90deg, #22c55e, #a3e635)' : 'linear-gradient(90deg, #ef4444, #f43f5e)';
     }
 
-    // Auto format typed numbers into valid YYYY-MM-DD
-    function autoFormatDate(input) {
-      let v = input.value.replace(/\D/g, ""); // only numbers
-      const today = new Date();
-      if (v.length === 4) {
-        // MMDD -> current year
-        input.value = `${today.getFullYear()}-${v.slice(0,2)}-${v.slice(2,4)}`;
-      } else if (v.length === 8) {
-        // YYYYMMDD
-        input.value = `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`;
-      }
-      // If they typed "MM-DD" with dashes
-      if (/^\d{2}-\d{2}$/.test(input.value)) {
-        input.value = `${today.getFullYear()}-${input.value}`;
-      }
+    // Validate yyyy-mm-dd
+    function isValidYMD(y, m, d) {
+      const dt = new Date(y, m - 1, d);
+      return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
     }
 
     function parseDateInput(v) {
       if (!v) return null;
-      const today = new Date();
-      let y, m, d;
-      const parts = v.split("-").map(Number);
-      if (parts.length === 3) {
-        [y, m, d] = parts;
-      } else if (parts.length === 2) {
-        y = today.getFullYear();
-        [m, d] = parts;
-      } else {
+      // Accept already formatted YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        const [y, m, d] = v.split('-').map(Number);
+        if (isValidYMD(y, m, d)) return { y, m, d };
         return null;
       }
-      return { y, m, d };
+      return null;
     }
 
     function inclusiveDays(a, b) {
@@ -150,6 +141,75 @@
       const dateB = new Date(b.y, b.m - 1, b.d);
       const diff = Math.abs(dateB - dateA);
       return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function closeMobileKeyboard() {
+      // reliably close on iOS/Android
+      [el.from, el.to].forEach(inp => {
+        inp.setAttribute('readonly', 'true');
+        inp.blur();
+        setTimeout(() => inp.removeAttribute('readonly'), 50);
+      });
+    }
+
+    function finishIfBothValid() {
+      const A = parseDateInput(el.from.value.trim());
+      const B = parseDateInput(el.to.value.trim());
+      if (A && B) {
+        const d = inclusiveDays(A, B);
+        el.days.textContent = String(d);
+        setStatus('Calculated');
+        closeMobileKeyboard();
+        return true;
+      }
+      return false;
+    }
+
+    // Auto format typed numbers into valid YYYY-MM-DD
+    function autoFormat(input, next) {
+      const digits = input.value.replace(/\D/g, '');
+      const today = new Date();
+
+      // If user entered 8 digits => YYYYMMDD
+      if (digits.length === 8) {
+        const y = Number(digits.slice(0, 4));
+        const m = Number(digits.slice(4, 6));
+        const d = Number(digits.slice(6, 8));
+        if (isValidYMD(y, m, d)) {
+          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          if (next && !next.value) next.focus();
+          finishIfBothValid();
+          return;
+        }
+      }
+
+      // If user entered 4 digits => MMDD (uses current year)
+      if (digits.length === 4) {
+        const y = today.getFullYear();
+        const m = Number(digits.slice(0, 2));
+        const d = Number(digits.slice(2, 4));
+        if (isValidYMD(y, m, d)) {
+          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          if (next && !next.value) next.focus();
+          finishIfBothValid();
+          return;
+        }
+      }
+
+      // If user typed 5 chars like MM-DD
+      if (/^\d{2}-\d{2}$/.test(input.value)) {
+        const y = today.getFullYear();
+        const [m, d] = input.value.split('-').map(Number);
+        if (isValidYMD(y, m, d)) {
+          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          if (next && !next.value) next.focus();
+          finishIfBothValid();
+          return;
+        }
+      }
+
+      // Keep only digits while typing (shows raw digits before auto-format)
+      input.value = digits;
     }
 
     function render() {
@@ -165,10 +225,6 @@
         const d = inclusiveDays(A, B);
         el.days.textContent = String(d);
         setStatus('Calculated');
-        // If both inputs are filled, unfocus to close keyboard
-        if (el.from.value && el.to.value && document.activeElement) {
-            document.activeElement.blur();
-        }
       } catch (e) {
         el.error.textContent = 'Invalid date input.';
         el.error.style.display = 'block';
@@ -177,19 +233,26 @@
     }
 
     // Events
-    el.from.addEventListener('input', () => { autoFormatDate(el.from); render(); });
-    el.to.addEventListener('input', () => { autoFormatDate(el.to); render(); });
-    el.calc.addEventListener('click', e => { e.preventDefault(); render(); });
+    el.from.addEventListener('input', () => { autoFormat(el.from, el.to); render(); });
+    el.to.addEventListener('input', () => { autoFormat(el.to, null); render(); });
+
+    // Auto-close on Enter
+    [el.from, el.to].forEach(inp => {
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (!finishIfBothValid()) {
+            // If only from is done, move to to
+            if (inp === el.from && !el.to.value) el.to.focus();
+          }
+        }
+      });
+    });
     
-    // NEW: Double click to clear input
-    el.from.addEventListener('dblclick', () => { 
-        el.from.value = '';
-        render();
-    });
-    el.to.addEventListener('dblclick', () => { 
-        el.to.value = '';
-        render();
-    });
+    el.calc.addEventListener('click', e => { e.preventDefault(); finishIfBothValid() || render(); });
+    
+    // Double tap to clear input
+    el.from.addEventListener('dblclick', () => { el.from.value = ''; render(); });
+    el.to.addEventListener('dblclick', () => { el.to.value = ''; render(); });
 
     el.single.addEventListener('click', e => {
       e.preventDefault();
@@ -207,6 +270,7 @@
         el.from.value = todayStr;
       }
       render();
+      finishIfBothValid();
     });
 
     el.clear.addEventListener('click', e => {
@@ -220,9 +284,10 @@
 
     el.example.addEventListener('click', () => {
       el.from.value = '0819'; // MMDD typing
-      autoFormatDate(el.from);
+      autoFormat(el.from, el.to);
       el.to.value = '2004-08-06';
       render();
+      finishIfBothValid();
     });
   </script>
   
