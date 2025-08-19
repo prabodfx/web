@@ -20,7 +20,6 @@
     }
   </script>
   <style>
-    /* Avoid iOS auto-zoom on focus */
     input { font-size: 16px; }
   </style>
 </head>
@@ -40,17 +39,16 @@
           <div>
             <label for="from" class="block text-sm font-medium text-slate-300 mb-2 text-left">From</label>
             <div class="relative">
-              <!-- Use text + inputmode to force numeric keypad on mobile -->
-              <input id="from" type="text" inputmode="numeric" pattern="\\d*" enterkeyhint="next" autocomplete="off" aria-label="From date"
+              <input id="from" type="text" inputmode="numeric" pattern="\d*" enterkeyhint="next" autocomplete="off" aria-label="From date"
                 placeholder="MMDD or YYYYMMDD"
                 class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white"
-                maxlength="10">
+                maxlength="10" autofocus>
             </div>
           </div>
           <div>
             <label for="to" class="block text-sm font-medium text-slate-300 mb-2 text-left">To</label>
             <div class="relative">
-              <input id="to" type="text" inputmode="numeric" pattern="\\d*" enterkeyhint="done" autocomplete="off" aria-label="To date"
+              <input id="to" type="text" inputmode="numeric" pattern="\d*" enterkeyhint="done" autocomplete="off" aria-label="To date"
                 placeholder="MMDD or YYYYMMDD"
                 class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white"
                 maxlength="10">
@@ -67,9 +65,9 @@
             class="btn bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-600 transition-all duration-200 w-full sm:w-auto">
             Count With Today
           </button>
-          <button id="clear"
+          <button id="freeze"
             class="btn bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-600 transition-all duration-200 w-full sm:w-auto">
-            Clear
+            Freeze Input
           </button>
         </div>
   
@@ -85,7 +83,7 @@
           <div class="text-red-500 text-sm mt-1" id="error" style="display:none"></div>
           <div class="text-slate-500 text-xs mt-3">
             <span id="example" class="inline-flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-800 transition-colors">
-              Example: 0819 → 2004-08-06 = <div class="text-slate-400 text-sm" id="explain">7683 days</div>
+              Example : 2004-08-06 =<div class="text-slate-400 text-sm" id="explain">7683 days</div>
             </span>
           </div>
         </div>
@@ -103,7 +101,7 @@
       to: document.getElementById('to'),
       calc: document.getElementById('calc'),
       single: document.getElementById('single'),
-      clear: document.getElementById('clear'),
+      freeze: document.getElementById('freeze'),
       days: document.getElementById('days'),
       status: document.getElementById('status'),
       error: document.getElementById('error'),
@@ -111,12 +109,13 @@
       example: document.getElementById('example')
     };
 
+    let freezeMode = false;
+
     function setStatus(msg, ok = true) {
       el.status.textContent = msg;
       el.status.style.background = ok ? 'linear-gradient(90deg, #22c55e, #a3e635)' : 'linear-gradient(90deg, #ef4444, #f43f5e)';
     }
 
-    // Validate yyyy-mm-dd
     function isValidYMD(y, m, d) {
       const dt = new Date(y, m - 1, d);
       return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
@@ -124,7 +123,6 @@
 
     function parseDateInput(v) {
       if (!v) return null;
-      // Accept already formatted YYYY-MM-DD
       if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
         const [y, m, d] = v.split('-').map(Number);
         if (isValidYMD(y, m, d)) return { y, m, d };
@@ -141,7 +139,6 @@
     }
 
     function closeMobileKeyboard() {
-      // reliably close on iOS/Android
       [el.from, el.to].forEach(inp => {
         inp.setAttribute('readonly', 'true');
         inp.blur();
@@ -162,12 +159,11 @@
       return false;
     }
 
-    // Auto format typed numbers into valid YYYY-MM-DD
     function autoFormat(input, next) {
+      if (freezeMode) return; // disable normal autoFormat when frozen
       const digits = input.value.replace(/\D/g, '');
       const today = new Date();
 
-      // If user entered 8 digits => YYYYMMDD
       if (digits.length === 8) {
         const y = Number(digits.slice(0, 4));
         const m = Number(digits.slice(4, 6));
@@ -180,7 +176,18 @@
         }
       }
 
-      // If user entered 4 digits => MMDD (uses current year)
+      if (digits.length === 3) {
+        const y = today.getFullYear();
+        const m = Number(digits.slice(0,2));
+        const d = Number(digits.slice(2,3));
+        if (isValidYMD(y, m, d)) {
+          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          if (next && !next.value) next.focus();
+          finishIfBothValid();
+          return;
+        }
+      }
+
       if (digits.length === 4) {
         const y = today.getFullYear();
         const m = Number(digits.slice(0, 2));
@@ -193,20 +200,69 @@
         }
       }
 
-      // If user typed 5 chars like MM-DD
-      if (/^\d{2}-\d{2}$/.test(input.value)) {
-        const y = today.getFullYear();
-        const [m, d] = input.value.split('-').map(Number);
-        if (isValidYMD(y, m, d)) {
-          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          if (next && !next.value) next.focus();
-          finishIfBothValid();
-          return;
+      input.value = digits;
+    }
+
+    function autoFormatOnEnter(input, next) {
+      const digits = input.value.replace(/\D/g, '');
+      if (!freezeMode) {
+        const today = new Date();
+        if (digits.length === 2) {
+          const y = today.getFullYear();
+          const m = Number(digits.slice(0,1));
+          const d = Number(digits.slice(1,2));
+          if (isValidYMD(y, m, d)) {
+            input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            if (next && !next.value) next.focus();
+            finishIfBothValid();
+            return;
+          }
+        }
+      } else {
+        // Freeze Mode Parsing
+        if (digits.length === 8) {
+          let y = Number(digits.slice(0,4));
+          let m = Number(digits.slice(4,6));
+          let d = Number(digits.slice(6,8));
+          if (isValidYMD(y, m, d)) {
+            input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            if (next && !next.value) next.focus();
+            finishIfBothValid();
+            return;
+          }
+        }
+        if (digits.length === 7) {
+          let y = Number(digits.slice(0,4));
+          let m = Number(digits.slice(4,6));
+          let d = Number(digits.slice(6,7));
+          if (isValidYMD(y, m, d)) {
+            input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            if (next && !next.value) next.focus();
+            finishIfBothValid();
+            return;
+          }
+          // allow 2-digit day at the end (e.g., 2000609 -> 2000/06/09)
+          m = Number(digits.slice(4,5));
+          d = Number(digits.slice(5,7));
+          if (isValidYMD(y, m, d)) {
+            input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            if (next && !next.value) next.focus();
+            finishIfBothValid();
+            return;
+          }
+        }
+        if (digits.length === 6) {
+          let y = Number(digits.slice(0,4));
+          let m = Number(digits.slice(4,5));
+          let d = Number(digits.slice(5,6));
+          if (isValidYMD(y, m, d)) {
+            input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            if (next && !next.value) next.focus();
+            finishIfBothValid();
+            return;
+          }
         }
       }
-
-      // Keep only digits while typing (shows raw digits before auto-format)
-      input.value = digits;
     }
 
     function render() {
@@ -229,16 +285,14 @@
       }
     }
 
-    // Events
     el.from.addEventListener('input', () => { autoFormat(el.from, el.to); render(); });
     el.to.addEventListener('input', () => { autoFormat(el.to, null); render(); });
 
-    // Auto-close on Enter
     [el.from, el.to].forEach(inp => {
       inp.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+          autoFormatOnEnter(inp, inp === el.from ? el.to : null);
           if (!finishIfBothValid()) {
-            // If only from is done, move to to
             if (inp === el.from && !el.to.value) el.to.focus();
           }
         }
@@ -247,7 +301,6 @@
     
     el.calc.addEventListener('click', e => { e.preventDefault(); finishIfBothValid() || render(); });
     
-    // Double tap to clear input
     el.from.addEventListener('dblclick', () => { el.from.value = ''; render(); });
     el.to.addEventListener('dblclick', () => { el.to.value = ''; render(); });
 
@@ -261,34 +314,46 @@
 
       if (el.from.value && !el.to.value) {
         el.to.value = todayStr;
+        el.to.focus();
       } else if (el.to.value && !el.from.value) {
         el.from.value = todayStr;
+        el.from.focus();
       } else {
         el.from.value = todayStr;
+        el.from.focus();
       }
       render();
       finishIfBothValid();
     });
 
-    el.clear.addEventListener('click', e => {
+    // Freeze button toggle
+    el.freeze.addEventListener('click', e => {
       e.preventDefault();
-      el.from.value = '';
-      el.to.value = '';
-      el.days.textContent = '—';
-      el.error.style.display = 'none';
-      setStatus('Cleared');
+      freezeMode = !freezeMode;
+      setStatus(freezeMode ? 'Freeze Mode Enabled' : 'Freeze Mode Disabled');
+    });
+
+    // Spacebar or "F" toggles Freeze Mode anywhere
+    document.addEventListener('keydown', (e) => {
+      if (e.code === "Space" || e.key.toLowerCase() === "f") {
+        e.preventDefault(); // block space typing in inputs
+        freezeMode = !freezeMode;
+        setStatus(freezeMode ? 'Freeze Mode Enabled' : 'Freeze Mode Disabled');
+      }
     });
 
     el.example.addEventListener('click', () => {
-      el.from.value = '0819'; // MMDD typing
+      el.from.value = '0819';
       autoFormat(el.from, el.to);
       el.to.value = '2004-08-06';
       render();
       finishIfBothValid();
     });
+
+    window.addEventListener('load', () => {
+      el.from.focus();
+    });
   </script>
   
 </body>
 </html>
-
-
