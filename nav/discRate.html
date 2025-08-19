@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRABODfx DiscRate Cal</title>
+
+  <style>
+    /* === Global Reset === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* === Background === */
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top, #1e1b4b, #0f172a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      color: #fff;
+    }
+
+    /* === Card Container === */
+    .card {
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(25px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* === Title === */
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: .5rem;
+      text-align: center;
+      background: linear-gradient(90deg, #ffffff, #00ff04);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.sub {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 2rem;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+    }
+
+    /* === Labels & Inputs === */
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: #ddd;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.9rem 0.9rem 0.9rem 2.5rem;
+      border-radius: 0.8rem;
+      border: 1px solid #444;
+      background: #1e293b;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus {
+      border-color: #9333ea;
+      box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.4);
+    }
+
+    /* === Button === */
+    button {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 0.8rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, #6d28d9, #9333ea);
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(147, 51, 234, 0.6);
+    }
+
+    /* === Result Section === */
+    #result-container {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #333;
+      display: none;
+      text-align: center;
+    }
+
+    #result {
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, #ffffff, #ff0048);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #result + span {
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      font-weight: 800;
+      color: #ff0048;
+    }
+
+    /* === Message Box === */
+    #message-box {
+      margin-top: 1.5rem;
+      padding: 0.9rem;
+      border-radius: 0.7rem;
+      text-align: center;
+      display: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .msg-success {
+      background: #15803d;
+    }
+
+    .msg-error {
+      background: #b91c1c;
+    }
+
+    /* === Mobile adjustments === */
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.5rem;
+        border-radius: 1rem;
+      }
+      button {
+        padding: 0.9rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Price DiscRate Calculator</h1>
+    <p class="sub">Calculate the discount rate between two prices.</p>
+
+    <div class="input-group">
+      <label for="set-price">Seted Price</label>
+      <span>Rs.</span>
+      <input type="number" id="set-price" placeholder="e.g., 100">
+    </div>
+
+    <div class="input-group">
+      <label for="gv-price">Given Price</label>
+      <span>Rs.</span>
+      <input type="number" id="gv-price" placeholder="e.g., 80">
+    </div>
+
+    <button id="calculate-button">Calculate Rate</button>
+
+    <div id="result-container">
+      <p>The calculated rate is:</p>
+      <div>
+        <span id="result"></span><span>%</span>
+      </div>
+    </div>
+
+    <div id="message-box"><p id="message-text"></p></div>
+  </div>
+
+  <script>
+    const setPriceInput = document.getElementById('set-price');
+    const gvPriceInput = document.getElementById('gv-price');
+    const calculateButton = document.getElementById('calculate-button');
+    const resultContainer = document.getElementById('result-container');
+    const resultElement = document.getElementById('result');
+    const messageBox = document.getElementById('message-box');
+    const messageText = document.getElementById('message-text');
+
+    function calculateRate() {
+      const a = parseFloat(setPriceInput.value);
+      const b = parseFloat(gvPriceInput.value);
+
+      resultContainer.style.display = 'none';
+      messageBox.style.display = 'none';
+
+      if (isNaN(a) || a <= 0) {
+        showMessage("Please enter a valid Seted Price.", true);
+        setPriceInput.focus();
+        return;
+      }
+      if (isNaN(b)) {
+        showMessage("Please enter a value for the Given Price.", true);
+        gvPriceInput.focus();
+        return;
+      }
+
+      const x = ((a - b) / a) * 100;
+      const calculatedResult = x.toFixed(2);
+
+      resultElement.textContent = calculatedResult;
+      resultContainer.style.display = 'block';
+
+      copyToClipboard(calculatedResult);
+    }
+
+    function showMessage(text, isError) {
+      messageText.textContent = text;
+      messageBox.style.display = 'block';
+      messageBox.className = isError ? "msg-error" : "msg-success";
+      setTimeout(() => { messageBox.style.display = 'none'; }, 4000);
+    }
+
+    function copyToClipboard(text) {
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showMessage("Rate copied to clipboard!", false);
+    }
+
+    calculateButton.addEventListener('click', calculateRate);
+
+    setPriceInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (setPriceInput.value && gvPriceInput.value) {
+          calculateRate();
+        } else {
+          gvPriceInput.focus();
+        }
+      }
+    });
+    gvPriceInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        calculateRate();
+      }
+    });
+
+    window.onload = () => setPriceInput.focus();
+  </script>
+</body>
+</html>

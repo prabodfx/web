@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prabodfx | Projects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(at top, #1f2937, #111827);
+            transition: background-color 0.5s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-down {
+            animation: fadeInDown 1s ease-out forwards;
+        }
+
+        .animate-slide-in-up {
+            animation: slideInUp 0.8s ease-out forwards;
+        }
+
+        .animate-slide-in-up.button-delay-1 {
+            animation-delay: 0.5s;
+        }
+
+        .animate-slide-in-up.button-delay-2 {
+            animation-delay: 1s;
+        }
+
+        .btn-premium-effect:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+            transform: translateY(-4px) scale(1.02);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-inter antialiased flex flex-col items-center justify-center min-h-screen p-6">
+
+    <div class="text-center">
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-14 drop-shadow-2xl animate-fade-in-down whitespace-nowrap">
+            Prabodfx Projects
+        </h1>
+
+        <div class="flex flex-col sm:flex-row gap-6 items-center">
+
+            <a href="discRate.html" id="button1" class="btn-premium-effect w-full max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-1">
+                DiscRate Cal
+            </a>
+
+            <a href="DayRangeCal.html" id="button2" class="btn-premium-effect w-full max-w-xs bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-2">
+                DayRange Cal
+            </a>
+            
+        </div>
+    </div>
+
+</body>
+</html>
