@@ -6,7 +6,6 @@
   <title>PRABODfx DiscRate Cal</title>
 
   <style>
-    /* === Global Reset === */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -35,6 +34,12 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 20px 45px rgba(0,0,0,0.7);
       animation: fadeIn 0.8s ease;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        margin-bottom: 2rem; 
+      }
     }
 
     @keyframes fadeIn {
@@ -195,11 +200,9 @@
     const messageText = document.getElementById('message-text');
 
     function cleanInput(value) {
-      // keep digits and at most one dot
       value = value.replace(/[^0-9.]/g, "");
       const parts = value.split(".");
       if (parts.length > 2) {
-        // if multiple dots, keep first as decimal, join rest
         value = parts[0] + "." + parts.slice(1).join("");
       }
       return value;
@@ -279,12 +282,10 @@
       }
     });
     
-    // Function to clear input value on double click
     function clearInputOnDoubleClick(e) {
       e.target.value = '';
     }
 
-    // Add event listeners for double click on input fields
     setPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
     gvPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
 
