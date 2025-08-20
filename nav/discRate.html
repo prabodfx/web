@@ -6,14 +6,12 @@
   <title>PRABODfx DiscRate Cal</title>
 
   <style>
-    /* === Global Reset === */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    /* === Background === */
     body {
       font-family: 'Segoe UI', Roboto, sans-serif;
       background: radial-gradient(circle at top, #1e1b4b, #0f172a);
@@ -23,9 +21,9 @@
       min-height: 100vh;
       padding: 1rem;
       color: #fff;
+      overflow: hidden;
     }
 
-    /* === Card Container === */
     .card {
       width: 100%;
       max-width: 500px;
@@ -43,7 +41,6 @@
       to {opacity: 1; transform: translateY(0);}
     }
 
-    /* === Title === */
     h1 {
       font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 700;
@@ -61,7 +58,6 @@
       font-size: clamp(0.85rem, 2vw, 1rem);
     }
 
-    /* === Labels & Inputs === */
     label {
       display: block;
       font-size: 0.9rem;
@@ -100,7 +96,6 @@
       box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.4);
     }
 
-    /* === Button === */
     button {
       width: 100%;
       padding: 1rem;
@@ -119,7 +114,6 @@
       box-shadow: 0 10px 30px rgba(147, 51, 234, 0.6);
     }
 
-    /* === Result Section === */
     #result-container {
       margin-top: 2rem;
       padding-top: 1.5rem;
@@ -142,7 +136,6 @@
       color: #ff0048;
     }
 
-    /* === Message Box === */
     #message-box {
       margin-top: 1.5rem;
       padding: 0.9rem;
@@ -160,31 +153,6 @@
     .msg-error {
       background: #b91c1c;
     }
-
-    /* === Mobile adjustments === */
-    @media (max-width: 480px) {
-      .card {
-        padding: 1.5rem;
-        border-radius: 1rem;
-      }
-      button {
-        padding: 0.9rem;
-        font-size: 1rem;
-      }
-    }
-
-    /* New CSS to center content and prevent scrolling on all devices */
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-      color: #fff;
-      /* Prevent scrolling on the body */
-      overflow: hidden; 
-    }
-
   </style>
 </head>
 <body>
@@ -195,13 +163,13 @@
     <div class="input-group">
       <label for="set-price">Seted Price</label>
       <span>Rs.</span>
-      <input type="number" id="set-price" placeholder="e.g., 100">
+      <input type="text" id="set-price" placeholder="e.g., 100">
     </div>
 
     <div class="input-group">
       <label for="gv-price">Given Price</label>
       <span>Rs.</span>
-      <input type="number" id="gv-price" placeholder="e.g., 80">
+      <input type="text" id="gv-price" placeholder="e.g., 80">
     </div>
 
     <button id="calculate-button">Calculate Rate</button>
@@ -225,9 +193,24 @@
     const messageBox = document.getElementById('message-box');
     const messageText = document.getElementById('message-text');
 
+    function cleanInput(value) {
+      value = value.replace(/[^0-9.]/g, "");
+      const parts = value.split(".");
+      if (parts.length > 2) {
+        value = parts[0] + "." + parts.slice(1).join("");
+      }
+      return value;
+    }
+
+    function getNumericValue(input) {
+      const cleaned = cleanInput(input.value);
+      input.value = cleaned;
+      return parseFloat(cleaned);
+    }
+
     function calculateRate() {
-      const a = parseFloat(setPriceInput.value);
-      const b = parseFloat(gvPriceInput.value);
+      const a = getNumericValue(setPriceInput);
+      const b = getNumericValue(gvPriceInput);
 
       resultContainer.style.display = 'none';
       messageBox.style.display = 'none';
@@ -287,6 +270,13 @@
         calculateRate();
       }
     });
+
+    function clearInputOnDoubleClick(e) {
+      e.target.value = '';
+    }
+
+    setPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
+    gvPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
 
     window.onload = () => setPriceInput.focus();
   </script>
