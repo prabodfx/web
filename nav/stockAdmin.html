@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;500&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top left, #0f0f0f, #000000 80%);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e0e0e0;
+      overflow: hidden; /* 🚫 no scrolling */
+    }
+
+    .card {
+      background: rgba(15, 15, 15, 0.85);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
+      max-width: 420px;
+      width: 95%;
+      height: auto;
+    }
+
+    .header {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffaa;
+      text-shadow: 0 0 15px rgba(0, 255, 170, 0.8);
+      letter-spacing: 3px;
+      animation: glow 3s infinite;
+    }
+    @keyframes glow {
+      0%,100% { text-shadow: 0 0 15px rgba(0,255,170,0.8); }
+      50% { text-shadow: 0 0 25px rgba(0,255,170,1); }
+    }
+
+    .premium-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,170,0.4);
+      color: #00ffaa;
+      transition: all 0.25s;
+    }
+    .premium-input:focus {
+      border-color: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+      background: rgba(0,255,170,0.1);
+      outline: none;
+    }
+
+    .neon-button {
+      background: linear-gradient(90deg, #00ffaa, #00ffcc);
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      border-radius: 9999px;
+      box-shadow: 0 0 20px rgba(0,255,170,0.7);
+      transition: all 0.3s;
+    }
+    .neon-button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 35px rgba(0,255,170,1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card flex flex-col justify-center">
+    <!-- Login -->
+    <div id="login-section">
+      <h1 class="header text-2xl text-center mb-2">ADMIN LOGIN</h1>
+      <p class="text-gray-400 mb-4 text-sm text-center">Secure Access Terminal</p>
+
+      <form id="login-form" class="space-y-3">
+        <div>
+          <label for="username" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Username</label>
+          <input type="email" id="username" name="username" required class="premium-input w-full rounded-md px-3 py-2">
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Password</label>
+          <input type="password" id="password" name="password" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
+        </div>
+        <button type="submit" class="neon-button w-full py-3 text-base">SIGN IN</button>
+        <p id="error-message" class="hidden text-center text-red-500 mt-3 text-sm"></p>
+      </form>
+    </div>
+
+    <!-- Item Form -->
+    <div id="item-form-section" class="hidden">
+      <h1 class="header text-2xl text-center mb-2">ADD ITEM</h1>
+      <p class="text-gray-400 mb-4 text-sm text-center">Enter new item details</p>
+
+      <form id="item-form" class="space-y-3">
+        <div>
+          <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name</label>
+          <input type="text" id="item-name" required class="premium-input w-full rounded-md px-3 py-2">
+        </div>
+        <div>
+          <label for="item-code" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1" >Item Code</label>
+          <input type="text" id="item-code" required class="premium-input w-full rounded-md px-3 py-2">
+        </div>
+        <div>
+          <label for="description" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Description</label>
+          <textarea id="description" required class="premium-input w-full rounded-md px-3 py-2 h-16 resize-none"></textarea>
+        </div>
+        <div>
+          <label for="price" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Price</label>
+          <input type="number" id="price" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
+        </div>
+        <button type="submit" class="neon-button w-full py-2 text-base">SUBMIT ITEM</button>
+        <div id="success-message" class="hidden text-[#00ffaa] mt-2 text-sm"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwkzabAX7MoXz4iCsJ_y383ZW7USwmW1Y",
+      authDomain: "stock-b07d3.firebaseapp.com",
+      projectId: "stock-b07d3",
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = app.auth();
+
+    const loginSection = document.getElementById('login-section');
+    const itemFormSection = document.getElementById('item-form-section');
+    const loginForm = document.getElementById('login-form');
+    const itemForm = document.getElementById('item-form');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+
+    // 🔥 Autofocus + Enter navigation
+    function enableAutoFocus(form) {
+      const inputs = form.querySelectorAll("input, textarea");
+      if (inputs.length > 0) inputs[0].focus();
+
+      inputs.forEach((input, idx) => {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const next = inputs[idx + 1];
+            if (next) {
+              next.focus();
+            } else {
+              // 🚀 last input → submit form
+              form.requestSubmit();
+            }
+          }
+        });
+      });
+    }
+
+    // Login
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMessage.classList.add('hidden');
+      const username = loginForm.username.value;
+      const password = loginForm.password.value;
+      try {
+        await auth.signInWithEmailAndPassword(username, password);
+        loginSection.classList.add('hidden');
+        itemFormSection.classList.remove('hidden');
+        enableAutoFocus(itemForm);
+      } catch (err) {
+        errorMessage.textContent = "Invalid username or password.";
+        errorMessage.classList.remove('hidden');
+      }
+    });
+
+    // Item Form
+    itemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      successMessage.textContent = "Item submitted successfully!";
+      successMessage.classList.remove('hidden');
+      itemForm.reset();
+      enableAutoFocus(itemForm);
+    });
+
+    // Initial auto focus on login
+    enableAutoFocus(loginForm);
+  </script>
+</body>
+</html>
