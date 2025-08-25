@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Code List</title>
+    <title>Inventory Search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Import the Inter font and set up the neon green dark theme */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Pure black background */
-            color: #f8f8f2; /* Off-white text for high contrast */
+            background-color: #000000;
+            color: #f8f8f2;
         }
-        /* Custom scrollbar for a better dark theme aesthetic */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -28,7 +26,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #333;
         }
-        /* A more refined, subtle glow for a premium feel */
         .premium-search-input {
             transition: all 0.3s ease-in-out;
         }
@@ -63,17 +60,14 @@
         <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-600 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none">
             Copied to clipboard!
         </div>
-
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <script>
-        // Use document.execCommand for better compatibility in iframes
-        function copyToClipboard(text) {
+        function copyToClipboard(text, message = 'Copied to clipboard!') {
             const tempInput = document.createElement('textarea');
             tempInput.value = text;
             document.body.appendChild(tempInput);
@@ -81,7 +75,7 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showToast();
+                    showToast(message);
                 } else {
                     console.error('Copy command was unsuccessful.');
                 }
@@ -91,27 +85,9 @@
             document.body.removeChild(tempInput);
         }
 
-        // Custom modal UI to handle the case of no price
-        function showCustomAlert(message) {
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50";
-            modal.innerHTML = `
-                <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-600 max-w-sm w-full text-center">
-                    <p class="text-white text-lg mb-4">${message}</p>
-                    <button id="close-alert-btn" class="bg-[#00ffaa] text-black font-bold py-2 px-6 rounded-full transition-all hover:bg-white focus:outline-none">
-                        OK
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            document.getElementById('close-alert-btn').addEventListener('click', () => {
-                modal.remove();
-            });
-        }
-
-        function showToast() {
+        function showToast(message) {
             const toast = document.getElementById('toast');
+            toast.textContent = message;
             toast.classList.remove('opacity-0', 'pointer-events-none');
             toast.classList.add('opacity-100');
             setTimeout(() => {
@@ -121,9 +97,9 @@
         }
 
         const firebaseConfig = {
-          apiKey: "AIzaSyDwkzabAX7MoXz4iCsJ_y383ZW7USwmW1Y",
-          authDomain: "stock-b07d3.firebaseapp.com",
-          projectId: "stock-b07d3",
+            apiKey: "AIzaSyDwkzabAX7MoXz4iCsJ_y383ZW7USwmW1Y",
+            authDomain: "stock-b07d3.firebaseapp.com",
+            projectId: "stock-b07d3",
         };
         const app = firebase.initializeApp(firebaseConfig);
         const auth = app.auth();
@@ -133,34 +109,31 @@
         const container = document.getElementById('data-container');
         const searchInput = document.getElementById('searchInput');
         const searchContainer = document.getElementById('searchContainer');
-        let allItems = []; // Store all fetched items
+        let allItems = [];
 
         auth.signInAnonymously().then(userCredential => {
             currentUserId = userCredential.user.uid;
             console.log("Signed in as anonymous user:", currentUserId);
-            // Once authenticated, listen for real-time updates
             listenForUpdates();
         }).catch(error => {
             console.error("Anonymous sign-in failed:", error);
         });
 
         function listenForUpdates() {
-          // Change the collection path to the public data location
-          const collectionRef = db.collection('artifacts').doc('default-app-id').collection('public').doc('data').collection('stock-items');
-
-          collectionRef.onSnapshot(querySnapshot => {
-            allItems = [];
-            querySnapshot.forEach(doc => {
-              const item = doc.data();
-              allItems.push({
-                ...item,
-                id: doc.id
-              });
+            const collectionRef = db.collection('items');
+            collectionRef.onSnapshot(querySnapshot => {
+                allItems = [];
+                querySnapshot.forEach(doc => {
+                    const item = doc.data();
+                    allItems.push({
+                        ...item,
+                        id: doc.id
+                    });
+                });
+                renderItems(searchInput.value);
+            }, error => {
+                console.error("Error listening to Firestore updates:", error);
             });
-            renderItems(searchInput.value);
-          }, error => {
-            console.error("Error listening to Firestore updates:", error);
-          });
         }
 
         function renderItems(query = '') {
@@ -168,14 +141,14 @@
             const lowerCaseQuery = query.toLowerCase().trim();
 
             const filteredItems = allItems.filter(item => {
-                const codeMatch = item.code.toLowerCase().includes(lowerCaseQuery);
-                const nameMatch = item.name.toLowerCase().includes(lowerCaseQuery);
-                const descriptionMatch = item.description.toLowerCase().includes(lowerCaseQuery);
+                const codeMatch = (item.itemCode || '').toLowerCase().includes(lowerCaseQuery);
+                const nameMatch = (item.itemName || '').toLowerCase().includes(lowerCaseQuery);
+                const descriptionMatch = (item.description || '').toLowerCase().includes(lowerCaseQuery);
                 return codeMatch || descriptionMatch || nameMatch;
             });
             
             const groupedFilteredItems = filteredItems.reduce((acc, item) => {
-                const group = item.name || 'General';
+                const group = item.itemName || 'General';
                 if (!acc[group]) {
                     acc[group] = [];
                 }
@@ -184,58 +157,79 @@
             }, {});
 
             for (const group in groupedFilteredItems) {
-                const groupAndPriceHeader = document.createElement('div');
-                groupAndPriceHeader.className = "flex justify-between items-center text-xl font-bold text-gray-300 mt-6 mb-2 border-b-2 border-[#39ff14]/50 pb-1";
+                const headerRow = document.createElement('div');
+                headerRow.className = "grid grid-cols-[2fr_2fr_1fr_1fr] gap-4 text-xl font-bold text-gray-400 mt-6 mb-2 border-b-2 border-[#39ff14]/50 pb-1";
 
                 const groupHeading = document.createElement('h2');
-                groupHeading.className = "text-xl font-bold text-gray-300";
-                groupHeading.textContent = `Item Group: ${group}`;
-                groupAndPriceHeader.appendChild(groupHeading);
+                groupHeading.className = "col-span-2 text-xl font-bold text-gray-300";
+                groupHeading.textContent = `Item Name: ${group}`;
+                headerRow.appendChild(groupHeading);
                 
-                const priceHeading = document.createElement('h2');
-                priceHeading.className = "text-xl font-bold text-gray-300";
-                priceHeading.textContent = "Given Price";
-                groupAndPriceHeader.appendChild(priceHeading);
+                const priceHeader = document.createElement('h2');
+                priceHeader.className = "text-left text-xl font-bold text-gray-300 -ml-[10px]";
+                priceHeader.textContent = "Given Price";
+                headerRow.appendChild(priceHeader);
 
-                container.appendChild(groupAndPriceHeader);
+                const discRateHeader = document.createElement('h2');
+                discRateHeader.className = "text-right pr-[12px] text-xl font-bold text-gray-300";
+                discRateHeader.textContent = "DiscRate";
+                headerRow.appendChild(discRateHeader);
 
+                container.appendChild(headerRow);
+                
                 groupedFilteredItems[group].forEach(item => {
                     const itemRow = document.createElement('div');
-                    itemRow.className = "grid grid-cols-3 gap-4 bg-[#1a1a1a] hover:bg-[#222] p-4 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm border border-transparent hover:border-[#39ff14]/50";
+                    itemRow.className = "grid grid-cols-[2fr_2fr_1fr_1fr] gap-4 bg-[#1a1a1a] hover:bg-[#222] p-4 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm border border-transparent hover:border-[#39ff14]/50 overflow-x-auto items-center";
 
                     const codeDiv = document.createElement('div');
                     codeDiv.className = "font-medium text-white text-sm md:text-base break-words";
-                    codeDiv.textContent = item.code;
+                    codeDiv.textContent = item.itemCode;
                     itemRow.appendChild(codeDiv);
 
                     const descDiv = document.createElement('div');
-                    descDiv.className = "text-gray-400 text-sm md:text-base break-words";
+                    descDiv.className = "text-gray-400 text-sm md:text-base -ml-[25px]";
                     descDiv.textContent = item.description || 'No description available';
                     itemRow.appendChild(descDiv);
 
                     const priceDiv = document.createElement('div');
-                    priceDiv.className = "flex justify-end items-center";
-                    
-                    if (item.price && item.price.trim() !== '') {
+                    priceDiv.className = "flex items-center text-left";
+                    if (item.price !== undefined && item.price !== null) {
                         const priceButton = document.createElement('span');
-                        priceButton.className = "bg-[#39ff14] text-black font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white transition-colors duration-200 shadow-lg";
-                        priceButton.textContent = `Rs. ${item.price}`;
+                        priceButton.className = "bg-[#39ff14] text-black font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white transition-colors duration-200 shadow-lg whitespace-nowrap";
+                        priceButton.textContent = `Rs. ${parseFloat(item.price).toFixed(2)}`;
                         priceDiv.appendChild(priceButton);
                     }
                     itemRow.appendChild(priceDiv);
-                    
+
+                    const discRateDiv = document.createElement('div');
+                    discRateDiv.className = "flex items-center justify-end pr-[-30px]";
+                    if (item.discRate !== undefined && item.discRate !== null) {
+                        const discRateButton = document.createElement('span');
+                        discRateButton.className = "bg-[#d60000] text-white font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 shadow-lg whitespace-nowrap";
+                        discRateButton.textContent = `${parseFloat(item.discRate).toFixed(2)}%`;
+                        discRateDiv.appendChild(discRateButton);
+                    }
+                    itemRow.appendChild(discRateDiv);
+
                     itemRow.addEventListener('click', (e) => {
                         const rect = itemRow.getBoundingClientRect();
                         const clickX = e.clientX;
-                        const middle = rect.left + rect.width / 2;
+                        const leftHalfBound = rect.left + rect.width * 0.5;
+                        const priceBound = rect.left + rect.width * 0.75;
 
-                        if (clickX < middle) {
-                            copyToClipboard(item.code);
-                        } else {
-                            if (item.price && item.price.trim() !== '') {
-                                copyToClipboard(item.price);
+                        if (clickX < leftHalfBound) {
+                            copyToClipboard(item.itemCode, 'Item Code copied!');
+                        } else if (clickX < priceBound) {
+                            if (item.price !== undefined && item.price !== null) {
+                                copyToClipboard(parseFloat(item.price).toFixed(2), 'Price copied!');
                             } else {
-                                showCustomAlert('No price available to copy.');
+                                showToast('Price not available.');
+                            }
+                        } else {
+                            if (item.discRate !== undefined && item.discRate !== null) {
+                                copyToClipboard(parseFloat(item.discRate).toFixed(2), 'Discount Rate copied!');
+                            } else {
+                                showToast('Discount Rate not available.');
                             }
                         }
                     });
@@ -250,6 +244,9 @@
                 noResults.textContent = "No items match your search.";
                 container.appendChild(noResults);
             }
+
+            // This line is removed to keep the search bar hidden initially and controlled by key presses.
+            // searchContainer.classList.remove('hidden');
         }
 
         searchInput.addEventListener('dblclick', () => {
@@ -260,20 +257,31 @@
         document.addEventListener('keydown', (e) => {
             const activeElement = document.activeElement;
             const isInput = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA';
-
+            
+            // Toggle visibility of the search bar on 'f' or 'space'
             if (!isInput) {
-                if (e.key === 'f') {
-                    e.preventDefault();
-                    searchContainer.classList.remove('hidden');
-                    searchInput.focus();
-                } else if (e.key === ' ') {
+                if (e.key === 'f' || e.key === ' ') {
                     e.preventDefault();
                     searchContainer.classList.toggle('hidden');
                     if (!searchContainer.classList.contains('hidden')) {
                         searchInput.focus();
+                    } else {
+                        searchInput.blur();
+                    }
+                }
+            } else {
+                // If the user is in an input field, only 'space' should be toggled
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    searchContainer.classList.toggle('hidden');
+                    if (!searchContainer.classList.contains('hidden')) {
+                        searchInput.focus();
+                    } else {
+                        searchInput.blur();
                     }
                 }
             }
+            
             if (e.ctrlKey && e.key === 'h') {
                 e.preventDefault();
                 window.location.href = 'stockAdmin.html';
@@ -285,7 +293,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial render is now handled by the onSnapshot listener after sign-in
         });
     </script>
 </body>
