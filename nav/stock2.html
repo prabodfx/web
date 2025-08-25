@@ -86,8 +86,10 @@
             document.body.removeChild(tempInput);
         }
 
-        function showToast() {
+        // Modified showToast function to handle custom messages
+        function showToast(message = 'Copied to clipboard!') {
             const toast = document.getElementById('toast');
+            toast.textContent = message;
             toast.classList.remove('opacity-0', 'pointer-events-none');
             toast.classList.add('opacity-100');
             setTimeout(() => {
@@ -109,7 +111,7 @@
             { group: "L04602", code: "LPBEN20PNT14", description: "", price: "5.50" },
             { group: "L04602", code: "LPBEN25PNT11", description: "", price: "6.75", discRate: "10" },
             { group: "L04602", code: "LPBEN32PNT11", description: "", price: "8.10" },
-            { group: "L04602", code: "LPBEN40PNT11", description: "", price: "9.95" },
+            { group: "L04602", code: "LPBEN40PNT11", description: "This is a very long description that needs to wrap to a second line. We are testing the layout to make sure it handles long text gracefully without breaking the grid.", price: "9.95" },
             { group: "L04602", code: "LPBEN50PNT11", description: "", price: "11.25" },
             { group: "L04602", code: "LPBEN63PNT11", description: "", price: "13.40", discRate: "20" },
             { group: "L04602", code: "LPRESOC110X50-N", description: "REDUCING SOCKET 110X50-N", price: "7.50" },
@@ -171,7 +173,7 @@
                 headerRow.appendChild(priceHeader);
 
                 const discRateHeader = document.createElement('h2');
-                discRateHeader.className = "text-right text-xl font-bold text-gray-300";
+                discRateHeader.className = "text-right pr-[12px] text-xl font-bold text-gray-300";
                 discRateHeader.textContent = "DiscRate";
                 headerRow.appendChild(discRateHeader);
 
@@ -180,82 +182,80 @@
                 // Create a grid for the items within the group
                 groupedFilteredItems[group].forEach(item => {
                     const itemRow = document.createElement('div');
-                    itemRow.className = "grid grid-cols-[2fr_2fr_1fr_1fr] gap-4 bg-[#1a1a1a] hover:bg-[#222] p-4 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm border border-transparent hover:border-[#39ff14]/50 overflow-x-auto";
+                    // Changed grid template to 2fr_2fr_1fr_1fr for a 4-column layout
+                    itemRow.className = "grid grid-cols-[2fr_2fr_1fr_1fr] gap-4 bg-[#1a1a1a] hover:bg-[#222] p-4 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm border border-transparent hover:border-[#39ff14]/50 overflow-x-auto items-center";
 
                     // Item Code Column
                     const codeDiv = document.createElement('div');
-                    codeDiv.className = "font-medium text-white text-sm md:text-base whitespace-nowrap";
+                    codeDiv.className = "font-medium text-white text-sm md:text-base";
                     codeDiv.textContent = item.code;
                     itemRow.appendChild(codeDiv);
 
-                    // Description Column
+                    // Description Column - Added negative margin to move it slightly left
                     const descDiv = document.createElement('div');
-                    descDiv.className = "text-gray-400 text-sm md:text-base whitespace-nowrap";
+                    descDiv.className = "text-gray-400 text-sm md:text-base -ml-[25px]";
                     descDiv.textContent = item.description || 'No description available';
                     itemRow.appendChild(descDiv);
 
-                    // Given Price and DiscRate combined column
-                    const priceAndDiscDiv = document.createElement('div');
-                    priceAndDiscDiv.className = "col-span-2 flex items-center justify-between";
-
-                    // Price button
+                    // Given Price Column - Use flexbox for vertical alignment
+                    const priceDiv = document.createElement('div');
+                    priceDiv.className = "flex items-center text-left";
                     if (item.price && item.price.trim() !== '') {
                         const priceButton = document.createElement('span');
-                        priceButton.className = "bg-[#39ff14] text-black font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white transition-colors duration-200 shadow-lg";
+                        // Added whitespace-nowrap to prevent price from wrapping
+                        priceButton.className = "bg-[#39ff14] text-black font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white transition-colors duration-200 shadow-lg whitespace-nowrap";
                         priceButton.textContent = `Rs. ${item.price}`;
-                        priceAndDiscDiv.appendChild(priceButton);
+                        priceDiv.appendChild(priceButton);
                     }
+                    itemRow.appendChild(priceDiv);
 
-                    // DiscRate button
+                    // DiscRate Column - Use flexbox for vertical alignment
+                    const discRateDiv = document.createElement('div');
+                    discRateDiv.className = "flex items-center justify-end pr-[-30px]";
                     if (item.discRate && item.discRate.trim() !== '') {
                         const discRateButton = document.createElement('span');
-                        discRateButton.className = "bg-[#d60000] text-white font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 shadow-lg";
+                        // Added whitespace-nowrap to prevent discRate from wrapping
+                        discRateButton.className = "bg-[#d60000] text-white font-bold text-sm md:text-base px-3 py-1 rounded-full cursor-pointer hover:bg-white hover:text-black transition-colors duration-200 shadow-lg whitespace-nowrap";
                         discRateButton.textContent = `${item.discRate}%`;
-                        priceAndDiscDiv.appendChild(discRateButton);
+                        discRateDiv.appendChild(discRateButton);
                     }
-                    itemRow.appendChild(priceAndDiscDiv);
+                    itemRow.appendChild(discRateDiv);
 
                     // Add the unified click event listener to the item row
                     itemRow.addEventListener('click', (e) => {
                         const rect = itemRow.getBoundingClientRect();
                         const clickX = e.clientX;
-                        const totalWidth = rect.width;
-
-                        // Recalculate the boundaries with the new 3-column layout
-                        const col1Width = rect.width * (2/5);
-                        const col2Width = rect.width * (2/5);
-                        const col3Width = rect.width * (1/5);
+                        
+                        // Calculate the column boundaries based on grid columns
+                        const totalFr = 2 + 2 + 1 + 1; // 6fr
+                        const col1Width = rect.width * (2 / totalFr);
+                        const col2Width = rect.width * (2 / totalFr);
+                        const col3Width = rect.width * (1 / totalFr);
                         
                         const codeBound = rect.left + col1Width;
                         const descBound = codeBound + col2Width;
-                        const combinedBound = descBound + col3Width;
+                        const priceBound = descBound + col3Width;
 
                         if (clickX < codeBound) {
                             copyToClipboard(item.code);
                         } else if (clickX < descBound) {
-                             if (item.description && item.description.trim() !== '') {
-                                copyToClipboard(item.description);
+                            // Changed to always copy item.code for the description section
+                            copyToClipboard(item.code);
+                        } else if (clickX < priceBound) {
+                            if (item.price && item.price.trim() !== '') {
+                                copyToClipboard(item.price);
                             } else {
-                                alert('No description available to copy.');
+                                // If price is unavailable, copy the item code
+                                copyToClipboard(item.code);
+                                showToast('Price not available. Item Code copied!');
                             }
-                        } else if (clickX < combinedBound) {
-                            const combinedDiv = e.target.closest('.flex');
-                            const combinedRect = combinedDiv.getBoundingClientRect();
-                            const priceButton = combinedDiv.querySelector('.bg-[#39ff14]');
-                            const discRateButton = combinedDiv.querySelector('.bg-[#d60000]');
-
-                            if (priceButton && e.target === priceButton) {
-                                if (item.price && item.price.trim() !== '') {
-                                    copyToClipboard(item.price);
-                                } else {
-                                    alert('No price available to copy.');
-                                }
-                            } else if (discRateButton && e.target === discRateButton) {
-                                if (item.discRate && item.discRate.trim() !== '') {
-                                    copyToClipboard(item.discRate);
-                                } else {
-                                    alert('No discount rate available to copy.');
-                                }
+                        } else {
+                            if (item.discRate && item.discRate.trim() !== '') {
+                                copyToClipboard(item.discRate);
+                            } else {
+                                // If discount rate is unavailable, copy the item code
+                                copyToClipboard(item.code);
+                                showToast('Discount Rate not available. Item Code copied!');
                             }
                         }
                     });
