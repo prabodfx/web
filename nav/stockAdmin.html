@@ -17,7 +17,7 @@
       align-items: center;
       justify-content: center;
       color: #e0e0e0;
-      overflow: hidden; /* 🚫 no scrolling */
+      overflow: hidden;
     }
 
     .card {
@@ -75,7 +75,6 @@
 <body>
 
   <div class="card flex flex-col justify-center">
-    <!-- Login -->
     <div id="login-section">
       <h1 class="header text-2xl text-center mb-2">ADMIN LOGIN</h1>
       <p class="text-gray-400 mb-4 text-sm text-center">Secure Access Terminal</p>
@@ -94,7 +93,6 @@
       </form>
     </div>
 
-    <!-- Item Form -->
     <div id="item-form-section" class="hidden">
       <h1 class="header text-2xl text-center mb-2">ADD ITEM</h1>
       <p class="text-gray-400 mb-4 text-sm text-center">Enter new item details</p>
@@ -114,17 +112,22 @@
         </div>
         <div>
           <label for="price" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Price</label>
-          <input type="number" id="price" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
+          <input type="number" id="price" required class="premium-input w-full rounded-md px-3 py-2">
+        </div>
+        <div>
+          <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate</label>
+          <input type="number" id="disc-rate" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
         </div>
         <button type="submit" class="neon-button w-full py-2 text-base">SUBMIT ITEM</button>
-        <div id="success-message" class="hidden text-[#00ffaa] mt-2 text-sm"></div>
+        <p id="item-status-message" class="hidden text-center text-sm mt-3"></p>
       </form>
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDwkzabAX7MoXz4iCsJ_y383ZW7USwmW1Y",
@@ -133,15 +136,15 @@
     };
     const app = firebase.initializeApp(firebaseConfig);
     const auth = app.auth();
+    const db = app.firestore();
 
     const loginSection = document.getElementById('login-section');
     const itemFormSection = document.getElementById('item-form-section');
     const loginForm = document.getElementById('login-form');
     const itemForm = document.getElementById('item-form');
     const errorMessage = document.getElementById('error-message');
-    const successMessage = document.getElementById('success-message');
+    const itemStatusMessage = document.getElementById('item-status-message');
 
-    // 🔥 Autofocus + Enter navigation
     function enableAutoFocus(form) {
       const inputs = form.querySelectorAll("input, textarea");
       if (inputs.length > 0) inputs[0].focus();
@@ -154,7 +157,6 @@
             if (next) {
               next.focus();
             } else {
-              // 🚀 last input → submit form
               form.requestSubmit();
             }
           }
@@ -180,12 +182,40 @@
     });
 
     // Item Form
-    itemForm.addEventListener('submit', (e) => {
+    itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      successMessage.textContent = "Item submitted successfully!";
-      successMessage.classList.remove('hidden');
-      itemForm.reset();
-      enableAutoFocus(itemForm);
+      itemStatusMessage.classList.add('hidden');
+
+      const itemName = itemForm['item-name'].value;
+      const itemCode = itemForm['item-code'].value;
+      const description = itemForm.description.value;
+      const price = parseFloat(itemForm.price.value);
+      const discRate = parseFloat(itemForm['disc-rate'].value);
+
+      try {
+        await db.collection("items").add({
+          itemName,
+          itemCode,
+          description,
+          price,
+          discRate,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        itemStatusMessage.textContent = "✅ Item submitted successfully!";
+        itemStatusMessage.classList.remove('hidden');
+        itemStatusMessage.classList.add('text-[#00ffaa]');
+        itemStatusMessage.classList.remove('text-red-500');
+
+        itemForm.reset();
+        enableAutoFocus(itemForm);
+      } catch (err) {
+        console.error("Error adding document: ", err);
+        itemStatusMessage.textContent = "❌ Failed to submit item. Please try again.";
+        itemStatusMessage.classList.remove('hidden');
+        itemStatusMessage.classList.add('text-red-500');
+        itemStatusMessage.classList.remove('text-[#00ffaa]');
+      }
     });
 
     // Initial auto focus on login
