@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futuristic Admin Panel</title>
+  <title>Futuristic Stock Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;500&display=swap');
 
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top left, #0f0f0f, #000000 80%);
+      background: linear-gradient(135deg, #0a0a0a, #0d0d0d, #000000 80%);
       height: 100vh;
       margin: 0;
       display: flex;
@@ -18,18 +18,34 @@
       justify-content: center;
       color: #e0e0e0;
       overflow: hidden;
+      padding: 1rem;
     }
 
     .card {
-      background: rgba(15, 15, 15, 0.85);
+      background: rgba(15, 15, 15, 0.9);
       border: 1px solid rgba(0, 255, 170, 0.3);
       border-radius: 1.5rem;
       padding: 2rem;
       backdrop-filter: blur(15px);
       box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
-      max-width: 420px;
+      max-width: 480px;
       width: 95%;
       height: auto;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .main-dashboard {
+      background: rgba(15, 15, 15, 0.9);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      border-radius: 1.5rem;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
+      width: 95%;
+      max-width: 1400px;
+      height: 90vh;
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
     }
 
     .header {
@@ -44,13 +60,13 @@
       50% { text-shadow: 0 0 25px rgba(0,255,170,1); }
     }
 
-    .premium-input {
+    .premium-input, .premium-textarea {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(0,255,170,0.4);
       color: #00ffaa;
       transition: all 0.25s;
     }
-    .premium-input:focus {
+    .premium-input:focus, .premium-textarea:focus {
       border-color: #00ffaa;
       box-shadow: 0 0 10px #00ffaa;
       background: rgba(0,255,170,0.1);
@@ -70,57 +86,145 @@
       transform: translateY(-2px) scale(1.03);
       box-shadow: 0 0 35px rgba(0,255,170,1);
     }
+    
+    .status-message {
+      text-align: center;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .form-fields {
+      flex: 1;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .scroll-container {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffaa #2d2d2d;
+    }
+    .scroll-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .scroll-container::-webkit-scrollbar-track {
+      background: #2d2d2d;
+      border-radius: 10px;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background-color: #00ffaa;
+      border-radius: 10px;
+      border: 2px solid #2d2d2d;
+    }
+    
+    @media (max-width: 1024px) {
+        .main-dashboard {
+            flex-direction: column;
+            height: auto;
+            max-width: 95%;
+        }
+    }
+    
+    .item-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .item-table th, .item-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 255, 170, 0.2);
+    }
+    .item-table th {
+        color: #00ffaa;
+        font-family: 'Orbitron', sans-serif;
+    }
+    .item-table tr:hover {
+        background: rgba(0, 255, 170, 0.05);
+        cursor: pointer;
+    }
+
+    .search-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,170,0.4);
+      color: #e0e0e0;
+      transition: all 0.25s;
+    }
+    .search-input:focus {
+      border-color: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+      background: rgba(0,255,170,0.1);
+      outline: none;
+    }
   </style>
 </head>
 <body>
+  <div id="login-section" class="card flex flex-col justify-center">
+    <h1 class="header text-2xl text-center mb-2">ADMIN LOGIN</h1>
+    <p class="text-gray-400 mb-4 text-sm text-center">Secure Access Terminal</p>
+    <form id="login-form" class="space-y-3">
+      <div>
+        <label for="username" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Username</label>
+        <input type="email" id="username" name="username" required class="premium-input w-full rounded-md px-3 py-2">
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Password</label>
+        <input type="password" id="password" name="password" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
+      </div>
+      <button type="submit" class="neon-button w-full py-3 text-base">SIGN IN</button>
+      <p id="error-message" class="hidden status-message text-red-500"></p>
+    </form>
+  </div>
 
-  <div class="card flex flex-col justify-center">
-    <div id="login-section">
-      <h1 class="header text-2xl text-center mb-2">ADMIN LOGIN</h1>
-      <p class="text-gray-400 mb-4 text-sm text-center">Secure Access Terminal</p>
-
-      <form id="login-form" class="space-y-3">
-        <div>
-          <label for="username" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Username</label>
-          <input type="email" id="username" name="username" required class="premium-input w-full rounded-md px-3 py-2">
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Password</label>
-          <input type="password" id="password" name="password" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
-        </div>
-        <button type="submit" class="neon-button w-full py-3 text-base">SIGN IN</button>
-        <p id="error-message" class="hidden text-center text-red-500 mt-3 text-sm"></p>
-      </form>
+  <div id="admin-panel" class="hidden main-dashboard">
+    <div class="w-full lg:w-2/5 flex flex-col space-y-4">
+      <h1 class="header text-2xl text-center" id="form-header">ADD NEW ITEM</h1>
+      <p class="text-gray-400 text-center text-sm" id="form-subheader">Enter item details below</p>
+      <div class="form-container">
+        <form id="item-form" class="flex flex-col space-y-3 flex-1">
+          <div class="form-fields flex-1 pr-2">
+            <div>
+              <label for="item-code" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Code</label>
+              <input type="text" id="item-code" required class="premium-input w-full rounded-md px-3 py-2">
+            </div>
+            <div>
+              <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name</label>
+              <input type="text" id="item-name" required class="premium-input w-full rounded-md px-3 py-2">
+              <datalist id="item-names-list"></datalist>
+            </div>
+            <div>
+              <label for="description" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Description</label>
+              <textarea id="description" class="premium-textarea w-full rounded-md px-3 py-2 h-24 resize-none"></textarea>
+            </div>
+            <div>
+              <label for="price" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Price</label>
+              <input type="number" id="price" class="premium-input w-full rounded-md px-3 py-2">
+            </div>
+            <div>
+              <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate</label>
+              <input type="number" id="disc-rate" class="premium-input w-full rounded-md px-3 py-2 mb-3">
+            </div>
+          </div>
+          <button type="submit" id="submit-btn" class="neon-button w-full py-2 text-base mt-auto">ADD ITEM</button>
+          <button type="button" id="clear-btn" class="text-center text-gray-400 mt-2 text-sm hover:text-[#00ffaa] transition-colors">Clear Form</button>
+          <p id="item-status-message" class="hidden status-message"></p>
+        </form>
+      </div>
     </div>
 
-    <div id="item-form-section" class="hidden">
-      <h1 class="header text-2xl text-center mb-2">ADD ITEM</h1>
-      <p class="text-gray-400 mb-4 text-sm text-center">Enter new item details</p>
-
-      <form id="item-form" class="space-y-3">
-        <div>
-          <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name</label>
-          <input type="text" id="item-name" required class="premium-input w-full rounded-md px-3 py-2">
-        </div>
-        <div>
-          <label for="item-code" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1" >Item Code</label>
-          <input type="text" id="item-code" required class="premium-input w-full rounded-md px-3 py-2">
-        </div>
-        <div>
-          <label for="description" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Description</label>
-          <textarea id="description" required class="premium-input w-full rounded-md px-3 py-2 h-16 resize-none"></textarea>
-        </div>
-        <div>
-          <label for="price" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Price</label>
-          <input type="number" id="price" required class="premium-input w-full rounded-md px-3 py-2">
-        </div>
-        <div>
-          <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate</label>
-          <input type="number" id="disc-rate" required class="premium-input w-full rounded-md px-3 py-2 mb-3">
-        </div>
-        <button type="submit" class="neon-button w-full py-2 text-base">SUBMIT ITEM</button>
-        <p id="item-status-message" class="hidden text-center text-sm mt-3"></p>
-      </form>
+    <div class="w-full lg:w-3/5 flex flex-col space-y-4">
+      <h1 class="header text-2xl text-center">CURRENT INVENTORY</h1>
+      <input type="text" id="search-input" placeholder="Search by name or code..." class="search-input w-full rounded-md px-3 py-2">
+      <div id="item-list-container" class="scroll-container flex-1">
+        <p id="loading-message" class="text-center text-gray-500">Loading items...</p>
+      </div>
     </div>
   </div>
 
@@ -139,32 +243,53 @@
     const db = app.firestore();
 
     const loginSection = document.getElementById('login-section');
-    const itemFormSection = document.getElementById('item-form-section');
+    const adminPanel = document.getElementById('admin-panel');
     const loginForm = document.getElementById('login-form');
     const itemForm = document.getElementById('item-form');
+    const itemListContainer = document.getElementById('item-list-container');
+    const loadingMessage = document.getElementById('loading-message');
     const errorMessage = document.getElementById('error-message');
     const itemStatusMessage = document.getElementById('item-status-message');
+    const submitBtn = document.getElementById('submit-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const formHeader = document.getElementById('form-header');
+    const formSubheader = document.getElementById('form-subheader');
+    const searchInput = document.getElementById('search-input');
+    const itemNameInput = document.getElementById('item-name');
+    const itemNamesList = document.getElementById('item-names-list');
+    
+    let currentEditDocId = null;
+
+    function showSection(sectionToShow, formToFocus) {
+      loginSection.classList.add('hidden');
+      adminPanel.classList.add('hidden');
+      sectionToShow.classList.remove('hidden');
+      if (formToFocus) {
+        enableAutoFocus(formToFocus);
+      }
+    }
 
     function enableAutoFocus(form) {
       const inputs = form.querySelectorAll("input, textarea");
       if (inputs.length > 0) inputs[0].focus();
-
-      inputs.forEach((input, idx) => {
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            const next = inputs[idx + 1];
-            if (next) {
-              next.focus();
-            } else {
-              form.requestSubmit();
-            }
-          }
-        });
-      });
     }
 
-    // Login
+    function displayStatus(message, colorClass, element) {
+      element.textContent = message;
+      element.className = 'status-message ' + colorClass;
+      element.classList.remove('hidden');
+    }
+
+    function clearForm() {
+      itemForm.reset();
+      currentEditDocId = null;
+      submitBtn.textContent = 'ADD ITEM';
+      formHeader.textContent = 'ADD NEW ITEM';
+      formSubheader.textContent = 'Enter item details below';
+      itemStatusMessage.classList.add('hidden');
+      enableAutoFocus(itemForm);
+    }
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMessage.classList.add('hidden');
@@ -172,53 +297,176 @@
       const password = loginForm.password.value;
       try {
         await auth.signInWithEmailAndPassword(username, password);
-        loginSection.classList.add('hidden');
-        itemFormSection.classList.remove('hidden');
-        enableAutoFocus(itemForm);
+        showSection(adminPanel);
+        clearForm();
+        setupRealtimeListener();
       } catch (err) {
-        errorMessage.textContent = "Invalid username or password.";
-        errorMessage.classList.remove('hidden');
+        displayStatus("Invalid username or password.", 'text-red-500', errorMessage);
       }
     });
 
-    // Item Form
+    function setupRealtimeListener() {
+        db.collection("items").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderItems(items);
+            populateItemNamesList(items);
+        }, (error) => {
+            console.error("Error setting up listener:", error);
+            displayStatus("Failed to load inventory. Please try again.", 'text-red-500', itemStatusMessage);
+        });
+    }
+
+    function populateItemNamesList(items) {
+      const uniqueItemNames = [...new Set(items.map(item => item.itemName))];
+      itemNamesList.innerHTML = uniqueItemNames.map(name => `<option value="${name}"></option>`).join('');
+    }
+
+    function renderItems(items) {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filteredItems = items.filter(item => 
+        (item.itemName && item.itemName.toLowerCase().includes(searchTerm)) || 
+        (item.itemCode && item.itemCode.toLowerCase().includes(searchTerm))
+      );
+
+      itemListContainer.innerHTML = '';
+      if (filteredItems.length === 0) {
+        itemListContainer.innerHTML = '<p class="text-center text-gray-500">No items found.</p>';
+        return;
+      }
+      
+      const table = document.createElement('table');
+      table.className = 'item-table';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th class="w-1/5">Name</th>
+            <th class="w-1/5">Code</th>
+            <th class="w-1/5">Price</th>
+            <th class="w-1/5">Disc Rate</th>
+            <th class="w-1/5">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="item-table-body"></tbody>
+      `;
+      itemListContainer.appendChild(table);
+      const tableBody = document.getElementById('item-table-body');
+      
+      filteredItems.forEach(item => {
+        const row = document.createElement('tr');
+        row.dataset.id = item.id;
+        row.innerHTML = `
+          <td class="break-words">${item.itemName}</td>
+          <td>${item.itemCode}</td>
+          <td>${item.price ? `$${item.price.toFixed(2)}` : 'N/A'}</td>
+          <td>${item.discRate ? `${item.discRate}%` : 'N/A'}</td>
+          <td class="flex space-x-2 py-3">
+            <button class="delete-btn text-red-500 hover:text-red-400 transition-colors text-sm" data-id="${item.id}">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+      addEventListeners();
+    }
+    
+    function addEventListeners() {
+      document.querySelectorAll('.item-table tr').forEach(row => {
+        if(row.dataset.id) {
+          row.addEventListener('click', handleRowClick);
+        }
+      });
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          handleDelete(e);
+        });
+      });
+    }
+
+    async function handleRowClick(e) {
+      const docId = e.currentTarget.dataset.id;
+      const docRef = await db.collection("items").doc(docId).get();
+      if (docRef.exists) {
+        const item = docRef.data();
+        currentEditDocId = docId;
+        document.getElementById('item-code').value = item.itemCode;
+        document.getElementById('item-name').value = item.itemName;
+        document.getElementById('description').value = item.description || '';
+        document.getElementById('price').value = item.price || '';
+        document.getElementById('disc-rate').value = item.discRate || '';
+        
+        submitBtn.textContent = 'UPDATE ITEM';
+        formHeader.textContent = 'EDIT ITEM';
+        formSubheader.textContent = 'Modify item details';
+        enableAutoFocus(itemForm);
+      }
+    }
+    
+    async function handleDelete(e) {
+      const docId = e.target.dataset.id;
+      if (confirm('Are you sure you want to delete this item?')) {
+        try {
+          await db.collection("items").doc(docId).delete();
+          displayStatus("✅ Item deleted successfully!", 'text-[#00ffaa]', itemStatusMessage);
+          clearForm();
+        } catch (err) {
+          console.error("Error deleting document: ", err);
+          displayStatus("❌ Failed to delete item. Try again.", 'text-red-500', itemStatusMessage);
+        }
+      }
+    }
+
     itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       itemStatusMessage.classList.add('hidden');
-
       const itemName = itemForm['item-name'].value;
       const itemCode = itemForm['item-code'].value;
-      const description = itemForm.description.value;
-      const price = parseFloat(itemForm.price.value);
-      const discRate = parseFloat(itemForm['disc-rate'].value);
+      
+      if (!itemName || !itemCode) {
+        displayStatus("❌ Item Name and Item Code are required.", 'text-red-500', itemStatusMessage);
+        return;
+      }
+      
+      const description = itemForm.description.value || null;
+      const price = itemForm.price.value ? parseFloat(itemForm.price.value) : null;
+      const discRate = itemForm['disc-rate'].value ? parseFloat(itemForm['disc-rate'].value) : null;
 
       try {
-        await db.collection("items").add({
-          itemName,
-          itemCode,
-          description,
-          price,
-          discRate,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        itemStatusMessage.textContent = "✅ Item submitted successfully!";
-        itemStatusMessage.classList.remove('hidden');
-        itemStatusMessage.classList.add('text-[#00ffaa]');
-        itemStatusMessage.classList.remove('text-red-500');
-
-        itemForm.reset();
-        enableAutoFocus(itemForm);
+        if (currentEditDocId) {
+          await db.collection("items").doc(currentEditDocId).update({
+            itemName,
+            itemCode,
+            description,
+            price,
+            discRate
+          });
+          displayStatus("✅ Item updated successfully!", 'text-[#00ffaa]', itemStatusMessage);
+        } else {
+          await db.collection("items").add({
+            itemName,
+            itemCode,
+            description,
+            price,
+            discRate,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          displayStatus("✅ Item submitted successfully!", 'text-[#00ffaa]', itemStatusMessage);
+        }
+        clearForm();
       } catch (err) {
-        console.error("Error adding document: ", err);
-        itemStatusMessage.textContent = "❌ Failed to submit item. Please try again.";
-        itemStatusMessage.classList.remove('hidden');
-        itemStatusMessage.classList.add('text-red-500');
-        itemStatusMessage.classList.remove('text-[#00ffaa]');
+        console.error("Error submitting document: ", err);
+        displayStatus("❌ Failed to submit item. Try again.", 'text-red-500', itemStatusMessage);
       }
     });
 
-    // Initial auto focus on login
+    searchInput.addEventListener('input', () => {
+      db.collection("items").orderBy("createdAt", "desc").get().then(snapshot => {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderItems(items);
+      });
+    });
+
+    clearBtn.addEventListener('click', clearForm);
+    
     enableAutoFocus(loginForm);
   </script>
 </body>
