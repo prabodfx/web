@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auto Paste | Prabodfx</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background:#f3f4f6; }
+    .modal { background-color: rgba(0,0,0,.5); }
+    .modal-content { background:#fff; }
+  </style>
+</head>
+
+<body class="p-8" oncontextmenu="return false;">
+
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Clipboard Content Display</h1>
+
+    <p class="text-gray-600 mb-6 text-center">
+      Double click anywhere to paste automatically.
+    </p>
+
+    <div id="tip" class="text-sm text-center text-blue-600 mb-6 hidden">
+      If you see a browser popup, click <b>Allow</b> once; later double clicks will paste automatically.
+    </div>
+
+    <div id="pasted-list" class="space-y-4"></div>
+  </div>
+
+  <div id="duplicate-modal" class="modal fixed inset-0 flex items-center justify-center p-4 hidden">
+    <div class="modal-content p-6 rounded-lg shadow-xl text-center max-w-sm">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Duplicate Entry Detected</h2>
+      <p class="mb-6 text-gray-600">This item is already added. Add it again?</p>
+      <div class="flex justify-center gap-4">
+        <button id="modal-yes" class="px-6 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md font-semibold">Yes</button>
+        <button id="modal-no" class="px-6 py-2 rounded-full text-gray-800 bg-gray-200 hover:bg-gray-300 shadow-md font-semibold">No</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Static data mapping (unchanged) ---
+    const customerData = {
+      "AP001":"NALAKA FINACE SOLUTION","BK002":"V.P H/W","BRW001":"RATHNAYAKA H/W",
+      "BRW025":"Abegunawardhana H/w","BULU001":"SETHUN HARDWERE","BVB001":"BALAVINNA H/W",
+      "BVB002":"GOLD STEEL","BVB003":"JAYASIRI HARDWARE","CASH":"CASH CUSTOMER",
+      "EMB025":"M.J.H/W","EMB088":"Royal  Cake","EMB089":"ANUHAS  H/W",
+      "EMB55":"NM HARDWARE","EME002":"INOSHA H/W"
+    };
+
+    const pastedList = document.getElementById('pasted-list');
+    const tip = document.getElementById('tip');
+    const modal = document.getElementById('duplicate-modal');
+    const modalYesBtn = document.getElementById('modal-yes');
+    const modalNoBtn  = document.getElementById('modal-no');
+
+    const pastedHistory = [];
+
+    // Track permission state across clicks (and across reloads if possible)
+    let permState = localStorage.getItem('clipboard-perm-state') || 'unknown';
+    let checkingPerm = false;
+
+    // Check permission if supported (best-effort; not all browsers expose this)
+    async function syncPermissionState() {
+      if (checkingPerm) return;
+      checkingPerm = true;
+      try {
+        if ('permissions' in navigator && navigator.permissions.query) {
+          const result = await navigator.permissions.query({ name: 'clipboard-read' });
+          permState = result.state;                               // 'granted' | 'denied' | 'prompt'
+          localStorage.setItem('clipboard-perm-state', permState);
+          result.onchange = () => {
+            permState = result.state;
+            localStorage.setItem('clipboard-perm-state', permState);
+          };
+        }
+      } catch(_) { /* ignore */ }
+      checkingPerm = false;
+    }
+    syncPermissionState();
+
+    // Duplicate modal helper
+    const showDuplicateModal = () => new Promise((resolve) => {
+      modal.classList.remove('hidden');
+      const yesHandler = () => { cleanup(); resolve(true); };
+      const noHandler  = () => { cleanup(); resolve(false); };
+      function cleanup() {
+        modal.classList.add('hidden');
+        modalYesBtn.removeEventListener('click', yesHandler);
+        modalNoBtn.removeEventListener('click', noHandler);
+      }
+      modalYesBtn.addEventListener('click', yesHandler);
+      modalNoBtn.addEventListener('click', noHandler);
+    });
+
+    // Render item
+    function addItemToPage(text) {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'p-4 rounded-lg bg-gray-100 shadow-sm relative group cursor-pointer';
+      itemDiv.setAttribute('data-clipboard-text', text);
+      
+      const displayContent = customerData[text]
+        ? `<span class="font-semibold text-gray-900">${text}</span> - <span class="text-gray-700">${customerData[text]}</span>`
+        : text;
+      
+      itemDiv.innerHTML = displayContent;
+      
+      const copyConfirmation = document.createElement('span');
+      copyConfirmation.className = 'absolute top-1 right-2 text-xs text-blue-600 opacity-0 transition-opacity duration-300';
+      copyConfirmation.innerText = 'Copied!';
+      itemDiv.appendChild(copyConfirmation);
+
+      itemDiv.addEventListener('click', async () => {
+          const codeToCopy = itemDiv.getAttribute('data-clipboard-text');
+          try {
+              await navigator.clipboard.writeText(codeToCopy);
+              copyConfirmation.style.opacity = '1';
+              setTimeout(() => {
+                  copyConfirmation.style.opacity = '0';
+              }, 1500);
+          } catch (err) {
+              console.error('Failed to copy text: ', err);
+          }
+      });
+
+      pastedList.prepend(itemDiv);
+      pastedHistory.push(text);
+    }
+
+    // Paste handler using Clipboard API
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        permState = 'granted';
+        localStorage.setItem('clipboard-perm-state', 'granted');
+
+        const trimmed = (text || '').trim();
+        if (!trimmed) return;
+
+        if (pastedHistory.includes(trimmed)) {
+          const again = await showDuplicateModal();
+          if (!again) return;
+        }
+        addItemToPage(trimmed);
+      } catch (err) {
+        if (!tip.classList.contains('hidden')) return;
+        tip.classList.remove('hidden');
+      }
+    }
+
+    // Double-click anywhere → always try to paste
+    document.addEventListener('dblclick', async (e) => {
+      // Ignore double-clicks inside the modal itself
+      if (!modal.classList.contains('hidden') && modal.contains(e.target)) return;
+      await pasteFromClipboard();
+    });
+
+    // Also paste on touch (mobile) if a double-tap gesture is detected.
+    // This is a basic implementation and can be improved for better UX.
+    let lastTouch = 0;
+    document.addEventListener('touchend', async (event) => {
+        const now = new Date().getTime();
+        const delta = now - lastTouch;
+        // Consider a double-tap if the time between touches is less than 300ms.
+        if (delta < 300 && delta > 0) {
+            event.preventDefault(); // Prevent default double-tap zoom
+            await pasteFromClipboard();
+        }
+        lastTouch = now;
+    }, { passive: false });
+  </script>
+</body>
+</html>
