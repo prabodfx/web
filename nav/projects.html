@@ -21,7 +21,7 @@
             justify-content: center;
             align-items: center;
             margin: 0;
-            overflow: hidden; /* This prevents scrolling */
+            overflow: hidden;
         }
 
         @keyframes fadeInDown {
@@ -79,44 +79,47 @@
             transform: translateY(-4px) scale(1.02);
         }
 
+        .btn-text-one-line {
+            white-space: nowrap;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem; /* Equivalent to gap-6 */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-inter antialiased">
 
-    <div class="text-center w-full max-w-2xl px-6">
+    <div class="text-center w-full max-w-4xl px-6">
         <h1 class="text-4xl md:text-6xl lg:text-5.5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-14 drop-shadow-2xl animate-fade-in-down whitespace-nowrap">
             Prabodfx Projects
         </h1>
 
-        <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
-
-            <a href="discRate.html" id="button1" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-1">
+        <div class="flex-container">
+            <a href="discRate.html" id="button1" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-1 btn-text-one-line">
                 DiscRate Cal
             </a>
 
-            <a href="DayRangeCal.html" id="button2" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-2">
+            <a href="DayRangeCal.html" id="button2" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-2 btn-text-one-line">
                 DayRange Cal
             </a>
 
-            <a href="stock2.html" id="button1" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-3">
+            <a href="stock2.html" id="button3" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-3 btn-text-one-line">
                 StockSearch
             </a>
-
-            <a href="stock.html" id="button2" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-4">
+            
+            <a href="stock.html" id="button4" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-4 btn-text-one-line">
                 StockSearch2
             </a>
 
-            <a href="cus.html" id="button1" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-5">
+            <a href="cus.html" id="button5" class="btn-premium-effect w-full sm:w-auto max-w-xs bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-10 rounded-full transition-all duration-300 transform opacity-0 animate-slide-in-up button-delay-5 btn-text-one-line">
                 Auto Paste
             </a>
-            
         </div>
     </div>
 
 </body>
 </html>
-
-
-
-
-
