@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auto Paste2 | Prabodfx</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background:#f3f4f6; }
+    .modal { background-color: rgba(0,0,0,.5); }
+    .modal-content { background:#fff; }
+    .search-bar { transition: all 0.3s ease-in-out; }
+    .code-card:hover {
+        background-color: #e5e7eb;
+    }
+  </style>
+</head>
+
+<body class="p-8" oncontextmenu="return false;">
+
+  <div class="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Customer Code Paster</h1>
+    <p class="text-gray-600 mb-6 text-center">
+      Double click anywhere to paste automatically. Use the search bar to add a code by pressing Enter.
+      Click on a pasted code to copy it. Double-click the search bar to clear it.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 mb-6 relative">
+      <input id="search-bar" type="text" placeholder="Enter code here..." class="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md search-bar hidden">
+    </div>
+
+    <div id="tip" class="text-sm text-center text-blue-600 mb-6 hidden">
+      If you see a browser popup, click <b>Allow</b> once; later double clicks will paste automatically.
+    </div>
+    
+    <div id="message-box" class="text-center p-3 rounded-lg font-semibold text-white mb-6 hidden"></div>
+
+    <div id="codes-container" class="space-y-6">
+        <!-- Sections will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <div id="duplicate-modal" class="modal fixed inset-0 flex items-center justify-center p-4 hidden">
+    <div class="modal-content p-6 rounded-lg shadow-xl text-center max-w-sm">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Duplicate Entry Detected</h2>
+      <p class="mb-6 text-gray-600">This item is already added. Add it again?</p>
+      <div class="flex justify-center gap-4">
+        <button id="modal-yes" class="px-6 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md font-semibold">Yes</button>
+        <button id="modal-no" class="px-6 py-2 rounded-full text-gray-800 bg-gray-200 hover:bg-gray-300 shadow-md font-semibold">No</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Data mapping and elements ---
+    const embilipitiyaData = {
+        "AP001":"NALAKA FINACE SOLUTION", "BK002":"V.P H/W", "BRW001":"RATHNAYAKA H/W", "BRW025":"Abegunawardhana H/w", "BULU001":"SETHUN HARDWERE", "BVB001":"BALAVINNA H/W", "BVB002":"GOLD STEEL", "BVB003":"JAYASIRI HARDWARE", "CASH":"CASH CUSTOMER", "WO008":"THEJAN H/W", "WO011":"GUNASEKARA H/W", "WO012":"JAYAMINI STORES", "WO013":"MADUSHANKA H/W", "WO014":"BIMANSA STORES", "WO015":"SEPALI H/W", "WO85":"SATHIRA CONSTRUCTION", "EME023":"SUMANAGIRI TRADRE CENTER", "EME024":"SUMITH H/W", "EME025":"WICKRAMA HARWARE STORES (PVT)", "EME027":"EMBILIPITIYA STORES (PVT) LTD", "EME029":"UDARA TRADRE CENTER", "EME032":"SARATHCHANDRA HOME CENTER", "EME035":"PRIYANTHA H/W", "EME046":"CENTRAL H/W", "EME056":"NALIN HARDWARE & TOOLS CENTER", "EME057":"RENDILA PLASTICS", "EME059":"SANDARU ENTERPRISES", "EME076":"Sirikatha H/w", "KL019":"DHANARANJANA H/W", "KL29":"MAKULUTHOTA", "KMB005":"SRI JAYA ENTERPRICES", "KOG001":"DALUMURAGAMA HARDWARE", "KP001":"SEWMI HARDWARE", "KP058":"ANANDA F/H", "KP059":"NIMAL CEREMIC AND GIFT CENTER", "KUA004":"DHANAPALA HARDWARE", "SW047":"OLITHA H/W", "SW100":"JAYAWEERA H/W", "SW75":"NIRMANA HARDWWARE", "SW77":"WASANA HARDWARE", "SW94":"SENEVIRATHNE HARDWARE", "SW85":"SATHIRA CONSTRUCTION"
+    };
+
+    const katuwanaData = {
+        "AKA003":"GAMAGE STORES", "AKA004":"SOMASIRI STORES", "AKA008":"DASA HW", "AKA012":"MADURANGA H/W", "AKA024":"M.K.STORES", "AKA025":"WEERASINGHE STORES - BINKAMA", "AKA036":"INDIKA H/W - USWEWA", "AKA037":"Jinasena H/w", "AKA038":"RUMESH HARDWARE", "AKA041":"SIRIWARDENA HARDWARE", "AKA044":"WICKRAMASEKARA GLASS CENTRE", "AKA045":"GANINDU HARDWARE", "AKA046":"RATHNAYAKE STORES - DANDENIGAMA", "AKA053":"SOHOYURO H/W", "AKA100":"RANJEEWA HARDWARE", "AKA101":"WIJESINGHE HARDWARE", "AKA102":"R.G.S HARDWARE", "aka127":"D.G.Super h/w", "AKA200":"SURANGA ENTERPRISES", "aka502":"RUBASINHE GENARAL STEEL & H/W", "AKA75":"Indika H/w", "ATA013":"AMARASINGHE BROTHERS", "ATA018":"ARUNA HW", "ATA021":"SRIYANI FH", "ATA027":"WEERASINGHE HW", "ATA033":"HEWARATHANA  H/W", "ATA042":"V.P. H/W", "ATA043":"DILSTAR HARDWARE", "ATA049":"SANUJI ENTERPRICES", "ATA062":"P.L.HARDWARE", "ATA064":"SANDUN HARDWARE", "ATA078":"SHAN ENTERPRICES", "ATA080":"WIJESEKARA HARDWARE", "ata085":"SITHARA TELERS", "ATA092":"T S MART", "ATA114":"NIMAL STORES", "ATA121":"RUWAN HARDWARE", "ATA129":"PEHESARA ENTERPRISES", "ATA203":"KUMA HARDWARE", "ATA23":"SHANTHA HW", "ATA399":"ONEL H/W", "ATA51":"Weerawarna h/w", "ATA70":"ROSHAN HW", "ATA77":"LIMO H/W", "BAA003":"LANKA HW", "BAA011":"LAKMINI HW", "BAA017":"DHARSANA PAINT", "BAA018":"JAYA STORES", "BAA019":"SINGHE H/W", "BAA034":"KODITHUWAKKU HARDWARE", "BAA036":"THILAK H/W", "BAA039":"OSHADI GLASS CENTRE", "BAA040":"RATHNAYAKE GIFT HOUSE", "BAA053":"BUDDHIKA HARDWARE", "BAA055":"MINUDI ENTERPRISES", "BAA062":"RASHAN HW", "BAA063":"TISSAKUTTIARACHCHI HW", "BAA064":"S.D.HARDWARE", "BAA066":"WANNIARACHCHI H/W", "BAA111":"AMILA H/W - BELIGALLA", "BAA112":"N.S.P.H/W", "BAA150":"SAMANTHA H/W", "baa206":"SANDALI HW & TRANSPORT", "BAA234":"SITHUMINI HW", "BAA256":"C.S. H/W", "baa378":"BELIATTA H/W", "BAA399":"S.N.P. H/W", "BAA456":"WIJAYANGA H/W", "baa555":"K.S.R HW", "BAA72":"Shan H/W", "BAA789":"CHANDRIKA PICTUER PALACE", "BAA80":"DAHAMSATH HARDWARE", "baa891":"VIDUNI H/W", "EMB002":"Pathirana H/w", "EMB005":"Jayashanka H/w", "EMB029":"Dhanapala H/W", "emb033":"Pathirana H/W", "Emb038":"Day Light", "EMB063":"Wickramasinha H/W", "EMB064":"Rakwana H/W", "EMB076":"Priyantha  h/w", "GLE001":"Indrajith Tubewell Works", "HGA003":"RATHNAYAKE HW", "HGA006":"HASHAN H/W", "HGA025":"Rajapaksha Hw", "HGA108":"T.M.Enterprices", "HK28":"LANKA HW - MEE ALLA", "HK29":"A.N.H  H/W", "KIB001":"Sujith H/w", "KOL002":"Junction H/W", "KOL006":"D.G.E AND H/W", "KWA000":"ARPICO CENTER", "KWA0001":"PRADEEP HW", "KWA0002":"PELANWATHTHA HARDWARE", "KWA001":"SARATH HW", "KWA002":"WIJENAYAKE HW", "KWA003":"Dhammika H/W", "KWA009":"MUDALIGE H/W", "kwa010":"Gamage H/W - Galpottayaye", "KWA011":"THILAK HARDWARE", "KWA015":"RANJITH HARDWARE.", "KWA018":"SUJEEWA HARDWARE", "kwa020":"Shehara stors", "KWA022":"RANAWAKA HARDWARE", "KWA025":"SHAN HARDWARE", "KWA026":"ROHANA H/W", "KWA030":"GUNASEKARA HW & STORES", "KWA032":"SAMAGI H/W", "kwa034":"Priyantha Stores", "KWA036":"YASHARA HARDWARE", "KWA045":"UPUL HARDWARE", "KWA046":"MADURANGA STORES", "KWA051":"Gunawardhana H/W", "kwa052":"Thilina H/W", "KWA053":"LALANTHA HW", "KWA082":"Jayans Lanka H/w", "KWA088":"LIYANAGE HW", "kwa102":"GAYAN ELECTRICLE", "kwa128":"A.T Hardware", "KWA13":"SASANDI MULTY TRADERS", "kwa202":"GUNAWARDHANA HW & TOOLS", "kwa222":"RUPASINGHE HW", "KWA321":"DINU CONCREET WORKS & HW", "kwa346":"Rathnaweera H/w", "KWA55":"RATHNA STORES", "kwa555":"CASH CUSTOMER", "KWA65":"JAYA LANKA HARDWARE - KEKIRIOBADA", "KWA666":"THARINDU H/W", "KWA879":"BANDARA H/W", "MDA001":"DASA PICTURE PALACE", "MDA006":"MATARA HW", "MDA010":"ABEYWARNA STORES", "MDA012":"SITHUMINI STORES", "MDA017":"SHASHI CONCRETE& H/W", "MDA026":"RAMANAYAKE HARDWARE", "MDA032":"Anura Tool Mart", "MDA038":"EKANAYAKE STORES", "MDA044":"S.K.H/W", "MDA048":"ABEYWARNA STORES (NOT USE)", "MDA051":"SISIRA STORES", "MDA056":"GARUSINGHE HARDWARE", "MDA100":"RASHENI HARDWARE", "MDA102":"WIJESEKARA HARDWARE", "MDA147":"New Hettiarachchi H/w", "mda199":"SAVINDU FURNITURE HOUSE", "MDA208":"R.M.H/W", "MDA222":"MUNASINGHE SUPER CITY  & HW", "MDA345":"W GAMAGE PAINT HOUSE", "MDA444":"KEMPANE H/W", "MDA528":"Nadeeshani H/w", "MDA94":"MILAN HARDWARE & MULTY SHOP", "MDP001":"Demika H/W", "MDP002":"Alpitiya H/w", "MDP005":"Y.U.S. H/W", "PDN002":"Priyanga Traders", "PLB003":"SAMAGI H/W", "PNMR003":"Panamura  H/w", "PNMR015":"Shan H/W", "RAK005":"New Heshan H/w", "RNA002":"VIJITHA HW", "RNA008":"BEZIL HW", "RNA011":"WELIGAMA ELECTRICALS & HARDWARE", "RNA032":"LAKEESHA FURNTURE", "rna033":"Sohoyuro Enterprices", "RNA055":"RATHNA HARDWARE", "RNA20":"Amarasinghe H/W", "Rna208":"SOHOYURO HW (RANNA TOWN)", "RNA56":"RATHNA HW", "RNA789":"UDAYA ELECTRICAL", "SRW006":"Premachandra  H/w", "SWG001":"Shashimal H/W", "TGA001":"WIJESOORIYA HW", "TGA003":"AL-FAHAD HW", "TGA008":"AMILA HARDWARE", "TGA011":"SITINAMALUWA HW", "TGA022":"CHANDANA STORES", "tga039":"PRESTIGE HOMES & POOL BUILDERS", "TGA040":"RESANDI HARDWARE", "TGA048":"KUMUDU HARDWARE", "TGA062":"LAKMINI H/W", "TGA1400":"ABAYA STORES", "TGA199":"New muthumala H/w", "TGA200":"R.N  H/W", "TGA28":"JAYAWARDANA H/W", "TGA90":"PREMASIRI", "UDW001":"U.G.H/w", "WKA004":"CHAMICA STORES", "WKA005":"RAJAPAKSHA ELECTRICALS & HW", "WKA009":"AMBEPITIYA HW", "wka0120":"Rantharu HW", "WKA013":"TISAKUTTI WELANDASELA", "WKA020":"VIJAYA H/W", "WKA021":"SINGITHI GROCERY", "WKA022":"MAHINDA HARDWARE", "WKA024":"NTG HARDWARE", "WKA0251":"GOLDEN   Water", "WKA026":"K-MARK ELECTRICAL", "WKA028":"SANUSHI  H/W", "wka033":"Deshani H/w", "WKA038":"HETTIARACHCHI HARDWARE", "wka039":"New Weerakatiya H/w", "WKA041":"JAYAWICKRAMA HARDWARE", "WKA044":"W.R.G.HARDWARE", "WKA056":"JAYASIRI H/W", "wka059":"lakmal enterprices", "WKA100":"PRABATH CONSTRUCTION", "wka122":"RUWAN PATHIRANA H/W", "wka200":"NEW INDIKA H/W", "wka2000":"Pathirana HW", "WKA2001":"WEERASINGHA  H/W", "WKA205":"RAJAPAKSHA  HW", "WKA21":"JAYASINGHE CONCREAT WORKS", "WKA250":"WEERAKATIYA HW", "wka332":"Sampath H/W", "WKA62":"NEW GAGANA STORES", "wka72":"Munasinghe H/W", "wka75":"GARU SIN HW (DEBOKKAWA)", "wka800":"Ramanayaka H/W", "WMA004":"WESTERN HW", "WMA005":"WALASMULLA PICTURE PALACE", "WMA007":"CENTRAL HW", "WMA014":"PKG HARDWARE", "WMA016":"JAYAMALI H/W", "WMA035":"SOUTHERN HARDWARE", "WMA036":"CITY ELECTRICLE", "WMA047":"UDAYAGIRI STORES", "WMA050":"DAYA & SONS", "wma053":"RANASI H/W", "WMA060":"WELIWATHTHA H/W", "WMA061":"PRASANNA STEEL", "WMA064":"JAGATH HARDWARE", "WMA065":"ASIAN HARDWARE", "WMA076":"Hettiarachchi  H/w", "WMA080":"Wijesooriya H/w", "WMA081":"JANAKANTHA H/W", "WMA100":"WELAGEDARA HARDWARE", "WMA101":"RAMSI HARDWARE", "WMA102":"KEKIRIOBADA TEMPLE", "wma113":"Govi Sewa Piyasa - BELIATTE", "wma500":"RAJAPAKSHA HW - HOREWELA", "WMA656":"GAMAGE HW "
+    };
+
+    const allData = { ...katuwanaData, ...embilipitiyaData };
+    
+    // --- Elements ---
+    const tip = document.getElementById('tip');
+    const messageBox = document.getElementById('message-box');
+    const modal = document.getElementById('duplicate-modal');
+    const modalYesBtn = document.getElementById('modal-yes');
+    const modalNoBtn = document.getElementById('modal-no');
+    const codesContainer = document.getElementById('codes-container');
+    const searchBar = document.getElementById('search-bar');
+
+    // --- State and History ---
+    const pastedSections = [];
+    const pastedHistory = [];
+
+    const isKatuwanaCode = (code) => katuwanaData.hasOwnProperty(code);
+    const isEmbilipitiyaCode = (code) => embilipitiyaData.hasOwnProperty(code);
+    const isDuplicate = (code) => pastedHistory.includes(code);
+
+    // --- Utility functions ---
+    const showDuplicateModal = () => new Promise((resolve) => {
+      modal.classList.remove('hidden');
+      const yesHandler = () => { cleanup(); resolve(true); };
+      const noHandler  = () => { cleanup(); resolve(false); };
+      function cleanup() {
+        modal.classList.add('hidden');
+        modalYesBtn.removeEventListener('click', yesHandler);
+        modalNoBtn.removeEventListener('click', noHandler);
+      }
+      modalYesBtn.addEventListener('click', yesHandler);
+      modalNoBtn.addEventListener('click', noHandler);
+    });
+
+    function showMessage(message, type) {
+      messageBox.textContent = message;
+      messageBox.classList.remove('hidden', 'bg-red-500', 'bg-blue-500', 'bg-green-500');
+      if (type === 'error') { messageBox.classList.add('bg-red-500'); }
+      else if (type === 'success') { messageBox.classList.add('bg-green-500'); }
+      else { messageBox.classList.add('bg-blue-500'); }
+    }
+
+    function copyCodeToClipboard(code) {
+        try {
+            navigator.clipboard.writeText(code).then(() => {
+                showMessage("Code copied!", 'blue');
+            }).catch(() => {
+                fallbackCopyTextToClipboard(code);
+            });
+        } catch (err) {
+            fallbackCopyTextToClipboard(code);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'Code copied (fallback)!' : 'Copying failed!';
+        showMessage(msg, successful ? 'blue' : 'error');
+      } catch (err) {
+        showMessage('Copying failed!', 'error');
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    // Function to process and add a code to the pasted list
+    async function processAndAddCode(code, doCopy = false) {
+        const trimmedCode = code.trim().toUpperCase();
+        if (!trimmedCode) {
+            showMessage("Code is empty.", 'error');
+            return;
+        }
+
+        if (isDuplicate(trimmedCode)) {
+            const again = await showDuplicateModal();
+            if (!again) return;
+        }
+        
+        let sectionType, sectionTitle, message;
+
+        if (isKatuwanaCode(trimmedCode)) {
+            sectionType = 'katuwana';
+            sectionTitle = "Katuwana Codes";
+            message = "Katuwana code added!";
+        } else if (isEmbilipitiyaCode(trimmedCode)) {
+            sectionType = 'embilipitiya';
+            sectionTitle = "Embilipitiya Codes";
+            message = "Embilipitiya code added!";
+        } else {
+            sectionType = 'other';
+            sectionTitle = "Other Codes";
+            message = "Code added to Other Codes.";
+        }
+        
+        const lastSection = pastedSections[pastedSections.length - 1];
+        if (lastSection && lastSection.type === sectionType) {
+            lastSection.codes.push(trimmedCode);
+        } else {
+            const newSection = {
+                type: sectionType,
+                title: sectionTitle,
+                codes: [trimmedCode]
+            };
+            pastedSections.push(newSection);
+        }
+
+        pastedHistory.push(trimmedCode);
+        showMessage(message, 'success');
+        
+        if (doCopy) {
+            copyCodeToClipboard(trimmedCode);
+        }
+        
+        // Render the page with the updated list
+        renderPage();
+    }
+
+    function createCodeCard(text) {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-4 rounded-lg bg-white shadow-sm cursor-pointer code-card';
+        itemDiv.dataset.code = text; 
+        
+        const customerName = allData[text];
+        itemDiv.innerHTML = customerName 
+          ? `<span class="font-semibold text-gray-900">${text}</span> - <span class="text-gray-700">${customerName}</span>`
+          : `<span class="font-semibold text-gray-900">${text}</span>`;
+
+        itemDiv.onclick = (e) => {
+            e.stopPropagation();
+            copyCodeToClipboard(text);
+        };
+        
+        return itemDiv;
+    }
+
+    function renderPage() {
+        codesContainer.innerHTML = '';
+        
+        pastedSections.forEach(section => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'bg-gray-100 p-6 rounded-lg shadow-inner';
+            
+            const title = document.createElement('h2');
+            title.className = 'text-2xl font-bold text-gray-700 mb-4 text-center';
+            title.textContent = section.title;
+            sectionDiv.appendChild(title);
+
+            const listDiv = document.createElement('div');
+            listDiv.className = 'space-y-4';
+            
+            section.codes.forEach(code => {
+                listDiv.appendChild(createCodeCard(code));
+            });
+            
+            sectionDiv.appendChild(listDiv);
+            codesContainer.appendChild(sectionDiv);
+        });
+    }
+    
+    // Event Listeners
+    document.addEventListener('dblclick', async (e) => {
+      // Check if the double click is on a code card
+      const codeCard = e.target.closest('[data-code]');
+      if (codeCard) {
+          const code = codeCard.dataset.code;
+          processAndAddCode(code);
+          return;
+      }
+      
+      // If the target is the search bar, handle the clearing logic
+      if (e.target.id === 'search-bar') {
+          searchBar.value = '';
+          searchBar.focus();
+          return;
+      }
+
+      // Prevent dblclick on modal
+      if (!modal.classList.contains('hidden') && modal.contains(e.target)) return;
+      
+      // Otherwise, perform regular paste operation from clipboard
+      try {
+        const text = await navigator.clipboard.readText();
+        await processAndAddCode(text);
+      } catch (err) {
+        if (!tip.classList.contains('hidden')) { return; }
+        tip.classList.remove('hidden');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === ' ') {
+        e.preventDefault();
+        searchBar.classList.toggle('hidden');
+        if (!searchBar.classList.contains('hidden')) {
+            searchBar.focus();
+        }
+      }
+    });
+
+    // Handle Enter keypress in search bar
+    searchBar.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const searchTerm = searchBar.value;
+            if (searchTerm.trim() !== '') {
+                // Pass true to the doCopy parameter to automatically copy
+                processAndAddCode(searchTerm, true); 
+                searchBar.value = ''; // Clear search bar after adding
+                searchBar.blur();
+                searchBar.classList.add('hidden');
+            } else {
+                showMessage("Search field is empty.", 'error');
+            }
+        }
+    });
+
+    let lastTouch = 0;
+    document.addEventListener('touchend', async (event) => {
+        const now = new Date().getTime();
+        const delta = now - lastTouch;
+        if (delta < 300 && delta > 0) {
+            event.preventDefault(); 
+            // Check if the double tap is on a code card
+            const codeCard = event.target.closest('[data-code]');
+            if (codeCard) {
+                const code = codeCard.dataset.code;
+                processAndAddCode(code);
+            } else {
+                // Otherwise, perform regular paste from clipboard
+                try {
+                  const text = await navigator.clipboard.readText();
+                  if (text) {
+                    await processAndAddCode(text);
+                  } else {
+                    showMessage("Clipboard is empty.", 'error');
+                  }
+                } catch (err) {
+                    if (!tip.classList.contains('hidden')) { return; }
+                    tip.classList.remove('hidden');
+                }
+            }
+            lastTouch = 0;
+        }
+        lastTouch = now;
+    });
+
+    // Initial render
+    renderPage();
+  </script>
+</body>
+</html>
