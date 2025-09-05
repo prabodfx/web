@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Auto Paste2 | Prabodfx</title>
+  <title>Auto Paste | Prabodfx</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -14,6 +14,22 @@
     .code-card:hover {
         background-color: #e5e7eb;
     }
+    .flash-red {
+        animation: flash-red-animation 0.5s ease-in-out;
+    }
+    @keyframes flash-red-animation {
+        0% { background-color: #e5e7eb; }
+        50% { background-color: #ef4444; }
+        100% { background-color: #e5e7eb; }
+    }
+    /* This class permanently marks the card in red */
+    .marked-red {
+        background-color: #ef4444 !important; /* Tailwind's red-500 */
+        color: white !important;
+    }
+    .marked-red span {
+        color: white !important;
+    }
   </style>
 </head>
 
@@ -22,23 +38,17 @@
   <div class="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-lg">
     <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Customer Code Paster</h1>
     <p class="text-gray-600 mb-6 text-center">
-      Double click anywhere to paste automatically. Use the search bar to add a code by pressing Enter.
-      Click on a pasted code to copy it. Double-click the search bar to clear it.
+      Reciept Can be Easily Setoff Now 📌
     </p>
 
     <div class="flex flex-col sm:flex-row gap-4 mb-6 relative">
       <input id="search-bar" type="text" placeholder="Enter code here..." class="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md search-bar hidden">
     </div>
-
-    <div id="tip" class="text-sm text-center text-blue-600 mb-6 hidden">
-      If you see a browser popup, click <b>Allow</b> once; later double clicks will paste automatically.
-    </div>
     
     <div id="message-box" class="text-center p-3 rounded-lg font-semibold text-white mb-6 hidden"></div>
 
     <div id="codes-container" class="space-y-6">
-        <!-- Sections will be dynamically inserted here -->
-    </div>
+        </div>
   </div>
 
   <div id="duplicate-modal" class="modal fixed inset-0 flex items-center justify-center p-4 hidden">
@@ -52,10 +62,21 @@
     </div>
   </div>
 
+  <div id="remove-mark-modal" class="modal fixed inset-0 flex items-center justify-center p-4 hidden">
+    <div class="modal-content p-6 rounded-lg shadow-xl text-center max-w-sm">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Remove Mark?</h2>
+      <p class="mb-6 text-gray-600">Do you want to remove the red mark from this item?</p>
+      <div class="flex justify-center gap-4">
+        <button id="remove-yes" class="px-6 py-2 rounded-full text-white bg-red-600 hover:bg-red-700 shadow-md font-semibold">Yes</button>
+        <button id="remove-no" class="px-6 py-2 rounded-full text-gray-800 bg-gray-200 hover:bg-gray-300 shadow-md font-semibold">No</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // --- Data mapping and elements ---
     const embilipitiyaData = {
-        "AP001":"NALAKA FINACE SOLUTION", "BK002":"V.P H/W", "BRW001":"RATHNAYAKA H/W", "BRW025":"Abegunawardhana H/w", "BULU001":"SETHUN HARDWERE", "BVB001":"BALAVINNA H/W", "BVB002":"GOLD STEEL", "BVB003":"JAYASIRI HARDWARE", "CASH":"CASH CUSTOMER", "WO008":"THEJAN H/W", "WO011":"GUNASEKARA H/W", "WO012":"JAYAMINI STORES", "WO013":"MADUSHANKA H/W", "WO014":"BIMANSA STORES", "WO015":"SEPALI H/W", "WO85":"SATHIRA CONSTRUCTION", "EME023":"SUMANAGIRI TRADRE CENTER", "EME024":"SUMITH H/W", "EME025":"WICKRAMA HARWARE STORES (PVT)", "EME027":"EMBILIPITIYA STORES (PVT) LTD", "EME029":"UDARA TRADRE CENTER", "EME032":"SARATHCHANDRA HOME CENTER", "EME035":"PRIYANTHA H/W", "EME046":"CENTRAL H/W", "EME056":"NALIN HARDWARE & TOOLS CENTER", "EME057":"RENDILA PLASTICS", "EME059":"SANDARU ENTERPRISES", "EME076":"Sirikatha H/w", "KL019":"DHANARANJANA H/W", "KL29":"MAKULUTHOTA", "KMB005":"SRI JAYA ENTERPRICES", "KOG001":"DALUMURAGAMA HARDWARE", "KP001":"SEWMI HARDWARE", "KP058":"ANANDA F/H", "KP059":"NIMAL CEREMIC AND GIFT CENTER", "KUA004":"DHANAPALA HARDWARE", "SW047":"OLITHA H/W", "SW100":"JAYAWEERA H/W", "SW75":"NIRMANA HARDWWARE", "SW77":"WASANA HARDWARE", "SW94":"SENEVIRATHNE HARDWARE", "SW85":"SATHIRA CONSTRUCTION"
+        "AP001":"NALAKA FINACE SOLUTION","BK002":"V.P H/W","BRW001":"RATHNAYAKA H/W","BRW025":"Abegunawardhana H/w","BULU001":"SETHUN HARDWERE","BVB001":"BALAVINNA H/W","BVB002":"GOLD STEEL","BVB003":"JAYASIRI HARDWARE","CASH":"CASH CUSTOMER","EMB025":"M.J.H/W","EMB088":"Royal Cake","EMB089":"ANUHAS H/W","EMB55":"NM HARDWARE","EME002":"INOSHA H/W","EME003":"MATARA H/W","EME006":"UDAGAMA H/W","EME012":"MAHINDA CONSTRUCTION","EME023":"TRADRE CENTER SUMANAGIRI","EME024":"SUMITH H/W","EME025":"WICKRAMA HARWARE STORES (PVT)","EME027":"EMBILIPITIYA STORES (PVT) LTD","EME029":"UDARA TRADRE CENTER", "EME032":"SARATHCHANDRA HOME CENTER", "EME035":"PRIYANTHA H/W", "EME046":"CENTRAL H/W", "EME056":"NALIN HARDWARE & TOOLS CENTER", "EME057":"RENDILA PLASTICS", "EME059":"SANDARU ENTERPRISES", "EME076":"SIRIKATHA H/W", "EME077":"N S D.H/W", "PNP001":"PANAMURA H/W", "PNP003":"DHANUSHKA H/W", "PNP010":"ATHULA H/W", "PNP011":"D.E.P HARDWARE", "PNP014":"SINGHA ENTERPRISES", "PNP016":"LIYANAGE STORES", "PNP017":"ISURU H/W", "PNP025":"LAKMAL H/W", "PNP025":"THILAK H/W", "PNP026":"GANESH H/W", "POT001":"SUGATH H/W", "PTP002":"HAPUARACHCHI TRADRE CENTER", "GWG007":"GALAHITIYA AGRO", "GWG012":"SANKO CONCRETE WORKS & HARDWARE", "GWG013":"CHELO FACTORY", "GWG029":"WEERASINGHA H/W", "GWG030":"T.R.M H/W", "GWG031":"KUMBURUGAMUWA STORES", "HAM002":"THISSA H/W", "HAM001":"ASHANKA ELECTRICLE", "KA001":"THATHSARANI H/W", "KP001":"SEWMI HARDWARE", "KP058":"ANANDA F/H", "KP059":"NIMAL CEREMIC AND GIFT CENTER", "KUA004":"DHANAPALA HARDWARE", "MDP001":"K.A. H/W", "MK002":"WASANTHA HARDWARE", "ML001":"SHAN H/W", "SW012":"SAVIJA HARDWARE", "SW016":"RANGA HARDWARE", "SW018":"INDIKA HARDWARE", "SW020":"V.G.L H/W", "SW025":"NEW P&C H/W", "SW027":"HARSHA H/W", "SW028":"W.G H/W", "SW030":"PRASANNA H/W", "SW045":"SINGHE HARDWARE", "SW047":"OLITHA H/W", "SW100":"JAYAWEERA H/W", "SW075":"NIRMANA HARDWARE", "SW077":"WASANA HARDWARE", "SW094":"SENEVIRATHNE HARDWARE", "KL005":"KAPILA STORES", "KL006":"D.D STORES", "KL007":"D.G ELECTRICAL", "KL008":"LANKA TRADING", "KL013":"S.L.N SENANAYAKA", "KL014":"BUDDHIKA HARDWARE", "KL015":"NEW KAPILA STORES & HARDWARE", "KL019":"DHANARANJANA H/W", "KL029":"MAKULUTHOTA", "KMB005":"SRI JAYA ENTERPRICES", "KOG001":"DALUMURAGAMA HARDWARE", "UW004":"PATHIRANA H/W", "UW005":"PATHMAPERUMA H/W", "UW009":"JAYAKODI H/W", "UW010":"GODAGEWATHTHA H/W", "UW011":"VINOTH STEEL", "RWR011":"JAYANTHA HARDWARE", "SE001":"NEW PATHIRANA H/W", "SE005":"THENUDI HARDWARE", "SE008":"RUWAN H/W", "SG001":"SHASHIMALL HARDWARE", "SG004":"LESINDU H/W", "SLS002":"LAKSHITHA H/W", "SLS003":"LIYANAGE H/W", "PD300":"VINITH ENTERPRISES", "PDN003":"PADALANGALA H/W", "PG001":"WEERATHUNGA H/W", "PNM032":"SANDAMALI H/W", "RW001":"RAKWANA HARDWARE", "RW005":"D.A.G HARDWARE", "WL001":"GAMAGE H/W", "WO001":"HARSHA MOTORS", "WO004":"LAKJAYA STORES", "WO005":"NALINDA H/W", "WO006":"NEW SENARATH H/W", "WO008":"THEJAN H/W", "WO011":"GUNASEKARA H/W", "WO012":"JAYAMINI STORES", "WO013":"MADUSHANKA H/W", "WO014":"BIMANSA STORES", "WO015":"SEPALI H/W", "WO016":"SATHIRA CONSTRUCTION",
     };
 
     const katuwanaData = {
@@ -67,32 +88,60 @@
     // --- Elements ---
     const tip = document.getElementById('tip');
     const messageBox = document.getElementById('message-box');
-    const modal = document.getElementById('duplicate-modal');
-    const modalYesBtn = document.getElementById('modal-yes');
-    const modalNoBtn = document.getElementById('modal-no');
+    const duplicateModal = document.getElementById('duplicate-modal');
+    const duplicateModalYesBtn = document.getElementById('modal-yes');
+    const duplicateModalNoBtn = document.getElementById('modal-no');
+    const removeMarkModal = document.getElementById('remove-mark-modal');
+    const removeMarkYesBtn = document.getElementById('remove-yes');
+    const removeMarkNoBtn = document.getElementById('remove-no');
     const codesContainer = document.getElementById('codes-container');
     const searchBar = document.getElementById('search-bar');
 
     // --- State and History ---
-    const pastedSections = [];
-    const pastedHistory = [];
+    const pastedGroups = [];
+    
+    const markedItems = new Set(); 
+    let isSortedAscending = true; 
 
     const isKatuwanaCode = (code) => katuwanaData.hasOwnProperty(code);
     const isEmbilipitiyaCode = (code) => embilipitiyaData.hasOwnProperty(code);
-    const isDuplicate = (code) => pastedHistory.includes(code);
+    
+    const isDuplicate = (code) => {
+        for (const group of pastedGroups) {
+            for (const item of group.items) {
+                if (item.code === code) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
 
     // --- Utility functions ---
     const showDuplicateModal = () => new Promise((resolve) => {
-      modal.classList.remove('hidden');
+      duplicateModal.classList.remove('hidden');
       const yesHandler = () => { cleanup(); resolve(true); };
       const noHandler  = () => { cleanup(); resolve(false); };
       function cleanup() {
-        modal.classList.add('hidden');
-        modalYesBtn.removeEventListener('click', yesHandler);
-        modalNoBtn.removeEventListener('click', noHandler);
+        duplicateModal.classList.add('hidden');
+        duplicateModalYesBtn.removeEventListener('click', yesHandler);
+        duplicateModalNoBtn.removeEventListener('click', noHandler);
       }
-      modalYesBtn.addEventListener('click', yesHandler);
-      modalNoBtn.addEventListener('click', noHandler);
+      duplicateModalYesBtn.addEventListener('click', yesHandler);
+      duplicateModalNoBtn.addEventListener('click', noHandler);
+    });
+
+    const showRemoveMarkModal = () => new Promise((resolve) => {
+        removeMarkModal.classList.remove('hidden');
+        const yesHandler = () => { cleanup(); resolve(true); };
+        const noHandler = () => { cleanup(); resolve(false); };
+        function cleanup() {
+            removeMarkModal.classList.add('hidden');
+            removeMarkYesBtn.removeEventListener('click', yesHandler);
+            removeMarkNoBtn.removeEventListener('click', noHandler);
+        }
+        removeMarkYesBtn.addEventListener('click', yesHandler);
+        removeMarkNoBtn.addEventListener('click', noHandler);
     });
 
     function showMessage(message, type) {
@@ -102,20 +151,38 @@
       else if (type === 'success') { messageBox.classList.add('bg-green-500'); }
       else { messageBox.classList.add('bg-blue-500'); }
     }
-
-    function copyCodeToClipboard(code) {
-        try {
-            navigator.clipboard.writeText(code).then(() => {
-                showMessage("Code copied!", 'blue');
-            }).catch(() => {
-                fallbackCopyTextToClipboard(code);
-            });
-        } catch (err) {
-            fallbackCopyTextToClipboard(code);
+    
+    function markAsRed(id) {
+        if (id) {
+            markedItems.add(id);
+            renderPage(); 
         }
     }
 
-    function fallbackCopyTextToClipboard(text) {
+    function removeMark(id) {
+        if (id && markedItems.has(id)) {
+            markedItems.delete(id);
+            renderPage();
+            showMessage("Mark removed!", 'success');
+        }
+    }
+
+    function copyCodeToClipboard(code, id) {
+        try {
+            navigator.clipboard.writeText(code).then(() => {
+                showMessage("Code copied!", 'blue');
+                if (id) {
+                   markAsRed(id); 
+                }
+            }).catch(() => {
+                fallbackCopyTextToClipboard(code, id);
+            });
+        } catch (err) {
+            fallbackCopyTextToClipboard(code, id);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text, id) {
       const textArea = document.createElement("textarea");
       textArea.value = text;
       textArea.style.top = "0";
@@ -130,15 +197,17 @@
         const successful = document.execCommand('copy');
         const msg = successful ? 'Code copied (fallback)!' : 'Copying failed!';
         showMessage(msg, successful ? 'blue' : 'error');
+        if (successful && id) {
+             markAsRed(id);
+        }
       } catch (err) {
         showMessage('Copying failed!', 'error');
       }
 
       document.body.removeChild(textArea);
     }
-
-    // Function to process and add a code to the pasted list
-    async function processAndAddCode(code, doCopy = false) {
+    
+    async function processAndAddCode(code) {
         const trimmedCode = code.trim().toUpperCase();
         if (!trimmedCode) {
             showMessage("Code is empty.", 'error');
@@ -150,80 +219,78 @@
             if (!again) return;
         }
         
-        let sectionType, sectionTitle, message;
+        const uniqueId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        const item = { code: trimmedCode, id: uniqueId };
 
+        let itemType;
         if (isKatuwanaCode(trimmedCode)) {
-            sectionType = 'katuwana';
-            sectionTitle = "Katuwana Codes";
-            message = "Katuwana code added!";
+            itemType = 'katuwana';
         } else if (isEmbilipitiyaCode(trimmedCode)) {
-            sectionType = 'embilipitiya';
-            sectionTitle = "Embilipitiya Codes";
-            message = "Embilipitiya code added!";
+            itemType = 'embilipitiya';
         } else {
-            sectionType = 'other';
-            sectionTitle = "Other Codes";
-            message = "Code added to Other Codes.";
+            itemType = 'other';
         }
         
-        const lastSection = pastedSections[pastedSections.length - 1];
-        if (lastSection && lastSection.type === sectionType) {
-            lastSection.codes.push(trimmedCode);
+        const lastGroup = pastedGroups.length > 0 ? pastedGroups[pastedGroups.length - 1] : null;
+
+        if (!lastGroup || lastGroup.type !== itemType) {
+            pastedGroups.push({ type: itemType, items: [item] });
         } else {
-            const newSection = {
-                type: sectionType,
-                title: sectionTitle,
-                codes: [trimmedCode]
-            };
-            pastedSections.push(newSection);
+            lastGroup.items.push(item);
         }
 
-        pastedHistory.push(trimmedCode);
-        showMessage(message, 'success');
-        
-        if (doCopy) {
-            copyCodeToClipboard(trimmedCode);
-        }
-        
-        // Render the page with the updated list
+        showMessage("Code added!", 'success');
         renderPage();
     }
-
-    function createCodeCard(text) {
+    
+    function createCodeCard(item) {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'p-4 rounded-lg bg-white shadow-sm cursor-pointer code-card';
-        itemDiv.dataset.code = text; 
+        itemDiv.dataset.code = item.code;
+        itemDiv.dataset.id = item.id;
         
-        const customerName = allData[text];
+        if (markedItems.has(item.id)) {
+            itemDiv.classList.add('marked-red');
+        }
+
+        const customerName = allData[item.code];
         itemDiv.innerHTML = customerName 
-          ? `<span class="font-semibold text-gray-900">${text}</span> - <span class="text-gray-700">${customerName}</span>`
-          : `<span class="font-semibold text-gray-900">${text}</span>`;
+          ? `<span class="font-semibold text-gray-900">${item.code}</span> - <span class="text-gray-700">${customerName}</span>`
+          : `<span class="font-semibold text-gray-900">${item.code}</span>`;
 
         itemDiv.onclick = (e) => {
             e.stopPropagation();
-            copyCodeToClipboard(text);
+            copyCodeToClipboard(item.code, item.id);
         };
         
         return itemDiv;
     }
-
+    
     function renderPage() {
         codesContainer.innerHTML = '';
         
-        pastedSections.forEach(section => {
+        const groupsToShow = isSortedAscending ? [...pastedGroups] : [...pastedGroups].reverse();
+    
+        groupsToShow.forEach(group => {
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'bg-gray-100 p-6 rounded-lg shadow-inner';
             
             const title = document.createElement('h2');
             title.className = 'text-2xl font-bold text-gray-700 mb-4 text-center';
-            title.textContent = section.title;
+            if (group.type === 'katuwana') {
+                title.textContent = 'Katuwana Area';
+            } else if (group.type === 'embilipitiya') {
+                title.textContent = 'Embilipitiya Area';
+            } else {
+                title.textContent = 'Other Codes';
+            }
             sectionDiv.appendChild(title);
 
             const listDiv = document.createElement('div');
             listDiv.className = 'space-y-4';
-            
-            section.codes.forEach(code => {
-                listDiv.appendChild(createCodeCard(code));
+
+            group.items.forEach(item => {
+                listDiv.appendChild(createCodeCard(item));
             });
             
             sectionDiv.appendChild(listDiv);
@@ -233,32 +300,39 @@
     
     // Event Listeners
     document.addEventListener('dblclick', async (e) => {
-      // Check if the double click is on a code card
-      const codeCard = e.target.closest('[data-code]');
-      if (codeCard) {
-          const code = codeCard.dataset.code;
-          processAndAddCode(code);
-          return;
-      }
-      
-      // If the target is the search bar, handle the clearing logic
-      if (e.target.id === 'search-bar') {
-          searchBar.value = '';
-          searchBar.focus();
-          return;
-      }
+        const codeCard = e.target.closest('[data-code]');
 
-      // Prevent dblclick on modal
-      if (!modal.classList.contains('hidden') && modal.contains(e.target)) return;
+        if (codeCard) {
+            const id = codeCard.dataset.id;
+            // Check if the item is already marked
+            if (markedItems.has(id)) {
+                const confirmRemove = await showRemoveMarkModal();
+                if (confirmRemove) {
+                    removeMark(id);
+                }
+            } else {
+                const code = codeCard.dataset.code;
+                processAndAddCode(code);
+            }
+            return;
+        }
       
-      // Otherwise, perform regular paste operation from clipboard
-      try {
-        const text = await navigator.clipboard.readText();
-        await processAndAddCode(text);
-      } catch (err) {
-        if (!tip.classList.contains('hidden')) { return; }
-        tip.classList.remove('hidden');
-      }
+        if (e.target.id === 'search-bar') {
+            searchBar.value = '';
+            searchBar.focus();
+            return;
+        }
+
+        if (!duplicateModal.classList.contains('hidden') && duplicateModal.contains(e.target)) return;
+        if (!removeMarkModal.classList.contains('hidden') && removeMarkModal.contains(e.target)) return;
+      
+        try {
+            const text = await navigator.clipboard.readText();
+            await processAndAddCode(text);
+        } catch (err) {
+            if (!tip.classList.contains('hidden')) { return; }
+            tip.classList.remove('hidden');
+        }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -268,17 +342,25 @@
         if (!searchBar.classList.contains('hidden')) {
             searchBar.focus();
         }
+      } 
+      else if (e.key === 'ArrowUp') {
+          isSortedAscending = false;
+          renderPage();
+          showMessage("Sorted Last-to-First", 'blue');
+      } 
+      else if (e.key === 'ArrowDown') {
+          isSortedAscending = true;
+          renderPage();
+          showMessage("Sorted First-to-Last", 'blue');
       }
     });
 
-    // Handle Enter keypress in search bar
     searchBar.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const searchTerm = searchBar.value;
             if (searchTerm.trim() !== '') {
-                // Pass true to the doCopy parameter to automatically copy
-                processAndAddCode(searchTerm, true); 
-                searchBar.value = ''; // Clear search bar after adding
+                processAndAddCode(searchTerm); 
+                searchBar.value = ''; 
                 searchBar.blur();
                 searchBar.classList.add('hidden');
             } else {
@@ -293,13 +375,11 @@
         const delta = now - lastTouch;
         if (delta < 300 && delta > 0) {
             event.preventDefault(); 
-            // Check if the double tap is on a code card
             const codeCard = event.target.closest('[data-code]');
             if (codeCard) {
                 const code = codeCard.dataset.code;
                 processAndAddCode(code);
             } else {
-                // Otherwise, perform regular paste from clipboard
                 try {
                   const text = await navigator.clipboard.readText();
                   if (text) {
@@ -317,7 +397,6 @@
         lastTouch = now;
     });
 
-    // Initial render
     renderPage();
   </script>
 </body>
