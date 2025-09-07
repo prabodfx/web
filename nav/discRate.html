@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PRABODfx DiscRate Cal</title>
+  <title>Price Calculator</title>
 
   <style>
+    /* === Global Reset === */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -128,12 +129,20 @@
       text-align: center;
     }
 
+    #result-label {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 500;
+      color: #ddd;
+      margin-bottom: 0.5rem;
+    }
+
     #result {
       font-size: clamp(2.2rem, 6vw, 3rem);
       font-weight: 800;
       background: linear-gradient(90deg, #ffffff, #ff0048);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-top: 0.5rem;
     }
 
     #result + span {
@@ -159,45 +168,92 @@
     .msg-error {
       background: #b91c1c;
     }
+
+    #mode-indicator {
+      text-align: center;
+      color: #00ff04;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Price DiscRate Calculator</h1>
-    <p class="sub">Calculate the discount rate between two prices.</p>
+    <h1 id="main-title">Price DiscRate Calculator</h1>
+    <p class="sub" id="sub-title">Calculate the discount rate between two prices.</p>
 
     <div class="input-group">
-      <label for="set-price">Seted Price</label>
-      <span>Rs.</span>
-      <input type="text" id="set-price" placeholder="e.g., 100">
+      <label id="label-a" for="price-a">Seted Price</label>
+      <span id="span-a">Rs.</span>
+      <input type="text" id="price-a" placeholder="e.g., 100">
     </div>
 
     <div class="input-group">
-      <label for="gv-price">Given Price</label>
-      <span>Rs.</span>
-      <input type="text" id="gv-price" placeholder="e.g., 80">
+      <label id="label-b" for="price-b">Given Price</label>
+      <span id="span-b">Rs.</span>
+      <input type="text" id="price-b" placeholder="e.g., 80">
     </div>
 
-    <button id="calculate-button">Calculate Rate</button>
+    <button id="calculate-button">Calculate</button>
 
     <div id="result-container">
-      <p>The calculated rate is:</p>
+      <p id="result-label"></p>
       <div>
-        <span id="result"></span><span>%</span>
+        <span id="result"></span>
       </div>
     </div>
 
     <div id="message-box"><p id="message-text"></p></div>
-  </div>
+    </div>
 
   <script>
-    const setPriceInput = document.getElementById('set-price');
-    const gvPriceInput = document.getElementById('gv-price');
+    const titleElement = document.getElementById('main-title');
+    const subtitleElement = document.getElementById('sub-title');
+    const labelA = document.getElementById('label-a');
+    const labelB = document.getElementById('label-b');
+    const inputA = document.getElementById('price-a');
+    const inputB = document.getElementById('price-b');
+    const spanA = document.getElementById('span-a'); 
+    const spanB = document.getElementById('span-b');
     const calculateButton = document.getElementById('calculate-button');
     const resultContainer = document.getElementById('result-container');
+    const resultLabel = document.getElementById('result-label');
     const resultElement = document.getElementById('result');
     const messageBox = document.getElementById('message-box');
     const messageText = document.getElementById('message-text');
+
+    let isDiscountRateMode = true;
+
+    function updateUI() {
+      if (isDiscountRateMode) {
+        titleElement.textContent = 'Price DiscRate Calculator';
+        subtitleElement.textContent = 'Calculate the discount rate between two prices.';
+        labelA.textContent = 'Seted Price';
+        labelB.textContent = 'Given Price';
+        calculateButton.textContent = 'Calculate Rate';
+        inputA.placeholder = 'e.g., 100';
+        inputB.placeholder = 'e.g., 80';
+        resultLabel.textContent = 'The calculated rate is:';
+        spanA.textContent = 'Rs.'; 
+        spanB.textContent = 'Rs.'; 
+        inputA.style.paddingLeft = '2.5rem';
+        inputB.style.paddingLeft = '2.5rem';
+      } else {
+        titleElement.textContent = 'Dis.Price Calculator';
+        subtitleElement.textContent = 'Calculate the discount price.';
+        labelA.textContent = 'Set Price';
+        labelB.textContent = 'Discount Rate (%)';
+        calculateButton.textContent = 'Calculate Price';
+        inputA.placeholder = 'e.g., 100';
+        inputB.placeholder = 'e.g., 20';
+        resultLabel.textContent = 'The Final Price is:';
+        spanA.textContent = 'Rs.';
+        spanB.textContent = '%'; 
+        inputA.style.paddingLeft = '2.5rem';
+        inputB.style.paddingLeft = '2.5rem'; 
+      }
+      clearResults();
+    }
 
     function cleanInput(value) {
       value = value.replace(/[^0-9.]/g, "");
@@ -214,32 +270,39 @@
       return parseFloat(cleaned);
     }
 
-    function calculateRate() {
-      const a = getNumericValue(setPriceInput);
-      const b = getNumericValue(gvPriceInput);
+    function calculate() {
+      const a = getNumericValue(inputA);
+      const b = getNumericValue(inputB);
 
       resultContainer.style.display = 'none';
       messageBox.style.display = 'none';
 
       if (isNaN(a) || a <= 0) {
-        showMessage("Please enter a valid Seted Price.", true);
-        setPriceInput.focus();
+        showMessage("Please enter a valid Set Price.", true);
+        inputA.focus();
         return;
       }
-      if (isNaN(b)) {
-        showMessage("Please enter a value for the Given Price.", true);
-        gvPriceInput.focus();
+      if (isNaN(b) || b < 0) {
+        showMessage("Please enter a valid value for the second field.", true);
+        inputB.focus();
         return;
       }
 
-      const x = ((a - b) / a) * 100;
-      const calculatedResult = truncateToTwo(x).toFixed(2);
+      let calculatedResult;
+      if (isDiscountRateMode) {
+        if (a === 0) {
+          showMessage("Seted Price cannot be zero for this calculation.", true);
+          return;
+        }
+        calculatedResult = ((a - b) / a) * 100;
+        resultElement.textContent = `${truncateToTwo(calculatedResult).toFixed(2)}%`;
+      } else {
+        calculatedResult = a - (a * (b / 100));
+        resultElement.textContent = `Rs. ${calculatedResult.toFixed(2)}`;
+      }
 
-
-      resultElement.textContent = calculatedResult;
       resultContainer.style.display = 'block';
-
-      copyToClipboard(calculatedResult);
+      copyToClipboard(isDiscountRateMode ? calculatedResult.toFixed(2) : calculatedResult.toFixed(2));
     }
 
     function truncateToTwo(num) {
@@ -260,37 +323,53 @@
       tempInput.select();
       document.execCommand('copy');
       document.body.removeChild(tempInput);
-      showMessage("Rate copied to clipboard!", false);
+    }
+    
+    function clearResults() {
+      inputA.value = '';
+      inputB.value = '';
+      resultContainer.style.display = 'none';
+      messageBox.style.display = 'none';
+      inputA.focus();
     }
 
-    calculateButton.addEventListener('click', calculateRate);
+    calculateButton.addEventListener('click', calculate);
 
-    setPriceInput.addEventListener('keydown', e => {
+    document.addEventListener('keydown', e => {
+      if (e.key === ' ') {
+        e.preventDefault();
+        isDiscountRateMode = !isDiscountRateMode;
+        updateUI();
+      }
+    });
+
+    inputA.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (setPriceInput.value && gvPriceInput.value) {
-          calculateRate();
+        if (inputA.value && inputB.value) {
+          calculate();
         } else {
-          gvPriceInput.focus();
+          inputB.focus();
         }
       }
     });
-    gvPriceInput.addEventListener('keydown', e => {
+
+    inputB.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        calculateRate();
+        calculate();
       }
     });
-    
+
     function clearInputOnDoubleClick(e) {
       e.target.value = '';
     }
 
-    setPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
-    gvPriceInput.addEventListener('dblclick', clearInputOnDoubleClick);
+    inputA.addEventListener('dblclick', clearInputOnDoubleClick);
+    inputB.addEventListener('dblclick', clearInputOnDoubleClick);
 
-    window.onload = () => setPriceInput.focus();
+    window.onload = () => updateUI();
+
   </script>
 </body>
 </html>
-
