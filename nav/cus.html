@@ -7,8 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { 
-      font-family: 'Poppins', sans-serif; 
+    body {
+      font-family: 'Poppins', sans-serif;
       background: #0d1117;
       color: #c9d1d9;
       padding: 1rem;
@@ -18,11 +18,11 @@
       min-height: 100vh;
       box-sizing: border-box;
     }
-    .container { 
-      max-width: 1000px; 
+    .container {
+      max-width: 1000px;
       width: 100%;
       margin: 0 auto;
-      padding: 2rem; 
+      padding: 2rem;
       background: #161b22;
       border-radius: 1.5rem;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
@@ -35,15 +35,15 @@
     }
     .input-container {
       display: flex;
-      align-items: center; 
+      align-items: center;
       gap: 0.75rem;
     }
     .input-container textarea {
       line-height: 36px;
-      min-height: 48px; 
+      min-height: 48px;
       max-height: 200px;
       padding: 0.75rem 1rem;
-      resize: none; 
+      resize: none;
       overflow-y: auto;
     }
     .input-container button {
@@ -54,17 +54,17 @@
       justify-content: center;
       font-weight: 600;
     }
-    .save-dialog, .delete-dialog {
+    .save-dialog, .delete-dialog, .rename-dialog {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: #21262d; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
       z-index: 2000; display: none;
       width: 90%; max-width: 400px;
     }
-    .save-dialog input {
+    .save-dialog input, .rename-dialog input {
       width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #30363d;
       background: #0d1117; color: #c9d1d9;
     }
-    .save-dialog button, .delete-dialog button {
+    .save-dialog button, .delete-dialog button, .rename-dialog button {
       padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600;
     }
     #savedDataList {
@@ -101,7 +101,7 @@
     </header>
 
     <div class="space-y-8">
-      <div id="inputControls" class="hidden-by-shift">
+      <div id="inputControls">
         <div class="input-container w-full">
           <textarea id="dataInput" rows="1" placeholder="Paste your data here..." class="w-full border border-gray-700 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 shadow-inner"></textarea>
           <button id="processBtn" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
@@ -109,7 +109,7 @@
           </button>
         </div>
       </div>
-      
+
       <div class="content-section">
         <div id="savedDataList" class="bg-gray-800 p-6 rounded-lg shadow-inner">
           <h1 class="text-xl font-semibold mb-4 text-white">Saved Datasets</h1>
@@ -147,13 +147,23 @@
         <button id="confirmSaveBtn" class="bg-blue-600 text-white hover:bg-blue-500">Save</button>
       </div>
     </div>
-    
+
     <div id="deleteDialog" class="delete-dialog">
         <h3 class="text-xl font-bold mb-4 text-white">Delete Dataset</h3>
         <p class="mb-4">Are you sure you want to delete <strong id="deleteDatasetName"></strong>?</p>
         <div class="flex justify-end gap-2">
             <button id="cancelDeleteBtn" class="bg-gray-600 text-white hover:bg-gray-500">Cancel</button>
             <button id="confirmDeleteBtn" class="bg-red-600 text-white hover:bg-red-500">Delete</button>
+        </div>
+    </div>
+
+    <div id="renameDialog" class="rename-dialog">
+        <h3 class="text-xl font-bold mb-4 text-white">Rename Dataset</h3>
+        <p class="mb-2">Enter a new name for <strong id="oldDatasetName"></strong>:</p>
+        <input type="text" id="renameInput" class="mb-4" placeholder="New dataset name"/>
+        <div class="flex justify-end gap-2">
+            <button id="cancelRenameBtn" class="bg-gray-600 text-white hover:bg-gray-500">Cancel</button>
+            <button id="confirmRenameBtn" class="bg-blue-600 text-white hover:bg-blue-500">Rename</button>
         </div>
     </div>
 
@@ -207,7 +217,7 @@
       }
     }
 
-    let lastProcessedData = null; 
+    let lastProcessedData = null;
 
     function processData() {
       const raw = document.getElementById('dataInput').value || '';
@@ -319,15 +329,20 @@
         showMessage('No valid data found.', 'error');
       }
     }
-    
-    function autoSaveProcessedData(name) {
+
+    function autoSaveProcessedData() {
         if (!lastProcessedData || lastProcessedData.length === 0) {
             return;
         }
 
+        const now = new Date();
+        const date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        const time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        const autoSaveName = `Auto-Save-${date}-${time}`;
+
         let savedData = JSON.parse(localStorage.getItem('categorizedDatasets') || '{}');
-        savedData[name] = lastProcessedData;
-        
+        savedData[autoSaveName] = lastProcessedData;
+
         try {
             localStorage.setItem('categorizedDatasets', JSON.stringify(savedData));
             loadSavedDatasetsList();
@@ -351,7 +366,7 @@
             showMessage('Please enter a name for the dataset.', 'error');
             return;
         }
-        
+
         let savedData = JSON.parse(localStorage.getItem('categorizedDatasets') || '{}');
         const newDataString = JSON.stringify(lastProcessedData);
 
@@ -362,7 +377,7 @@
         }
 
         savedData[saveName] = lastProcessedData;
-        
+
         try {
             localStorage.setItem('categorizedDatasets', JSON.stringify(savedData));
             showMessage(`Dataset "${saveName}" saved successfully.`, 'success');
@@ -385,9 +400,33 @@
             delete savedData[name];
             localStorage.setItem('categorizedDatasets', JSON.stringify(savedData));
             showMessage(`Dataset "${name}" deleted successfully.`, 'success');
-            loadSavedDatasetsList(); 
+            loadSavedDatasetsList();
         } else {
             showMessage('Error: Dataset not found.', 'error');
+        }
+    }
+
+    function renameDataset(oldName, newName) {
+        if (!newName.trim()) {
+            showMessage('New name cannot be empty.', 'error');
+            return;
+        }
+        let savedData = JSON.parse(localStorage.getItem('categorizedDatasets') || '{}');
+        if (savedData.hasOwnProperty(newName)) {
+            showMessage(`A dataset with the name "${newName}" already exists.`, 'error');
+            return;
+        }
+        if (savedData.hasOwnProperty(oldName)) {
+            const dataToRename = savedData[oldName];
+            delete savedData[oldName];
+            savedData[newName] = dataToRename;
+            localStorage.setItem('categorizedDatasets', JSON.stringify(savedData));
+            showMessage(`Dataset "${oldName}" renamed to "${newName}".`, 'success');
+            document.getElementById('renameDialog').style.display = 'none';
+            document.getElementById('renameInput').value = '';
+            loadSavedDatasetsList();
+        } else {
+            showMessage('Error: Dataset to rename not found.', 'error');
         }
     }
 
@@ -406,12 +445,12 @@
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-md hover:bg-gray-600 transition-colors cursor-pointer';
                 li.innerHTML = `<span>${name}</span>`;
-                li.dataset.name = name; 
+                li.dataset.name = name;
                 savesList.appendChild(li);
             });
         }
     }
-    
+
     function handleLoadRequest(event) {
         const li = event.target.closest('li');
         if (li && li.dataset.name) {
@@ -445,7 +484,7 @@
     document.getElementById('searchBar').addEventListener('input', (e) => {
         loadSavedDatasetsList(e.target.value);
     });
-    
+
     document.getElementById('saveNameInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -466,28 +505,33 @@
       }
     });
 
+    // Updated dblclick event listener on document
     document.addEventListener('dblclick', async (e) => {
-        const row = e.target.closest('#resultsTableBody tr');
-        if (!row) {
-            try {
-                const text = await navigator.clipboard.readText();
-                if (text) {
-                    dataInput.value = text;
-                    dataInput.style.height = 'auto';
-                    dataInput.style.height = (dataInput.scrollHeight) + 'px';
-                    processData();
-                    const autoSaveName = `Auto-Save-${new Date().toISOString()}`;
-                    autoSaveProcessedData(autoSaveName);
-                    showMessage('Data pasted, processed, and auto-saved.', 'success');
-                } else {
-                    showMessage('Clipboard is empty.', 'error');
-                }
-            } catch (err) {
-                showMessage('Clipboard access denied. Please manually paste.', 'error');
-            }
-        }
+      // Check if the double-click happened inside a specific section
+      const clickedSection = e.target.closest('#savedDataList, #resultsTableBody');
+      if (clickedSection) {
+        // If so, do nothing and return early
+        return;
+      }
+      
+      // Original logic for automatic paste
+      try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+              dataInput.value = text;
+              dataInput.style.height = 'auto';
+              dataInput.style.height = (dataInput.scrollHeight) + 'px';
+              processData();
+              autoSaveProcessedData();
+              showMessage('Data pasted, processed, and auto-saved.', 'success');
+          } else {
+              showMessage('Clipboard is empty.', 'error');
+          }
+      } catch (err) {
+          showMessage('Clipboard access denied. Please manually paste.', 'error');
+      }
     });
-    
+
     document.getElementById('resultsTableBody').addEventListener('click', (e) => {
         const row = e.target.closest('tr');
         if (row) {
@@ -497,7 +541,7 @@
     });
 
     document.getElementById('resultsTableBody').addEventListener('contextmenu', (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         const row = e.target.closest('tr');
         if (row) {
             const quantity = row.children[1].textContent;
@@ -512,7 +556,22 @@
             copyToClipboard(rate);
         }
     });
+
+    document.getElementById('savesList').addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const li = e.target.closest('li');
+        if (li && li.dataset.name) {
+            const name = li.dataset.name;
+            document.getElementById('oldDatasetName').textContent = name;
+            document.getElementById('renameDialog').dataset.name = name;
+            document.getElementById('renameInput').value = name;
+            document.getElementById('renameDialog').style.display = 'block';
+            document.getElementById('renameInput').focus();
+            document.getElementById('renameInput').select();
+        }
+    });
     
+    // Updated dblclick event listener for saved data deletion
     document.getElementById('savesList').addEventListener('dblclick', (e) => {
         const li = e.target.closest('li');
         if (li && li.dataset.name) {
@@ -522,17 +581,34 @@
             document.getElementById('deleteDialog').style.display = 'block';
         }
     });
-    
+
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
         const name = document.getElementById('deleteDialog').dataset.name;
         deleteDataset(name);
         document.getElementById('deleteDialog').style.display = 'none';
     });
-    
+
     document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
         document.getElementById('deleteDialog').style.display = 'none';
     });
 
+    document.getElementById('confirmRenameBtn').addEventListener('click', () => {
+        const oldName = document.getElementById('renameDialog').dataset.name;
+        const newName = document.getElementById('renameInput').value.trim();
+        renameDataset(oldName, newName);
+    });
+
+    document.getElementById('cancelRenameBtn').addEventListener('click', () => {
+        document.getElementById('renameDialog').style.display = 'none';
+    });
+
+    document.getElementById('renameInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const oldName = document.getElementById('renameDialog').dataset.name;
+            const newName = document.getElementById('renameInput').value.trim();
+            renameDataset(oldName, newName);
+        }
+    });
 
     document.addEventListener('keydown', (e) => {
       const saveDialog = document.getElementById('saveDialog');
@@ -566,16 +642,16 @@
               loadSavedDatasetsList();
           }
       }
-
-      if (e.key === ' ' && saveDialog.style.display !== 'block') {
-          if (activeElement !== dataInput) {
-            e.preventDefault();
-            saveProcessedData();
-          }
+      
+      // Updated spacebar logic to only save when not in the data input field
+      if (e.key === ' ' && saveDialog.style.display !== 'block' && activeElement !== dataInput) {
+          e.preventDefault();
+          saveProcessedData();
       }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('inputControls').classList.add('hidden-by-shift');
         loadSavedDatasetsList();
     });
   </script>
