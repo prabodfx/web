@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BILL SAVER | Prabodfx</title>
+  <title>Data Categorizer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -92,6 +92,19 @@
     .results-row td {
         cursor: pointer;
     }
+    /* New style for marked rows */
+    .results-row.marked {
+      background-color: #3b82f6 !important; /* Tailwind's blue-500 */
+      color: #fff;
+    }
+    .results-row.marked td {
+        color: inherit;
+    }
+    /* Style for selected saved list item */
+    .saved-list-item.selected {
+        background-color: #3b82f6 !important;
+        color: #fff;
+    }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-300">
@@ -126,6 +139,7 @@
           <table class="min-w-full">
             <thead class="bg-gray-800">
               <tr>
+                <th class="py-4 px-6 text-left text-sm font-semibold text-gray-400 uppercase tracking-wider">#</th>
                 <th class="py-4 px-6 text-left text-sm font-semibold text-gray-400 uppercase tracking-wider">Item Code</th>
                 <th class="py-4 px-6 text-left text-sm font-semibold text-gray-400 uppercase tracking-wider">Quantity</th>
                 <th class="py-4 px-6 text-left text-sm font-semibold text-gray-400 uppercase tracking-wider">Rate</th>
@@ -191,6 +205,46 @@
       return /^[-+]?\d+(\.\d+)?$/.test(t);
     };
     const isAllCapsShort = (s) => /^[A-Z]{1,4}$/.test(s);
+    
+    // Utility: split a line into tokens using heuristics
+    function smartSplit(line){
+      // Trim first
+      var s = line.trim();
+      if(!s) return [];
+      // try tab
+      var parts = s.split('\t').map(p=>p.trim()).filter(Boolean);
+      if(parts.length >= 5) return parts;
+      // try two or more spaces (to avoid splitting description words)
+      parts = s.split(/ {2,}/).map(p=>p.trim()).filter(Boolean);
+      if(parts.length >= 5) return parts;
+      // try comma
+      parts = s.split(',').map(p=>p.trim()).filter(Boolean);
+      if(parts.length >= 5) return parts;
+      // fallback: split by single space (weak)
+      parts = s.split(/\s+/).map(p=>p.trim()).filter(Boolean);
+      return parts;
+    }
+
+    function extractFromLine(line){
+      var tokens = smartSplit(line);
+      var get = (i)=> (tokens[i] !== undefined) ? tokens[i] : '';
+      
+      var itemCode = get(1);
+      var quantity, rate;
+
+      // Check for the "0.00" condition at index 3
+      if (tokens.length > 3 && looksNumeric(tokens[3]) && numStrToFloat(tokens[3]) === 0) {
+        // Condition met: use index 4 for quantity and index 5 for rate
+        quantity = get(4);
+        rate = get(5);
+      } else {
+        // Normal case: use index 3 for quantity and index 4 for rate
+        quantity = get(3);
+        rate = get(4);
+      }
+
+      return {itemCode: itemCode, quantity: quantity, rate: rate, tokens: tokens};
+    }
 
     function displayData(data) {
       const tbody = document.getElementById('resultsTableBody');
@@ -206,6 +260,7 @@
             tr.classList.add('bg-gray-900');
           }
           tr.innerHTML = `
+            <td class="py-4 px-6 text-gray-300 font-medium">${index + 1}</td>
             <td class="py-4 px-6 text-gray-300 font-medium">${it.itemCode}</td>
             <td class="py-4 px-6 text-gray-300">${it.quantity}</td>
             <td class="py-4 px-6 text-gray-300">${it.rate}</td>
@@ -216,109 +271,29 @@
         noResults.style.display = 'block';
       }
     }
+    
+    function markRow(row) {
+      row.classList.add('marked');
+    }
+
+    function unmarkRow(row) {
+      row.classList.remove('marked');
+    }
 
     let lastProcessedData = null;
+    let selectedSavedItem = null;
 
     function processData() {
       const raw = document.getElementById('dataInput').value || '';
-      const rows = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
       const processed = [];
 
-      rows.forEach(line => {
-        let tokens = line.split(/\s+/).filter(Boolean);
-        if (!tokens.length) return;
-
-        let hadSerialAtStart = false;
-        if (looksNumeric(tokens[0]) && Number.isInteger(numStrToFloat(tokens[0]))) {
-          hadSerialAtStart = true;
-          tokens.shift();
+      lines.forEach(line => {
+        var extracted = extractFromLine(line);
+        // only include rows where at least one of the 3 values is present
+        if(extracted.itemCode || extracted.quantity || extracted.rate) {
+          processed.push(extracted);
         }
-
-        let itemCode = '';
-        let searchStart = 0;
-
-        if (hadSerialAtStart) {
-          if (tokens.length === 0) return;
-          let parts = [tokens[0]];
-          let i = 1;
-          while (i < tokens.length && isAllCapsShort(tokens[i])) {
-            parts.push(tokens[i]);
-            i++;
-          }
-          itemCode = parts.join(' ').trim();
-          searchStart = i;
-        } else {
-          let iCodeIdx = -1;
-          for (let i = 0; i < tokens.length; i++) {
-            if (!looksNumeric(tokens[i])) {
-              itemCode = tokens[i];
-              iCodeIdx = i;
-              if (tokens[i + 1] && isAllCapsShort(tokens[i + 1])) {
-                itemCode += ' ' + tokens[i + 1];
-                iCodeIdx = i + 1;
-              }
-              break;
-            }
-          }
-          searchStart = (iCodeIdx >= 0) ? iCodeIdx + 1 : 0;
-        }
-
-        if (!itemCode) return;
-
-        let zeroIdx = -1;
-        for (let i = searchStart; i < tokens.length; i++) {
-          if (looksNumeric(tokens[i]) && Math.abs(numStrToFloat(tokens[i]) - 0) < 1e-9) {
-            zeroIdx = i;
-            break;
-          }
-        }
-
-        let qty = 'N/A';
-        let rate = 'N/A';
-
-        if (zeroIdx >= 0) {
-          let qIdx = -1;
-          for (let j = zeroIdx + 1; j < tokens.length; j++) {
-            if (looksNumeric(tokens[j])) {
-              const v = numStrToFloat(tokens[j]);
-              if (!isNaN(v) && v >= 0) {
-                qty = tokens[j];
-                qIdx = j;
-                break;
-              }
-            }
-          }
-          if (qIdx >= 0) {
-            for (let k = qIdx + 1; k < tokens.length; k++) {
-              if (looksNumeric(tokens[k])) {
-                rate = tokens[k];
-                break;
-              }
-            }
-          }
-        } else {
-          let qIdx = -1;
-          for (let i = searchStart; i < tokens.length; i++) {
-            if (looksNumeric(tokens[i])) {
-              const v = numStrToFloat(tokens[i]);
-              if (!isNaN(v)) {
-                qty = tokens[i];
-                qIdx = i;
-                break;
-              }
-            }
-          }
-          if (qIdx >= 0) {
-            for (let k = qIdx + 1; k < tokens.length; k++) {
-              if (looksNumeric(tokens[k])) {
-                rate = tokens[k];
-                break;
-              }
-            }
-          }
-        }
-
-        processed.push({ itemCode, quantity: qty, rate });
       });
 
       lastProcessedData = processed;
@@ -329,7 +304,7 @@
         showMessage('No valid data found.', 'error');
       }
     }
-
+    
     function autoSaveProcessedData() {
         if (!lastProcessedData || lastProcessedData.length === 0) {
             return;
@@ -443,12 +418,14 @@
         } else {
             filteredNames.forEach(name => {
                 const li = document.createElement('li');
-                li.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-md hover:bg-gray-600 transition-colors cursor-pointer';
+                li.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-md hover:bg-gray-600 transition-colors cursor-pointer saved-list-item';
                 li.innerHTML = `<span>${name}</span>`;
                 li.dataset.name = name;
+                li.tabIndex = 0; // Make list items focusable
                 savesList.appendChild(li);
             });
         }
+        selectedSavedItem = null;
     }
 
     function handleLoadRequest(event) {
@@ -467,11 +444,24 @@
             }
         }
     }
+    
+    // Function to handle the rename action
+    function openRenameDialog(name) {
+        document.getElementById('oldDatasetName').textContent = name;
+        document.getElementById('renameDialog').dataset.name = name;
+        document.getElementById('renameInput').value = name;
+        document.getElementById('renameDialog').style.display = 'block';
+        document.getElementById('renameInput').focus();
+        document.getElementById('renameInput').select();
+    }
 
-    async function copyToClipboard(text) {
+    async function copyToClipboard(text, row) {
         try {
             await navigator.clipboard.writeText(text);
             showMessage(`'${text}' copied to clipboard!`, 'success');
+            if (row) {
+              markRow(row);
+            }
         } catch (err) {
             showMessage('Failed to copy to clipboard.', 'error');
         }
@@ -480,7 +470,20 @@
     document.getElementById('processBtn').addEventListener('click', processData);
     document.getElementById('confirmSaveBtn').addEventListener('click', confirmSave);
     document.getElementById('cancelSaveBtn').addEventListener('click', cancelSave);
-    document.getElementById('savesList').addEventListener('click', handleLoadRequest);
+    document.getElementById('savesList').addEventListener('click', (e) => {
+        // Clear previous selection
+        const prevSelected = document.querySelector('.saved-list-item.selected');
+        if (prevSelected) {
+            prevSelected.classList.remove('selected');
+        }
+
+        const li = e.target.closest('li');
+        if (li && li.dataset.name) {
+            li.classList.add('selected');
+            selectedSavedItem = li;
+        }
+        handleLoadRequest(e);
+    });
     document.getElementById('searchBar').addEventListener('input', (e) => {
         loadSavedDatasetsList(e.target.value);
     });
@@ -531,28 +534,48 @@
           showMessage('Clipboard access denied. Please manually paste.', 'error');
       }
     });
+    
+    // Logic for tracking right-clicks to simulate a "right-double-click"
+    let lastRightClickTime = 0;
+    let lastRightClickTarget = null;
+    const rightDoubleClickDelay = 500; // milliseconds
 
     document.getElementById('resultsTableBody').addEventListener('click', (e) => {
         const row = e.target.closest('tr');
         if (row) {
-            const itemCode = row.children[0].textContent;
-            copyToClipboard(itemCode);
+            const itemCode = row.children[1].textContent;
+            copyToClipboard(itemCode, row);
         }
     });
 
+    // Right Single-Click: Copy quantity
     document.getElementById('resultsTableBody').addEventListener('contextmenu', (e) => {
         e.preventDefault();
         const row = e.target.closest('tr');
-        if (row) {
-            const quantity = row.children[1].textContent;
+        if (!row) return;
+
+        const currentTime = Date.now();
+
+        // Check for right double-click
+        if (lastRightClickTarget === row && (currentTime - lastRightClickTime) < rightDoubleClickDelay) {
+            unmarkRow(row);
+            showMessage('Mark removed.', 'success');
+            lastRightClickTarget = null; // Reset for next interaction
+        } else {
+            // This is a right single-click
+            const quantity = row.children[2].textContent;
             copyToClipboard(quantity);
+            
+            // Update last right click state for potential double-click detection
+            lastRightClickTime = currentTime;
+            lastRightClickTarget = row;
         }
     });
 
     document.getElementById('resultsTableBody').addEventListener('dblclick', (e) => {
         const row = e.target.closest('tr');
         if (row) {
-            const rate = row.children[2].textContent;
+            const rate = row.children[3].textContent;
             copyToClipboard(rate);
         }
     });
@@ -561,13 +584,7 @@
         e.preventDefault();
         const li = e.target.closest('li');
         if (li && li.dataset.name) {
-            const name = li.dataset.name;
-            document.getElementById('oldDatasetName').textContent = name;
-            document.getElementById('renameDialog').dataset.name = name;
-            document.getElementById('renameInput').value = name;
-            document.getElementById('renameDialog').style.display = 'block';
-            document.getElementById('renameInput').focus();
-            document.getElementById('renameInput').select();
+            openRenameDialog(li.dataset.name);
         }
     });
     
@@ -643,10 +660,14 @@
           }
       }
       
-      // Updated spacebar logic to only save when not in the data input field
-      if (e.key === ' ' && saveDialog.style.display !== 'block' && activeElement !== dataInput) {
+      // Updated spacebar logic to also handle renaming when an item is selected
+      if (e.key === ' ' && saveDialog.style.display !== 'block') {
           e.preventDefault();
-          saveProcessedData();
+          if (selectedSavedItem) {
+              openRenameDialog(selectedSavedItem.dataset.name);
+          } else if (activeElement !== dataInput) {
+              saveProcessedData();
+          }
       }
     });
 
@@ -657,4 +678,3 @@
   </script>
 </body>
 </html>
-
