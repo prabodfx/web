@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Data Extractor</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      overflow: hidden; /* Prevent body scrollbars */
+    }
+
+    /* Main container for the application */
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 450px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Heading 1 style */
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      font-weight: 300;
+    }
+
+    /* Input field styling */
+    input[type="text"] {
+      width: 80%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 12px;
+      outline: none;
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    /* Placeholder text color for the input field */
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Focus state for the input field */
+    input[type="text"]:focus {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Button styling */
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      background: #ff005d;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background: #000000;
+      transform: translateY(-2px);
+    }
+
+    /* Result box styling */
+    .result {
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Feedback text styling */
+    .feedback {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Premium styling for customer data with better alignment */
+    .result-item {
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    
+    .customer-name {
+      display: block;
+      font-size: 2rem;
+      color: #b3ffb3; /* A vibrant green for the name */
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .customer-code, .invoice-info {
+      display: block;
+      color: #fff;
+    }
+
+    .customer-code {
+      color: #87cefa; /* Sky blue for the code */
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .invoice-info {
+        font-weight: 800;
+        margin-top: 5px; /* Adds space after the code for better separation */
+        font-size: 1.6rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Invoice Data Extractor</h1>
+    <p class="feedback" id="feedback-text">
+    </p>
+    <input type="text" id="invoiceInput" placeholder="Enter Invoice Number" autofocus>
+    <br>
+    <button onclick="searchInvoice()">Search</button>
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <script>
+    // Global variables to store application state
+    let customerData = {}; // Stores invoice data parsed from PDFs
+
+    // DOM element references
+    const feedbackText = document.getElementById('feedback-text');
+    const invoiceInput = document.getElementById('invoiceInput');
+    const resultBox = document.getElementById('resultBox');
+
+    /**
+     * Initializes the application by loading data from local storage.
+     * This function is called when the page first loads.
+     */
+    function loadFromLocalStorage() {
+      // Load invoice data from the 'invoiceData' key in local storage
+      const storedData = localStorage.getItem('invoiceData');
+      if (storedData) {
+        customerData = JSON.parse(storedData);
+        feedbackText.textContent = `Data loaded from previous sessions.`;
+      }
+    }
+
+    /**
+     * Saves the `customerData` object to local storage.
+     */
+    function saveToLocalStorage() {
+      localStorage.setItem('invoiceData', JSON.stringify(customerData));
+    }
+
+    // Event listeners for drag and drop functionality
+    document.body.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #2c253d, #a291b9)';
+    });
+
+    document.body.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #1f1c2c, #928dab)';
+    });
+
+    document.body.addEventListener('drop', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #1f1c2c, #928dab)';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === "application/pdf") {
+        parsePDF(file);
+      } else {
+        feedbackText.textContent = "Please drop a valid PDF file.";
+      }
+    });
+
+    /**
+     * Parses the dropped PDF file, extracts data, and stores it.
+     * This version handles cases where customer data is on a different page than the invoice number.
+     * @param {File} file - The PDF file to be parsed.
+     */
+    async function parsePDF(file) {
+      const fileId = `${file.name}-${file.size}`;
+      
+      if (localStorage.getItem(fileId)) {
+        feedbackText.textContent = "This PDF has already been processed and saved.";
+        return;
+      }
+      feedbackText.textContent = "Processing PDF... Please wait.";
+      
+      const fileReader = new FileReader();
+      fileReader.onload = async function() {
+        try {
+          const typedarray = new Uint8Array(this.result);
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+          
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+          let newCustomerData = {};
+          let customerDataByPage = [];
+          
+          // First pass: extract customer data from each page
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const textItems = textContent.items.map(item => item.str);
+            let currentCustomer = null;
+            
+            // Look for the last "Customer:" line on the page
+            for (let j = textItems.length - 1; j >= 0; j--) {
+              if (textItems[j].startsWith("Customer:")) {
+                let parts = textItems[j].replace("Customer:", "").trim().split("-");
+                currentCustomer = {
+                  code: parts[0].trim(),
+                  name: parts.slice(1).join("-").trim()
+                };
+                break;
+              }
+            }
+            customerDataByPage.push(currentCustomer);
+          }
+          
+          // Second pass: extract invoice numbers and link them to the correct customer
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const textItems = textContent.items.map(item => item.str);
+            
+            for (let line of textItems) {
+              if (/^\d{4,}/.test(line)) {
+                let invoice = line.split(" ")[0].trim();
+                let associatedCustomer = null;
+
+                // Check the current page for customer data first
+                if (customerDataByPage[i - 1]) {
+                    associatedCustomer = customerDataByPage[i - 1];
+                } else if (i > 1 && customerDataByPage[i - 2]) {
+                    // If no customer data on current page, check previous page
+                    associatedCustomer = customerDataByPage[i - 2];
+                }
+
+                if (associatedCustomer) {
+                  newCustomerData[invoice] = associatedCustomer;
+                }
+              }
+            }
+          }
+
+          customerData = { ...customerData, ...newCustomerData };
+          localStorage.setItem(fileId, 'processed');
+          saveToLocalStorage();
+          feedbackText.textContent = "PDF processed successfully! Data saved. You can now search.";
+        } catch (error) {
+          feedbackText.textContent = "Error processing PDF. Please try again.";
+          console.error("PDF parsing error:", error);
+        }
+      };
+      fileReader.readAsArrayBuffer(file);
+    }
+
+    /**
+     * Performs a basic invoice search and copies the customer code.
+     */
+    async function searchInvoice() {
+        const input = invoiceInput.value.trim();
+        let foundInvoice = null;
+        for (const key in customerData) {
+            const regex = new RegExp(`\\b${key}\\b`);
+            if (regex.test(input) || key === input) {
+                foundInvoice = key;
+                break;
+            }
+        }
+        
+        if (foundInvoice) {
+            const { code, name } = customerData[foundInvoice];
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+              <div class="result-item customer-name">${name}</div>
+              <div class="result-item customer-code">${code}</div>
+              <div class="result-item invoice-info">Invoice No: ${foundInvoice}</div>
+            `;
+            
+            // Attempt to copy the customer code to the clipboard
+            try {
+                await navigator.clipboard.writeText(code);
+                feedbackText.textContent = "Code copied to clipboard!";
+            } catch (err) {
+                feedbackText.textContent = "Failed to copy code. Please copy manually.";
+                console.error('Failed to copy text:', err);
+            }
+        } else {
+            resultBox.style.display = 'block';
+            resultBox.textContent = "Invoice not found! Please try a different number or process a new PDF.";
+            feedbackText.textContent = ""; // Clear feedback
+        }
+    }
+    
+    // Handle 'Enter' key press on the main invoice input field
+    invoiceInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        searchInvoice();
+      }
+    });
+
+    // Initial function call to load data when the page loads
+    loadFromLocalStorage();
+  </script>
+</body>
+</html>
