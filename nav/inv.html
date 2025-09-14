@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invoice Data Extractor</title>
+  <title>Invoice Extractor | Prabodfx</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
@@ -363,8 +363,8 @@
         customerData = JSON.parse(storedData);
         feedbackText.textContent = `Data loaded from previous sessions.`;
       }
-      loadSavedFromLocalStorage();
       loadSelectedItems();
+      loadSavedFromLocalStorage();
       // Initially show only the search section
       savedSection.style.display = 'none';
       searchSection.style.display = 'block';
@@ -377,8 +377,8 @@
       const storedSavedData = localStorage.getItem('savedInvoices');
       if (storedSavedData) {
         savedData = JSON.parse(storedSavedData);
-        renderSavedTables();
       }
+      renderSavedTables();
     }
     
     /**
