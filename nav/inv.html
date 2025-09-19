@@ -338,6 +338,40 @@
         margin: 0 5px;
         padding: 12px 20px;
     }
+
+    /* Media query for smaller screens */
+    @media (max-width: 600px) {
+        .search-container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .saved-container {
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .item-name {
+            width: 50%;
+        }
+
+        .item-code {
+            width: 50%;
+        }
+
+        .item-invoice {
+            display: none; /* Hide the invoice info */
+        }
+
+        .saved-item {
+            gap: 10px;
+        }
+
+        .modal-content {
+            width: 90%;
+            padding: 20px;
+        }
+    }
   </style>
 </head>
 <body>
@@ -657,6 +691,7 @@
           const { code, name, originalInvoice, savedUserInput } = savedData[date][invoiceNo];
           const listItem = document.createElement('li');
           listItem.className = 'saved-item';
+          
           listItem.innerHTML = `
             <div class="item-name">${name}</div>
             <div class="item-code">${code}</div>
