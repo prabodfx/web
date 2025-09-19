@@ -310,6 +310,24 @@
         background: rgba(255, 255, 255, 0.2);
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     }
+    
+    .modal-content textarea {
+        width: 90%;
+        height: 100px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-content textarea:focus {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
 
     .modal-content select {
         width: 95%;
@@ -351,6 +369,15 @@
       </div>
   </div>
 
+  <div id="editModal" class="modal-overlay">
+      <div class="modal-content">
+          <h3>Edit Full Invoice Content</h3>
+          <textarea id="editContentInput" placeholder="Enter new invoice content"></textarea>
+          <button onclick="submitEditContent()">Save</button>
+          <button onclick="closeEditModal()">Cancel</button>
+      </div>
+  </div>
+
   <script>
     // Global variables to store application state
     let customerData = {};
@@ -359,7 +386,7 @@
     let markedItems = []; // New array to store marked invoice numbers
     let activeRow = null; // New global variable to track the clicked row
 
-    // New global variables for the right-click process
+    // New global variables for the right-click and auto-increment process
     let processingActive = false;
     let currentReceiptNo = null;
     let receiptOperator = null;
@@ -375,6 +402,10 @@
     const receiptModal = document.getElementById('receiptModal');
     const receiptNoInput = document.getElementById('receiptNoInput');
     const operatorSelect = document.getElementById('operatorSelect');
+    
+    // New DOM element references for the edit modal
+    const editModal = document.getElementById('editModal');
+    const editContentInput = document.getElementById('editContentInput');
 
     /**
      * Helper function to get the current date in YYYY-MM-DD format.
@@ -382,8 +413,8 @@
     function getCurrentDate() {
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart('2', '0');
+        const day = String(today.getDate()).padStart('2', '0');
         return `${year}-${month}-${day}`;
     }
 
@@ -704,7 +735,91 @@
         handleRightClick(rightClickedInvoice, receiptNo, operator);
         closeModal();
     }
-
+    
+    // New functions for the full content edit modal
+    
+    /**
+     * Opens the new edit modal with pre-populated content.
+     */
+    function openEditModal() {
+        if (!activeRow) {
+            feedbackText.textContent = "Please select a row to edit first.";
+            return;
+        }
+        const invoiceNo = activeRow.dataset.invoiceNo;
+        editContentInput.value = invoiceNo;
+        editModal.style.display = 'flex';
+        editContentInput.focus();
+    }
+    
+    /**
+     * Closes the new edit modal.
+     */
+    function closeEditModal() {
+        editModal.style.display = 'none';
+        editContentInput.value = '';
+    }
+    
+    /**
+     * Submits the edited content, ensuring the receipt number is constant.
+     */
+    function submitEditContent() {
+        const newContent = editContentInput.value.trim();
+        if (!newContent) {
+            alert("Content cannot be empty.");
+            return;
+        }
+        
+        const oldInvoiceNo = activeRow.dataset.invoiceNo;
+        const date = getCurrentDate();
+        
+        if (savedData[date] && savedData[date][oldInvoiceNo]) {
+            // Regex to find the receipt number at the end of the string
+            const receiptNoMatch = oldInvoiceNo.match(/Rece (\d+)$/);
+            const receiptNo = receiptNoMatch ? receiptNoMatch[1] : null;
+            
+            let newInvoiceNo = newContent;
+            
+            // If a receipt number was found, append it to the new content
+            if (receiptNo) {
+                // Ensure the new content does not already contain a receipt number
+                const newContentReceiptMatch = newContent.match(/Rece (\d+)$/);
+                if (!newContentReceiptMatch) {
+                    newInvoiceNo = `${newContent} - Rece ${receiptNo}`;
+                }
+            }
+            
+            // Find the new customer data based on the new content's invoice number
+            const newInvoiceNumberOnly = newContent.split(/[-()]/)[0].trim();
+            const newCustomer = customerData[newInvoiceNumberOnly];
+            
+            let updatedEntry = { ...savedData[date][oldInvoiceNo] };
+            if (newCustomer) {
+                updatedEntry.name = newCustomer.name;
+                updatedEntry.code = newCustomer.code;
+            }
+            
+            // Update the data in local storage
+            const wasMarked = markedItems.includes(oldInvoiceNo);
+            if (wasMarked) {
+                const index = markedItems.indexOf(oldInvoiceNo);
+                if (index > -1) {
+                    markedItems.splice(index, 1);
+                }
+                markedItems.push(newInvoiceNo);
+                saveMarkedItems();
+            }
+            
+            delete savedData[date][oldInvoiceNo];
+            savedData[date][newInvoiceNo] = updatedEntry;
+            saveSavedToLocalStorage();
+            renderSavedTables();
+            feedbackText.textContent = `Invoice content updated.`;
+        }
+        closeEditModal();
+        activeRow = null;
+    }
+    
     /**
      * Handles the right-click event on a saved item.
      */
@@ -868,38 +983,21 @@
               }
               renderSavedTables();
               feedbackText.textContent = `Invoice ${invoiceNo} deleted.`;
+              
+              // NEW FIX: After deletion, check if the deleted invoice was part of a process.
+              if (processingActive) {
+                const deletedReceiptNoMatch = invoiceNo.match(/Rece (\d+)/);
+                if (deletedReceiptNoMatch && parseInt(deletedReceiptNoMatch[1]) === currentReceiptNo) {
+                  // If the deleted invoice had the current receipt number,
+                  // decrement the counter to "go back" to the previous number.
+                  currentReceiptNo--;
+                }
+              }
           }
           activeRow = null; // Clear the active row
       } else if (key === 'e' && activeRow) {
           e.preventDefault();
-          const invoiceNo = activeRow.dataset.invoiceNo;
-          const newReceiptNo = prompt("Enter new receipt number:");
-          if (newReceiptNo) {
-              const date = getCurrentDate();
-              if (savedData[date] && savedData[date][invoiceNo]) {
-                  const originalInvoice = savedData[date][invoiceNo].originalInvoice;
-                  const savedUserInput = savedData[date][invoiceNo].savedUserInput;
-                  const newInvoiceKey = `NVAT ${savedUserInput} - Rece ${newReceiptNo}`;
-                  
-                  // Check if the old key was marked, and update the array
-                  const wasMarked = markedItems.includes(invoiceNo);
-                  if (wasMarked) {
-                      const index = markedItems.indexOf(invoiceNo);
-                      if (index > -1) {
-                          markedItems.splice(index, 1);
-                      }
-                      markedItems.push(newInvoiceKey);
-                      saveMarkedItems();
-                  }
-
-                  savedData[date][newInvoiceKey] = { ...savedData[date][invoiceNo], originalInvoice, savedUserInput: savedUserInput };
-                  delete savedData[date][invoiceNo];
-                  saveSavedToLocalStorage();
-                  renderSavedTables();
-                  feedbackText.textContent = `Invoice ${invoiceNo} updated to ${newInvoiceKey}.`;
-              }
-          }
-          activeRow = null; // Clear the active row
+          openEditModal();
       } else if (key === 'p' && activeRow) {
           e.preventDefault();
           const invoiceNo = activeRow.dataset.invoiceNo;
@@ -911,6 +1009,30 @@
           }
           saveMarkedItems();
           activeRow.classList.toggle('marked-premium');
+      } else if (key === '+' && activeRow) {
+          e.preventDefault();
+          const invoiceNo = activeRow.dataset.invoiceNo;
+          const receiptNoMatch = invoiceNo.match(/Rece (\d+)$/);
+          if (receiptNoMatch) {
+              processingActive = true;
+              currentReceiptNo = parseInt(receiptNoMatch[1], 10);
+              receiptOperator = '+';
+              feedbackText.textContent = `Auto-increment started. Next receipt will be ${currentReceiptNo + 1}. Press 'z' to end.`;
+          } else {
+              feedbackText.textContent = "Selected row does not have a receipt number.";
+          }
+      } else if (key === '-' && activeRow) {
+          e.preventDefault();
+          const invoiceNo = activeRow.dataset.invoiceNo;
+          const receiptNoMatch = invoiceNo.match(/Rece (\d+)$/);
+          if (receiptNoMatch) {
+              processingActive = true;
+              currentReceiptNo = parseInt(receiptNoMatch[1], 10);
+              receiptOperator = '-';
+              feedbackText.textContent = `Auto-decrement started. Next receipt will be ${currentReceiptNo - 1}. Press 'z' to end.`;
+          } else {
+              feedbackText.textContent = "Selected row does not have a receipt number.";
+          }
       } else if (key === 'q') {
           e.preventDefault();
           clearAllData();
