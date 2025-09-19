@@ -46,6 +46,8 @@
         max-width: 95%; /* Responsive on smaller screens */
         margin-top: 50px;
         margin-bottom: 50px;
+        max-height: 80vh; /* Set a maximum height */
+        overflow-y: auto; /* Enable scrolling for this container */
     }
 
     /* Heading 1 style */
@@ -172,8 +174,6 @@
       border-radius: 15px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       text-align: left;
-      max-height: 500px;
-      overflow-y: auto;
       width: 100%;
       box-sizing: border-box;
     }
@@ -584,25 +584,25 @@
     /**
      * Adds a newly searched invoice to the saved list and saves it.
      */
-    function addInvoiceToSavedList(invoiceNo, customer, foundInvoice) {
+    function addInvoiceToSavedList(userInput, customer, foundInvoice) {
         const today = getCurrentDate();
         if (!savedData[today]) {
             savedData[today] = {};
         }
 
-        let savedInvoiceKey = invoiceNo;
+        let savedInvoiceKey = foundInvoice; // Default to found invoice
         if (processingActive) {
             if (receiptOperator === '+') {
                 currentReceiptNo++;
             } else if (receiptOperator === '-') {
                 currentReceiptNo--;
             }
-            
-            savedInvoiceKey = `NVAT ${invoiceNo} - Rece ${currentReceiptNo}`;
+            // Use userInput instead of foundInvoice in the saved key
+            savedInvoiceKey = `NVAT ${userInput} - Rece ${currentReceiptNo}`;
         }
 
         if (!savedData[today][savedInvoiceKey]) {
-            savedData[today][savedInvoiceKey] = { ...customer, originalInvoice: foundInvoice };
+            savedData[today][savedInvoiceKey] = { ...customer, originalInvoice: foundInvoice, savedUserInput: userInput };
             saveSavedToLocalStorage();
             renderSavedTables();
         }
@@ -623,7 +623,7 @@
         const savedList = tableContainer.querySelector('.saved-list');
         const invoices = Object.keys(savedData[date]).reverse(); // Show latest first
         invoices.forEach(invoiceNo => {
-          const { code, name, originalInvoice } = savedData[date][invoiceNo];
+          const { code, name, originalInvoice, savedUserInput } = savedData[date][invoiceNo];
           const listItem = document.createElement('li');
           listItem.className = 'saved-item';
           listItem.innerHTML = `
@@ -634,6 +634,7 @@
           listItem.dataset.code = code;
           listItem.dataset.originalInvoice = originalInvoice || invoiceNo;
           listItem.dataset.invoiceNo = invoiceNo;
+          listItem.dataset.savedUserInput = savedUserInput;
           
           if (selectedItems.includes(invoiceNo)) {
               listItem.classList.add('selected');
@@ -644,14 +645,14 @@
           }
           
           listItem.addEventListener('click', copyCodeAndMarkRow);
-          listItem.addEventListener('dblclick', copyInvoiceNoFromRow);
           listItem.addEventListener('mousedown', (e) => {
               if (e.button === 0) { // Left click
                   activeRow = listItem;
               }
           });
-          listItem.addEventListener('contextmenu', (e) => {
-              e.preventDefault();
+          
+          // New double-click functionality
+          listItem.addEventListener('dblclick', () => {
               if (processingActive) {
                   feedbackText.textContent = "A process is already active. Press 'z' to end it first.";
               } else {
@@ -659,6 +660,13 @@
                   openModal();
               }
           });
+          
+          // New right-click functionality
+          listItem.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              copyInvoiceNoFromRow(e);
+          });
+          
           savedList.appendChild(listItem);
         });
         savedTablesContainer.appendChild(tableContainer);
@@ -707,16 +715,18 @@
         
         const today = getCurrentDate();
         let oldInvoiceKey = null;
+        let savedUserInput = null;
         for (const key in savedData[today]) {
             if (savedData[today][key].originalInvoice === originalInvoice) {
                 oldInvoiceKey = key;
+                savedUserInput = savedData[today][key].savedUserInput;
                 break;
             }
         }
         
         if (oldInvoiceKey) {
             const { code, name } = savedData[today][oldInvoiceKey];
-            const newInvoiceKey = `NVAT ${originalInvoice} - Rece ${receiptInput}`;
+            const newInvoiceKey = `NVAT ${savedUserInput} - Rece ${receiptInput}`;
             
             // If the old key was marked, mark the new key too.
             const wasMarked = markedItems.includes(oldInvoiceKey);
@@ -732,7 +742,7 @@
             }
             
             delete savedData[today][oldInvoiceKey];
-            savedData[today][newInvoiceKey] = { code, name, originalInvoice };
+            savedData[today][newInvoiceKey] = { code, name, originalInvoice, savedUserInput };
             saveSavedToLocalStorage();
             renderSavedTables();
         }
@@ -868,7 +878,8 @@
               const date = getCurrentDate();
               if (savedData[date] && savedData[date][invoiceNo]) {
                   const originalInvoice = savedData[date][invoiceNo].originalInvoice;
-                  const newInvoiceKey = `NVAT ${originalInvoice} - Rece ${newReceiptNo}`;
+                  const savedUserInput = savedData[date][invoiceNo].savedUserInput;
+                  const newInvoiceKey = `NVAT ${savedUserInput} - Rece ${newReceiptNo}`;
                   
                   // Check if the old key was marked, and update the array
                   const wasMarked = markedItems.includes(invoiceNo);
@@ -881,7 +892,7 @@
                       saveMarkedItems();
                   }
 
-                  savedData[date][newInvoiceKey] = { ...savedData[date][invoiceNo], originalInvoice };
+                  savedData[date][newInvoiceKey] = { ...savedData[date][invoiceNo], originalInvoice, savedUserInput: savedUserInput };
                   delete savedData[date][invoiceNo];
                   saveSavedToLocalStorage();
                   renderSavedTables();
