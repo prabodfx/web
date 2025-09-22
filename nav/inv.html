@@ -1091,6 +1091,27 @@
         }
     });
 
+    // Added event listener to the edit content input field for the 'Enter' key
+    editContentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitEditContent();
+      }
+    });
+
+    // Added event listener to the receipt number input field for the 'Enter' key
+    receiptNoInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            operatorSelect.value = '+';
+            submitReceiptInfo();
+        } else if (e.key === '-') {
+            e.preventDefault();
+            operatorSelect.value = '-';
+            submitReceiptInfo();
+        }
+    });
+
     // Initial function call to load data when the page loads
     loadFromLocalStorage();
   </script>
