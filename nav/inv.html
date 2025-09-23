@@ -11,7 +11,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      background: linear-gradient(135deg, #121212, #242424, #121212);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -220,13 +220,13 @@
     }
 
     .saved-item.selected {
-        background-color: #5a3c6d;
+        background-color: rgba(255, 255, 255, 0.15);
     }
 
     .saved-item.marked-premium {
-        background: rgba(135, 206, 250, 0.3);
-        border: 1px solid #87cefa;
-        box-shadow: 0 0 10px rgba(135, 206, 250, 0.5);
+        background: rgba(255, 215, 0, 0.3); /* Golden background */
+        border: 1px solid #FFD700; /* Golden border */
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Golden glow */
     }
 
     .item-name {
@@ -532,17 +532,17 @@
     // Event listeners for drag and drop functionality
     document.body.addEventListener('dragover', (e) => {
       e.preventDefault();
-      document.body.style.background = 'linear-gradient(135deg, #2c253d, #a291b9)';
+      document.body.style.background = 'linear-gradient(135deg, #2c2c2c, #4a4a4a, #2c2c2c)';
     });
 
     document.body.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      document.body.style.background = 'linear-gradient(135deg, #1f1c2c, #928dab)';
+      document.body.style.background = 'linear-gradient(135deg, #121212, #242424, #121212)';
     });
 
     document.body.addEventListener('drop', (e) => {
       e.preventDefault();
-      document.body.style.background = 'linear-gradient(135deg, #1f1c2c, #928dab)';
+      document.body.style.background = 'linear-gradient(135deg, #121212, #242424, #121212)';
       const file = e.dataTransfer.files[0];
       if (file && file.type === "application/pdf") {
         parsePDF(file);
@@ -643,6 +643,20 @@
             resultBox.textContent = "Invoice not found ⚠️";
             resultBox.classList.add('warning'); // Add the new warning class
             feedbackText.textContent = "";
+        }
+        
+        // NEW: Check for the special '-' character in the search input
+        if (userInput.includes('-') && !processingActive) {
+            const parts = userInput.split('-');
+            const potentialReceiptNo = parseInt(parts[1]);
+            if (!isNaN(potentialReceiptNo)) {
+                processingActive = true;
+                currentReceiptNo = potentialReceiptNo;
+                receiptOperator = '+';
+                toggleSections(); // Switch to the saved section
+                // The feedback message will be displayed in the saved section
+                feedbackText.textContent = `Auto-increment started. Next receipt will be ${currentReceiptNo + 1}. Press 'z' to end.`;
+            }
         }
     }
     
@@ -897,7 +911,10 @@
             renderSavedTables();
         }
         
-        feedbackText.textContent = `Processing started. Press 'z' to end.`;
+        // Show feedback message only if we are in the saved section
+        if (savedSection.style.display !== 'none') {
+            feedbackText.textContent = `Processing started. Press 'z' to end.`;
+        }
     }
 
     /**
@@ -907,12 +924,13 @@
       if (searchSection.style.display !== 'none') {
         searchSection.style.display = 'none';
         savedSection.style.display = 'block';
+        feedbackText.textContent = ""; // Clear feedback when switching to saved
       } else {
         searchSection.style.display = 'block';
         savedSection.style.display = 'none';
         invoiceInput.value = '';
         invoiceInput.focus();
-        feedbackText.textContent = "";
+        feedbackText.textContent = ""; // Clear feedback when switching to search
         resultBox.style.display = 'none';
       }
     }
