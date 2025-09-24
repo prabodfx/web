@@ -210,9 +210,10 @@
         align-items: center;
         padding: 15px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+        cursor: grab; /* Change cursor for drag and drop */
         gap: 20px; /* Creates space between columns */
+        /* PREMIUM ANIMATION */
+        transition: transform 0.3s ease-in-out, background-color 0.2s ease;
     }
     
     .saved-item:hover {
@@ -255,6 +256,14 @@
         text-align: left; /* Left align */
     }
 
+    /* PREMIUM ANIMATION: Style for the dragged item */
+    .saved-item.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+    
     /* Modal styles - PREMIUM LOOK */
     .modal-overlay {
       display: none;
@@ -419,6 +428,9 @@
     let selectedItems = [];
     let markedItems = []; // New array to store marked invoice numbers
     let activeRow = null; // New global variable to track the clicked row
+
+    // NEW: Drag and drop variables
+    let draggedItem = null;
 
     // New global variables for the right-click and auto-increment process
     let processingActive = false;
@@ -706,6 +718,9 @@
           const listItem = document.createElement('li');
           listItem.className = 'saved-item';
           
+          // NEW: Add draggable attribute
+          listItem.setAttribute('draggable', true);
+
           listItem.innerHTML = `
             <div class="item-name">${name}</div>
             <div class="item-code">${code}</div>
@@ -747,11 +762,80 @@
               copyInvoiceNoFromRow(e);
           });
           
+          // NEW: Drag and drop event listeners
+          listItem.addEventListener('dragstart', handleDragStart);
+          listItem.addEventListener('dragover', handleDragOver);
+          listItem.addEventListener('drop', handleDrop);
+          listItem.addEventListener('dragend', handleDragEnd);
+
           savedList.appendChild(listItem);
         });
         savedTablesContainer.appendChild(tableContainer);
       });
     }
+
+    // NEW: Drag and drop handler functions
+    function handleDragStart(e) {
+      draggedItem = this;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.innerHTML);
+      this.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        const target = e.target.closest('.saved-item');
+        if (target && target !== draggedItem) {
+            const savedList = target.parentElement;
+            const bounding = target.getBoundingClientRect();
+            const offset = bounding.y + (bounding.height / 2);
+
+            if (e.clientY < offset) {
+                // Dragging above the target
+                if (draggedItem !== target.previousElementSibling) {
+                    savedList.insertBefore(draggedItem, target);
+                }
+            } else {
+                // Dragging below the target
+                if (draggedItem !== target.nextElementSibling) {
+                    savedList.insertBefore(draggedItem, target.nextSibling);
+                }
+            }
+        }
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      // The DOM is already reordered by handleDragOver, so we just need to finalize it.
+      // Call updateSavedDataOrder to save the new order to local storage.
+      updateSavedDataOrder();
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+      draggedItem = null;
+    }
+
+    function updateSavedDataOrder() {
+        // Find all saved list containers
+        const savedLists = document.querySelectorAll('.saved-list');
+
+        savedLists.forEach(savedList => {
+            const date = savedList.closest('.saved-table-container').querySelector('h3').textContent;
+            
+            // Re-order the data for this specific date
+            const newOrder = Array.from(savedList.children).map(li => li.dataset.invoiceNo);
+            const reorderedData = {};
+            newOrder.forEach(invoiceNo => {
+                if (savedData[date][invoiceNo]) {
+                    reorderedData[invoiceNo] = savedData[date][invoiceNo];
+                }
+            });
+            savedData[date] = reorderedData;
+        });
+        saveSavedToLocalStorage();
+    }
+
 
     /**
      * Opens the custom receipt modal.
@@ -939,6 +1023,9 @@
      * Handles the click event on a saved item.
      */
     async function copyCodeAndMarkRow(event) {
+      // Prevent drag-and-drop from triggering this on click
+      if (draggedItem) return;
+
       const item = event.currentTarget;
       const code = item.dataset.code;
       const invoiceNo = item.dataset.invoiceNo;
@@ -1074,8 +1161,9 @@
           } else {
               feedbackText.textContent = "Selected row does not have a receipt number.";
           }
-      } else if (key === '-' && activeRow) {
-          e.preventDefault();
+      } else if (key === '-') {
+        e.preventDefault();
+        if (activeRow) {
           const invoiceNo = activeRow.dataset.invoiceNo;
           const receiptNoMatch = invoiceNo.match(/Rece (\d+)$/);
           if (receiptNoMatch) {
@@ -1086,6 +1174,7 @@
           } else {
               feedbackText.textContent = "Selected row does not have a receipt number.";
           }
+        }
       } else if (key === 'q') {
           e.preventDefault();
           clearAllData();
