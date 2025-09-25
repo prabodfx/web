@@ -1,10 +1,12 @@
-<!DOCTYPE html>
+<!DOCTYPE: html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invoice Extractor | Prabodfx</title>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -128,7 +130,7 @@
         margin-bottom: 12px;
         font-weight: 600;
     }
-
+    
     .customer-name {
       display: block;
       font-size: 2rem;
@@ -181,7 +183,7 @@
       font-weight: 400;
       margin-bottom: 20px;
     }
-
+    
     .saved-table-container {
       margin-bottom: 20px;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -213,7 +215,7 @@
         /* PREMIUM ANIMATION */
         transition: transform 0.3s ease-in-out, background-color 0.2s ease;
     }
-
+    
     .saved-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
@@ -261,7 +263,7 @@
         transform: scale(1.05);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
     }
-
+    
     /* Modal styles - PREMIUM LOOK */
     .modal-overlay {
       display: none;
@@ -276,7 +278,7 @@
       justify-content: center;
       align-items: center;
     }
-
+    
     .modal-content {
       background: linear-gradient(145deg, #1a1826, #2c293d);
       padding: 40px;
@@ -287,12 +289,12 @@
       border: 2px solid rgba(255, 255, 255, 0.3);
       transition: all 0.3s ease;
     }
-
+    
     .modal-content:hover {
         transform: translateY(-5px);
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
-
+    
     .modal-content h3 {
         margin-top: 0;
         font-weight: 400;
@@ -317,7 +319,7 @@
         background: rgba(255, 255, 255, 0.2);
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     }
-
+    
     .modal-content textarea {
         width: 90%;
         height: 100px;
@@ -330,7 +332,7 @@
         font-size: 1.1rem;
         transition: all 0.3s ease;
     }
-
+    
     .modal-content textarea:focus {
         background: rgba(255, 255, 255, 0.2);
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
@@ -357,7 +359,7 @@
             width: 100%;
             padding: 20px;
         }
-
+        
         .item-name {
             width: 50%;
         }
@@ -381,10 +383,11 @@
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
+
   <div class="saved-container container" id="savedSection">
-    <h2>Saved Invoices</h2>
-    <div id="savedTablesContainer"></div>
+      <h2>Saved Invoices</h2>
+      <div id="savedTablesContainer"></div>
   </div>
 
   <div class="search-container container" id="searchSection">
@@ -395,7 +398,7 @@
     <button onclick="searchInvoice()">Search</button>
     <div class="result" id="resultBox"></div>
   </div>
-
+  
   <div id="receiptModal" class="modal-overlay">
       <div class="modal-content">
           <h3>Edit Invoice No Format</h3>
@@ -417,7 +420,8 @@
           <button onclick="closeEditModal()">Cancel</button>
       </div>
   </div>
-<script>
+
+  <script>
     // Global variables to store application state
     let customerData = {};
     let savedData = {};
@@ -444,7 +448,7 @@
     const receiptModal = document.getElementById('receiptModal');
     const receiptNoInput = document.getElementById('receiptNoInput');
     const operatorSelect = document.getElementById('operatorSelect');
-
+    
     // New DOM element references for the edit modal
     const editModal = document.getElementById('editModal');
     const editContentInput = document.getElementById('editContentInput');
@@ -487,7 +491,7 @@
       }
       renderSavedTables();
     }
-
+    
     /**
      * Loads the selected items from local storage.
      */
@@ -497,7 +501,7 @@
             selectedItems = JSON.parse(storedSelected);
         }
     }
-
+    
     /**
      * Loads the marked items from local storage.
      */
@@ -514,27 +518,28 @@
     function saveToLocalStorage() {
       localStorage.setItem('invoiceData', JSON.stringify(customerData));
     }
-
+    
     /**
      * Saves the `savedData` object to local storage.
      */
     function saveSavedToLocalStorage() {
       localStorage.setItem('savedInvoices', JSON.stringify(savedData));
     }
-
+    
     /**
      * Saves the selected items to local storage.
      */
     function saveSelectedItems() {
         localStorage.setItem('selectedInvoices', JSON.stringify(selectedItems));
     }
-
+    
     /**
      * Saves the marked items to local storage.
      */
     function saveMarkedItems() {
         localStorage.setItem('markedInvoices', JSON.stringify(markedItems));
     }
+
 
     // Event listeners for drag and drop functionality
     document.body.addEventListener('dragover', (e) => {
@@ -564,28 +569,28 @@
      */
     async function parsePDF(file) {
       const fileId = `${file.name}-${file.size}`;
-
+      
       if (localStorage.getItem(fileId)) {
         feedbackText.textContent = "This PDF has already been processed and saved.";
         return;
       }
       feedbackText.textContent = "Processing PDF... Please wait.";
-
+      
       const fileReader = new FileReader();
       fileReader.onload = async function() {
         try {
           const typedarray = new Uint8Array(this.result);
           pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
+          
           const pdf = await pdfjsLib.getDocument(typedarray).promise;
           let newCustomerData = {};
           let lastCustomer = null;
-
+          
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
             const textItems = textContent.items.map(item => item.str);
-
+            
             for (let line of textItems) {
               if (line.startsWith("Customer:")) {
                 let parts = line.replace("Customer:", "").trim().split("-");
@@ -600,6 +605,7 @@
               }
             }
           }
+
           customerData = { ...customerData, ...newCustomerData };
           localStorage.setItem(fileId, 'processed');
           saveToLocalStorage();
@@ -618,7 +624,7 @@
     async function searchInvoice() {
         const userInput = invoiceInput.value.trim();
         const searchKey = userInput.split(/[-()]/)[0].trim();
-
+        
         let foundInvoice = null;
         for (const key in customerData) {
             if (key === searchKey) {
@@ -626,7 +632,7 @@
                 break;
             }
         }
-
+        
         if (foundInvoice) {
             const { code, name } = customerData[foundInvoice];
             resultBox.style.display = 'block';
@@ -650,8 +656,8 @@
             resultBox.classList.add('warning'); // Add the new warning class
             feedbackText.textContent = "";
         }
-
-        // Check for the special '-' character in the search input
+        
+        // NEW: Check for the special '-' character in the search input
         if (userInput.includes('-') && !processingActive) {
             const parts = userInput.split('-');
             const potentialReceiptNo = parseInt(parts[1]);
@@ -660,11 +666,12 @@
                 currentReceiptNo = potentialReceiptNo;
                 receiptOperator = '+';
                 toggleSections(); // Switch to the saved section
+                // The feedback message will be displayed in the saved section
                 feedbackText.textContent = `Auto-increment started. Next receipt will be ${currentReceiptNo + 1}. Press 'z' to end.`;
             }
         }
     }
-
+    
     /**
      * Adds a newly searched invoice to the saved list and saves it.
      */
@@ -710,7 +717,7 @@
           const { code, name, originalInvoice, savedUserInput } = savedData[date][invoiceNo];
           const listItem = document.createElement('li');
           listItem.className = 'saved-item';
-
+          
           // NEW: Add draggable attribute
           listItem.setAttribute('draggable', true);
 
@@ -723,22 +730,22 @@
           listItem.dataset.originalInvoice = originalInvoice || invoiceNo;
           listItem.dataset.invoiceNo = invoiceNo;
           listItem.dataset.savedUserInput = savedUserInput;
-
+          
           if (selectedItems.includes(invoiceNo)) {
               listItem.classList.add('selected');
           }
-
+          
           if (markedItems.includes(invoiceNo)) {
               listItem.classList.add('marked-premium');
           }
-
+          
           listItem.addEventListener('click', copyCodeAndMarkRow);
           listItem.addEventListener('mousedown', (e) => {
               if (e.button === 0) { // Left click
                   activeRow = listItem;
               }
           });
-
+          
           // New double-click functionality
           listItem.addEventListener('dblclick', () => {
               if (processingActive) {
@@ -748,13 +755,13 @@
                   openModal();
               }
           });
-
+          
           // New right-click functionality
           listItem.addEventListener('contextmenu', (e) => {
               e.preventDefault();
               copyInvoiceNoFromRow(e);
           });
-
+          
           // NEW: Drag and drop event listeners
           listItem.addEventListener('dragstart', handleDragStart);
           listItem.addEventListener('dragover', handleDragOver);
@@ -796,7 +803,7 @@
             }
         }
     }
-
+    
     function handleDrop(e) {
       e.preventDefault();
       // The DOM is already reordered by handleDragOver, so we just need to finalize it.
@@ -815,7 +822,7 @@
 
         savedLists.forEach(savedList => {
             const date = savedList.closest('.saved-table-container').querySelector('h3').textContent;
-
+            
             // Re-order the data for this specific date
             const newOrder = Array.from(savedList.children).map(li => li.dataset.invoiceNo);
             const reorderedData = {};
@@ -829,6 +836,7 @@
         saveSavedToLocalStorage();
     }
 
+
     /**
      * Opens the custom receipt modal.
      */
@@ -836,7 +844,7 @@
         receiptModal.style.display = 'flex';
         receiptNoInput.focus();
     }
-
+    
     /**
      * Closes the custom receipt modal.
      */
@@ -851,16 +859,18 @@
     function submitReceiptInfo() {
         const receiptNo = receiptNoInput.value.trim();
         const operator = operatorSelect.value;
-
+        
         if (!receiptNo || isNaN(parseInt(receiptNo, 10))) {
             alert("Please enter a valid receipt number.");
             return;
         }
-
+        
         handleRightClick(rightClickedInvoice, receiptNo, operator);
         closeModal();
     }
+    
     // New functions for the full content edit modal
+    
     /**
      * Opens the new edit modal with pre-populated content.
      */
@@ -874,7 +884,7 @@
         editModal.style.display = 'flex';
         editContentInput.focus();
     }
-
+    
     /**
      * Closes the new edit modal.
      */
@@ -882,7 +892,7 @@
         editModal.style.display = 'none';
         editContentInput.value = '';
     }
-
+    
     /**
      * Submits the edited content, ensuring the receipt number is constant.
      */
@@ -892,17 +902,17 @@
             alert("Content cannot be empty.");
             return;
         }
-
+        
         const oldInvoiceNo = activeRow.dataset.invoiceNo;
         const date = getCurrentDate();
-
+        
         if (savedData[date] && savedData[date][oldInvoiceNo]) {
             // Regex to find the receipt number at the end of the string
             const receiptNoMatch = oldInvoiceNo.match(/Rece (\d+)$/);
             const receiptNo = receiptNoMatch ? receiptNoMatch[1] : null;
-
+            
             let newInvoiceNo = newContent;
-
+            
             // If a receipt number was found, append it to the new content
             if (receiptNo) {
                 // Ensure the new content does not already contain a receipt number
@@ -911,17 +921,17 @@
                     newInvoiceNo = `${newContent} - Rece ${receiptNo}`;
                 }
             }
-
+            
             // Find the new customer data based on the new content's invoice number
             const newInvoiceNumberOnly = newContent.split(/[-()]/)[0].trim();
             const newCustomer = customerData[newInvoiceNumberOnly];
-
+            
             let updatedEntry = { ...savedData[date][oldInvoiceNo] };
             if (newCustomer) {
                 updatedEntry.name = newCustomer.name;
                 updatedEntry.code = newCustomer.code;
             }
-
+            
             // Update the data in local storage
             const wasMarked = markedItems.includes(oldInvoiceNo);
             if (wasMarked) {
@@ -932,7 +942,7 @@
                 markedItems.push(newInvoiceNo);
                 saveMarkedItems();
             }
-
+            
             delete savedData[date][oldInvoiceNo];
             savedData[date][newInvoiceNo] = updatedEntry;
             saveSavedToLocalStorage();
@@ -942,7 +952,7 @@
         closeEditModal();
         activeRow = null;
     }
-
+    
     /**
      * Handles the right-click event on a saved item.
      */
@@ -950,7 +960,7 @@
         processingActive = true;
         currentReceiptNo = parseInt(receiptInput, 10);
         receiptOperator = operator;
-
+        
         const today = getCurrentDate();
         let oldInvoiceKey = null;
         let savedUserInput = null;
@@ -961,11 +971,11 @@
                 break;
             }
         }
-
+        
         if (oldInvoiceKey) {
             const { code, name } = savedData[today][oldInvoiceKey];
             const newInvoiceKey = `NVAT ${savedUserInput} - Rece ${receiptInput}`;
-
+            
             // If the old key was marked, mark the new key too.
             const wasMarked = markedItems.includes(oldInvoiceKey);
             if (wasMarked) {
@@ -978,13 +988,13 @@
               }
               saveMarkedItems();
             }
-
+            
             delete savedData[today][oldInvoiceKey];
             savedData[today][newInvoiceKey] = { code, name, originalInvoice, savedUserInput };
             saveSavedToLocalStorage();
             renderSavedTables();
         }
-
+        
         // Show feedback message only if we are in the saved section
         if (savedSection.style.display !== 'none') {
             feedbackText.textContent = `Processing started. Press 'z' to end.`;
@@ -1019,114 +1029,203 @@
       const item = event.currentTarget;
       const code = item.dataset.code;
       const invoiceNo = item.dataset.invoiceNo;
-      
-      item.classList.toggle('selected');
 
+      item.classList.toggle('selected');
+      
       if (item.classList.contains('selected')) {
           if (!selectedItems.includes(invoiceNo)) {
               selectedItems.push(invoiceNo);
           }
       } else {
-          const index = selectedItems.indexOf(invoiceNo);
-          if (index > -1) {
-              selectedItems.splice(index, 1);
-          }
+          selectedItems = selectedItems.filter(item => item !== invoiceNo);
       }
       saveSelectedItems();
-
+      
       try {
-          await navigator.clipboard.writeText(code);
-          feedbackText.textContent = "Code copied to clipboard!";
+        await navigator.clipboard.writeText(code);
+        feedbackText.textContent = "Code copied from table!";
       } catch (err) {
-          feedbackText.textContent = "Failed to copy code. Please copy manually.";
-          console.error('Failed to copy text:', err);
+        feedbackText.textContent = "Failed to copy code. Please copy manually.";
+        console.error('Failed to copy text:', err);
       }
     }
 
     /**
-     * Copies the invoice number from a right-clicked row.
+     * Handles the double-click event on a saved item.
      */
-    async function copyInvoiceNoFromRow(e) {
-      const invoiceNo = e.currentTarget.dataset.invoiceNo;
+    async function copyInvoiceNoFromRow(event) {
+      event.preventDefault();
+      const item = event.currentTarget;
+      const invoiceNo = item.dataset.invoiceNo;
+      
       try {
         await navigator.clipboard.writeText(invoiceNo);
-        feedbackText.textContent = "Invoice number copied to clipboard!";
+        feedbackText.textContent = "Invoice No copied from table!";
       } catch (err) {
-        feedbackText.textContent = "Failed to copy invoice number.";
+        feedbackText.textContent = "Failed to copy invoice number. Please copy manually.";
         console.error('Failed to copy text:', err);
       }
     }
     
-    // Global keyboard shortcuts
+    /**
+     * Clears all data from local storage and resets the application state.
+     */
+    function clearAllData() {
+        localStorage.clear();
+        customerData = {};
+        savedData = {};
+        selectedItems = [];
+        markedItems = []; // Also clear marked items
+        activeRow = null;
+        processingActive = false;
+        currentReceiptNo = null;
+        receiptOperator = null;
+        rightClickedInvoice = null;
+        renderSavedTables();
+        feedbackText.textContent = "All data has been cleared.";
+    }
+
+    // Add event listeners for new functionality
     document.addEventListener('keydown', (e) => {
-        // Toggle view on 's'
-        if (e.key === 's' || e.key === 'S') {
-            toggleSections();
+      const key = e.key.toLowerCase();
+      // Check if the event target is an input or textarea
+      const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+
+      // --- Global Hotkeys ---
+      if (e.ctrlKey && key === 'd') {
+          e.preventDefault();
+          savedData = {};
+          selectedItems = [];
+          markedItems = [];
+          saveSavedToLocalStorage();
+          saveSelectedItems();
+          saveMarkedItems();
+          renderSavedTables();
+          feedbackText.textContent = "Saved section data cleared. (PDF data is safe)";
+      } else if (key === 's') {
+          window.open('https://prabodfx.github.io/web/nav/sh.html', '_blank');
+      } else if (key === ' ') {
+        e.preventDefault();
+        toggleSections();
+      } else if (key === 'z' && processingActive) {
+        processingActive = false;
+        currentReceiptNo = null;
+        receiptOperator = null;
+        feedbackText.textContent = "Processing ended. You can start a new process.";
+      } else if (key === 'q') {
+          e.preventDefault();
+          clearAllData();
+      // --- Saved Section Hotkeys (Prevent default only if not in an input/textarea) ---
+      } else if (!isInput && key === 'd' && activeRow) {
+          e.preventDefault();
+          const invoiceNo = activeRow.dataset.invoiceNo;
+          const date = getCurrentDate();
+          if (savedData[date] && savedData[date][invoiceNo]) {
+              delete savedData[date][invoiceNo];
+              saveSavedToLocalStorage();
+              // Remove the invoice from markedItems as well
+              const index = markedItems.indexOf(invoiceNo);
+              if (index > -1) {
+                  markedItems.splice(index, 1);
+                  saveMarkedItems();
+              }
+              renderSavedTables();
+              feedbackText.textContent = `Invoice ${invoiceNo} deleted.`;
+              
+              // NEW FIX: After deletion, check if the deleted invoice was part of a process.
+              if (processingActive) {
+                const deletedReceiptNoMatch = invoiceNo.match(/Rece (\d+)/);
+                if (deletedReceiptNoMatch && parseInt(deletedReceiptNoMatch[1]) === currentReceiptNo) {
+                  // If the deleted invoice had the current receipt number,
+                  // decrement the counter to "go back" to the previous number.
+                  currentReceiptNo--;
+                }
+              }
+          }
+          activeRow = null; // Clear the active row
+      } else if (!isInput && key === 'e' && activeRow) {
+          e.preventDefault();
+          openEditModal();
+      } else if (!isInput && key === 'p' && activeRow) {
+          e.preventDefault();
+          const invoiceNo = activeRow.dataset.invoiceNo;
+          const index = markedItems.indexOf(invoiceNo);
+          if (index > -1) {
+              markedItems.splice(index, 1);
+          } else {
+              markedItems.push(invoiceNo);
+          }
+          saveMarkedItems();
+          activeRow.classList.toggle('marked-premium');
+      } else if (!isInput && key === '+' && activeRow) {
+          e.preventDefault();
+          const invoiceNo = activeRow.dataset.invoiceNo;
+          const receiptNoMatch = invoiceNo.match(/Rece (\d+)$/);
+          if (receiptNoMatch) {
+              processingActive = true;
+              currentReceiptNo = parseInt(receiptNoMatch[1], 10);
+              receiptOperator = '+';
+              feedbackText.textContent = `Auto-increment started. Next receipt will be ${currentReceiptNo + 1}. Press 'z' to end.`;
+          } else {
+              feedbackText.textContent = "Selected row does not have a receipt number.";
+          }
+      } 
+      // FIX: Only prevent default for '-' if we have an activeRow and we are NOT in an input/textarea.
+      else if (!isInput && key === '-' && activeRow) {
+        e.preventDefault();
+        const invoiceNo = activeRow.dataset.invoiceNo;
+        const receiptNoMatch = invoiceNo.match(/Rece (\d+)$/);
+        if (receiptNoMatch) {
+            processingActive = true;
+            currentReceiptNo = parseInt(receiptNoMatch[1], 10);
+            receiptOperator = '-';
+            feedbackText.textContent = `Auto-decrement started. Next receipt will be ${currentReceiptNo - 1}. Press 'z' to end.`;
+        } else {
+            feedbackText.textContent = "Selected row does not have a receipt number.";
         }
-        // End auto-increment process on 'z'
-        if (e.key === 'z' || e.key === 'Z') {
-            if (processingActive) {
-                processingActive = false;
-                feedbackText.textContent = "Auto-increment process ended.";
-            }
-        }
-        // Save selected items as 'marked-premium' with 'a'
-        if (e.key === 'a' || e.key === 'A') {
-            e.preventDefault(); // Prevent default browser action
-            markSelectedItems();
-        }
-        // Open edit modal on 'e'
-        if (e.key === 'e' || e.key === 'E' && activeRow) {
-            e.preventDefault();
-            openEditModal();
-        }
-        // Perform search when Enter is pressed
-        if (e.key === 'Enter') {
-            if (searchSection.style.display !== 'none') {
-                searchInvoice();
-            }
-        }
-        // Add a new function to handle deleting a selected row on 'Delete' or 'Backspace'
-        if ((e.key === 'Delete' || e.key === 'Backspace') && activeRow) {
-            e.preventDefault();
-            deleteActiveRow();
+      }
+    });
+
+    invoiceInput.addEventListener('dblclick', () => {
+      invoiceInput.value = '';
+    });
+
+    invoiceInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        searchInvoice();
+      }
+    });
+    
+    // Clear active row when clicking elsewhere
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.saved-item')) {
+            activeRow = null;
         }
     });
 
-    /**
-     * Marks all currently selected items as 'premium' and saves them.
-     */
-    function markSelectedItems() {
-        const markedForSave = [...selectedItems];
-        markedItems = [...new Set([...markedItems, ...markedForSave])];
-        selectedItems = []; // Clear selected items
-        saveMarkedItems();
-        saveSelectedItems();
-        renderSavedTables();
-        feedbackText.textContent = "Items marked as premium and saved!";
-    }
-
-    /**
-     * Deletes the currently active row from the saved list.
-     */
-    function deleteActiveRow() {
-      if (!activeRow) return;
-
-      const invoiceNoToDelete = activeRow.dataset.invoiceNo;
-      const date = activeRow.closest('.saved-table-container').querySelector('h3').textContent;
-
-      if (savedData[date] && savedData[date][invoiceNoToDelete]) {
-        delete savedData[date][invoiceNoToDelete];
-        saveSavedToLocalStorage();
-        activeRow.remove();
-        activeRow = null;
-        feedbackText.textContent = `Invoice ${invoiceNoToDelete} deleted.`;
+    // Added event listener to the edit content input field for the 'Enter' key
+    editContentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitEditContent();
       }
-    }
+    });
 
-    // Call init function to set up the app on page load
-    window.onload = loadFromLocalStorage;
+    // Added event listener to the receipt number input field for the 'Enter' key
+    receiptNoInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            operatorSelect.value = '+';
+            submitReceiptInfo();
+        } else if (e.key === '-') {
+            e.preventDefault();
+            operatorSelect.value = '-';
+            submitReceiptInfo();
+        }
+    });
 
-</script>
+    // Initial function call to load data when the page loads
+    loadFromLocalStorage();
+  </script>
 </body>
 </html>
