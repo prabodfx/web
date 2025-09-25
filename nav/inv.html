@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Extractor | Prabodfx</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #121212, #242424, #121212);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    /* Main container for the application */
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-sizing: border-box;
+    }
+
+    .search-container {
+        width: 800px; /* Increased width to accommodate longer names */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .saved-container {
+        width: 1200px; /* Wider saved section */
+        max-width: 95%; /* Responsive on smaller screens */
+        margin-top: 50px;
+        margin-bottom: 50px;
+        max-height: 80vh; /* Set a maximum height */
+        overflow-y: auto; /* Enable scrolling for this container */
+    }
+
+    /* Heading 1 style */
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 25px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    /* Input field styling */
+    input[type="text"] {
+      width: 80%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 12px;
+      outline: none;
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Placeholder text color for the input field */
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Focus state for the input field */
+    input[type="text"]:focus {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Button styling */
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      background: #ff005d;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 15px rgba(255, 0, 93, 0.4);
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background: #e60052;
+      transform: translateY(-1px);
+      box-shadow: 6px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Result box styling */
+    .result {
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Feedback text styling */
+    .feedback {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Premium styling for customer data with better alignment */
+    .result-item {
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .customer-name {
+      display: block;
+      font-size: 2rem;
+      color: #b3ffb3;
+      font-weight: bold;
+      margin-bottom: 5px;
+      white-space: nowrap; /* Forces the text to stay on one line */
+    }
+
+    .customer-code, .invoice-info {
+      display: block;
+      color: #fff;
+    }
+
+    .customer-code {
+      color: #87cefa;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .invoice-info {
+        font-weight: 800;
+        margin-top: 5px;
+        font-size: 1.6rem;
+    }
+
+    /* NEW: Styling for the warning message */
+    .warning {
+        color: #ff0000; /* Bright red color */
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-shadow: 0 0 3px rgb(0, 0, 0);
+    }
+
+    /* New styles for the saved section */
+    .saved-section {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      text-align: left;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .saved-section h2 {
+      text-align: center;
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    .saved-table-container {
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .saved-table-container h3 {
+      text-align: center;
+      margin-top: 0;
+      color: #b3ffb3;
+    }
+
+    /* Updated styles for the list-based saved entries for alignment */
+    .saved-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .saved-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: grab; /* Change cursor for drag and drop */
+        gap: 20px; /* Creates space between columns */
+        /* PREMIUM ANIMATION */
+        transition: transform 0.3s ease-in-out, background-color 0.2s ease;
+    }
+
+    .saved-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .saved-item.selected {
+        background-color: rgba(157, 0, 255, 0.658);
+    }
+
+    .saved-item.marked-premium {
+        background: rgba(255, 215, 0, 0.3); /* Golden background */
+        border: 1px solid #FFD700; /* Golden border */
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Golden glow */
+    }
+
+    .item-name {
+        width: 350px; /* Fixed width for alignment */
+        flex-shrink: 0;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left; /* Left align */
+    }
+
+    .item-code {
+        width: 200px; /* Fixed width for alignment */
+        flex-shrink: 0;
+        color: #87cefa;
+        font-weight: bold;
+        text-align: left; /* Left align */
+    }
+
+    .item-invoice {
+        width: 400px; /* Fixed width for alignment */
+        flex-shrink: 0;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: left; /* Left align */
+    }
+
+    /* PREMIUM ANIMATION: Style for the dragged item */
+    .saved-item.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Modal styles - PREMIUM LOOK */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(145deg, #1a1826, #2c293d);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      width: 400px;
+      text-align: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .modal-content:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content h3 {
+        margin-top: 0;
+        font-weight: 400;
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-content input, .modal-content select {
+      width: 90%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .modal-content input:focus, .modal-content select:focus {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-content textarea {
+        width: 90%;
+        height: 100px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .modal-content textarea:focus {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-content select {
+        width: 95%;
+    }
+
+    .modal-content button {
+        width: 45%;
+        margin: 0 5px;
+        padding: 12px 20px;
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 600px) {
+        .search-container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .saved-container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .item-name {
+            width: 50%;
+        }
+
+        .item-code {
+            width: 50%;
+        }
+
+        .item-invoice {
+            display: none; /* Hide the invoice info */
+        }
+
+        .saved-item {
+            gap: 10px;
+        }
+
+        .modal-content {
+            width: 90%;
+            padding: 20px;
+        }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+  <div class="saved-container container" id="savedSection">
+    <h2>Saved Invoices</h2>
+    <div id="savedTablesContainer"></div>
+  </div>
+
+  <div class="search-container container" id="searchSection">
+    <h1>Invoice Data Extractor</h1>
+    <p class="feedback" id="feedback-text"></p>
+    <input type="text" id="invoiceInput" placeholder="Enter Invoice Number" autofocus>
+    <br>
+    <button onclick="searchInvoice()">Search</button>
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <div id="receiptModal" class="modal-overlay">
+      <div class="modal-content">
+          <h3>Edit Invoice No Format</h3>
+          <input type="text" id="receiptNoInput" placeholder="Receipt No" autocomplete="off">
+          <select id="operatorSelect">
+              <option value="+">+</option>
+              <option value="-">-</option>
+          </select>
+          <button onclick="submitReceiptInfo()">Submit</button>
+          <button onclick="closeModal()">Cancel</button>
+      </div>
+  </div>
+
+  <div id="editModal" class="modal-overlay">
+      <div class="modal-content">
+          <h3>Edit Full Invoice Content</h3>
+          <textarea id="editContentInput" placeholder="Enter new invoice content"></textarea>
+          <button onclick="submitEditContent()">Save</button>
+          <button onclick="closeEditModal()">Cancel</button>
+      </div>
+  </div>
+<script>
+    // Global variables to store application state
+    let customerData = {};
+    let savedData = {};
+    let selectedItems = [];
+    let markedItems = []; // New array to store marked invoice numbers
+    let activeRow = null; // New global variable to track the clicked row
+
+    // NEW: Drag and drop variables
+    let draggedItem = null;
+
+    // New global variables for the right-click and auto-increment process
+    let processingActive = false;
+    let currentReceiptNo = null;
+    let receiptOperator = null;
+    let rightClickedInvoice = null;
+
+    // DOM element references
+    const feedbackText = document.getElementById('feedback-text');
+    const invoiceInput = document.getElementById('invoiceInput');
+    const resultBox = document.getElementById('resultBox');
+    const searchSection = document.getElementById('searchSection');
+    const savedSection = document.getElementById('savedSection');
+    const savedTablesContainer = document.getElementById('savedTablesContainer');
+    const receiptModal = document.getElementById('receiptModal');
+    const receiptNoInput = document.getElementById('receiptNoInput');
+    const operatorSelect = document.getElementById('operatorSelect');
+
+    // New DOM element references for the edit modal
+    const editModal = document.getElementById('editModal');
+    const editContentInput = document.getElementById('editContentInput');
+
+    /**
+     * Helper function to get the current date in YYYY-MM-DD format.
+     */
+    function getCurrentDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart('2', '0');
+        const day = String(today.getDate()).padStart('2', '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * Initializes the application by loading data from local storage.
+     */
+    function loadFromLocalStorage() {
+      const storedData = localStorage.getItem('invoiceData');
+      if (storedData) {
+        customerData = JSON.parse(storedData);
+        feedbackText.textContent = `Data loaded from previous sessions.`;
+      }
+      loadSelectedItems();
+      loadMarkedItems(); // Load marked items
+      loadSavedFromLocalStorage();
+      // Initially show only the search section
+      savedSection.style.display = 'none';
+      searchSection.style.display = 'block';
+    }
+
+    /**
+     * Loads the `savedData` object from local storage.
+     */
+    function loadSavedFromLocalStorage() {
+      const storedSavedData = localStorage.getItem('savedInvoices');
+      if (storedSavedData) {
+        savedData = JSON.parse(storedSavedData);
+      }
+      renderSavedTables();
+    }
+
+    /**
+     * Loads the selected items from local storage.
+     */
+    function loadSelectedItems() {
+        const storedSelected = localStorage.getItem('selectedInvoices');
+        if (storedSelected) {
+            selectedItems = JSON.parse(storedSelected);
+        }
+    }
+
+    /**
+     * Loads the marked items from local storage.
+     */
+    function loadMarkedItems() {
+        const storedMarked = localStorage.getItem('markedInvoices');
+        if (storedMarked) {
+            markedItems = JSON.parse(storedMarked);
+        }
+    }
+
+    /**
+     * Saves the `customerData` object to local storage.
+     */
+    function saveToLocalStorage() {
+      localStorage.setItem('invoiceData', JSON.stringify(customerData));
+    }
+
+    /**
+     * Saves the `savedData` object to local storage.
+     */
+    function saveSavedToLocalStorage() {
+      localStorage.setItem('savedInvoices', JSON.stringify(savedData));
+    }
+
+    /**
+     * Saves the selected items to local storage.
+     */
+    function saveSelectedItems() {
+        localStorage.setItem('selectedInvoices', JSON.stringify(selectedItems));
+    }
+
+    /**
+     * Saves the marked items to local storage.
+     */
+    function saveMarkedItems() {
+        localStorage.setItem('markedInvoices', JSON.stringify(markedItems));
+    }
+
+    // Event listeners for drag and drop functionality
+    document.body.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #2c2c2c, #4a4a4a, #2c2c2c)';
+    });
+
+    document.body.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #121212, #242424, #121212)';
+    });
+
+    document.body.addEventListener('drop', (e) => {
+      e.preventDefault();
+      document.body.style.background = 'linear-gradient(135deg, #121212, #242424, #121212)';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === "application/pdf") {
+        parsePDF(file);
+      } else {
+        feedbackText.textContent = "Please drop a valid PDF file.";
+      }
+    });
+
+    /**
+     * Parses the dropped PDF file, extracts data, and stores it.
+     * ✅ FIXED: carry forward last customer to next page
+     */
+    async function parsePDF(file) {
+      const fileId = `${file.name}-${file.size}`;
+
+      if (localStorage.getItem(fileId)) {
+        feedbackText.textContent = "This PDF has already been processed and saved.";
+        return;
+      }
+      feedbackText.textContent = "Processing PDF... Please wait.";
+
+      const fileReader = new FileReader();
+      fileReader.onload = async function() {
+        try {
+          const typedarray = new Uint8Array(this.result);
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+          let newCustomerData = {};
+          let lastCustomer = null;
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const textItems = textContent.items.map(item => item.str);
+
+            for (let line of textItems) {
+              if (line.startsWith("Customer:")) {
+                let parts = line.replace("Customer:", "").trim().split("-");
+                lastCustomer = {
+                  code: parts[0].trim(),
+                  name: parts.slice(1).join("-").trim()
+                };
+              } else if (/^\d{3,6}$/.test(line.trim())) {
+                if (lastCustomer) {
+                  newCustomerData[line.trim()] = lastCustomer;
+                }
+              }
+            }
+          }
+          customerData = { ...customerData, ...newCustomerData };
+          localStorage.setItem(fileId, 'processed');
+          saveToLocalStorage();
+          feedbackText.textContent = "PDF processed successfully! Data saved. You can now search.";
+        } catch (error) {
+          feedbackText.textContent = "Error processing PDF. Please try again.";
+          console.error("PDF parsing error:", error);
+        }
+      };
+      fileReader.readAsArrayBuffer(file);
+    }
+
+    /**
+     * Performs a basic invoice search.
+     */
+    async function searchInvoice() {
+        const userInput = invoiceInput.value.trim();
+        const searchKey = userInput.split(/[-()]/)[0].trim();
+
+        let foundInvoice = null;
+        for (const key in customerData) {
+            if (key === searchKey) {
+                foundInvoice = key;
+                break;
+            }
+        }
+
+        if (foundInvoice) {
+            const { code, name } = customerData[foundInvoice];
+            resultBox.style.display = 'block';
+            resultBox.classList.remove('warning');
+            resultBox.innerHTML = `
+              <div class="result-item customer-name">${name}</div>
+              <div class="result-item customer-code">${code}</div>
+              <div class="result-item invoice-info">Invoice No: ${foundInvoice}</div>
+            `;
+            addInvoiceToSavedList(userInput, customerData[foundInvoice], foundInvoice);
+            try {
+                await navigator.clipboard.writeText(code);
+                feedbackText.textContent = "Code copied to clipboard!";
+            } catch (err) {
+                feedbackText.textContent = "Failed to copy code. Please copy manually.";
+                console.error('Failed to copy text:', err);
+            }
+        } else {
+            resultBox.style.display = 'block';
+            resultBox.textContent = "Invoice not found ⚠️";
+            resultBox.classList.add('warning'); // Add the new warning class
+            feedbackText.textContent = "";
+        }
+
+        // Check for the special '-' character in the search input
+        if (userInput.includes('-') && !processingActive) {
+            const parts = userInput.split('-');
+            const potentialReceiptNo = parseInt(parts[1]);
+            if (!isNaN(potentialReceiptNo)) {
+                processingActive = true;
+                currentReceiptNo = potentialReceiptNo;
+                receiptOperator = '+';
+                toggleSections(); // Switch to the saved section
+                feedbackText.textContent = `Auto-increment started. Next receipt will be ${currentReceiptNo + 1}. Press 'z' to end.`;
+            }
+        }
+    }
+
+    /**
+     * Adds a newly searched invoice to the saved list and saves it.
+     */
+    function addInvoiceToSavedList(userInput, customer, foundInvoice) {
+        const today = getCurrentDate();
+        if (!savedData[today]) {
+            savedData[today] = {};
+        }
+
+        let savedInvoiceKey = foundInvoice; // Default to found invoice
+        if (processingActive) {
+            if (receiptOperator === '+') {
+                currentReceiptNo++;
+            } else if (receiptOperator === '-') {
+                currentReceiptNo--;
+            }
+            // Use userInput instead of foundInvoice in the saved key
+            savedInvoiceKey = `NVAT ${userInput} - Rece ${currentReceiptNo}`;
+        }
+
+        if (!savedData[today][savedInvoiceKey]) {
+            savedData[today][savedInvoiceKey] = { ...customer, originalInvoice: foundInvoice, savedUserInput: userInput };
+            saveSavedToLocalStorage();
+            renderSavedTables();
+        }
+    }
+
+    /**
+     * Renders the saved invoices as separate tables for each date.
+     */
+    function renderSavedTables() {
+      savedTablesContainer.innerHTML = '';
+      const dates = Object.keys(savedData).sort().reverse(); // Sort dates latest first
+      dates.forEach(date => {
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'saved-table-container';
+        tableContainer.innerHTML = `<h3>${date}</h3>
+          <ul class="saved-list"></ul>
+        `;
+        const savedList = tableContainer.querySelector('.saved-list');
+        const invoices = Object.keys(savedData[date]).reverse(); // Show latest first
+        invoices.forEach(invoiceNo => {
+          const { code, name, originalInvoice, savedUserInput } = savedData[date][invoiceNo];
+          const listItem = document.createElement('li');
+          listItem.className = 'saved-item';
+
+          // NEW: Add draggable attribute
+          listItem.setAttribute('draggable', true);
+
+          listItem.innerHTML = `
+            <div class="item-name">${name}</div>
+            <div class="item-code">${code}</div>
+            <div class="item-invoice">${invoiceNo}</div>
+          `;
+          listItem.dataset.code = code;
+          listItem.dataset.originalInvoice = originalInvoice || invoiceNo;
+          listItem.dataset.invoiceNo = invoiceNo;
+          listItem.dataset.savedUserInput = savedUserInput;
+
+          if (selectedItems.includes(invoiceNo)) {
+              listItem.classList.add('selected');
+          }
+
+          if (markedItems.includes(invoiceNo)) {
+              listItem.classList.add('marked-premium');
+          }
+
+          listItem.addEventListener('click', copyCodeAndMarkRow);
+          listItem.addEventListener('mousedown', (e) => {
+              if (e.button === 0) { // Left click
+                  activeRow = listItem;
+              }
+          });
+
+          // New double-click functionality
+          listItem.addEventListener('dblclick', () => {
+              if (processingActive) {
+                  feedbackText.textContent = "A process is already active. Press 'z' to end it first.";
+              } else {
+                  rightClickedInvoice = listItem.dataset.originalInvoice;
+                  openModal();
+              }
+          });
+
+          // New right-click functionality
+          listItem.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              copyInvoiceNoFromRow(e);
+          });
+
+          // NEW: Drag and drop event listeners
+          listItem.addEventListener('dragstart', handleDragStart);
+          listItem.addEventListener('dragover', handleDragOver);
+          listItem.addEventListener('drop', handleDrop);
+          listItem.addEventListener('dragend', handleDragEnd);
+
+          savedList.appendChild(listItem);
+        });
+        savedTablesContainer.appendChild(tableContainer);
+      });
+    }
+
+    // NEW: Drag and drop handler functions
+    function handleDragStart(e) {
+      draggedItem = this;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.innerHTML);
+      this.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        const target = e.target.closest('.saved-item');
+        if (target && target !== draggedItem) {
+            const savedList = target.parentElement;
+            const bounding = target.getBoundingClientRect();
+            const offset = bounding.y + (bounding.height / 2);
+
+            if (e.clientY < offset) {
+                // Dragging above the target
+                if (draggedItem !== target.previousElementSibling) {
+                    savedList.insertBefore(draggedItem, target);
+                }
+            } else {
+                // Dragging below the target
+                if (draggedItem !== target.nextElementSibling) {
+                    savedList.insertBefore(draggedItem, target.nextSibling);
+                }
+            }
+        }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      // The DOM is already reordered by handleDragOver, so we just need to finalize it.
+      // Call updateSavedDataOrder to save the new order to local storage.
+      updateSavedDataOrder();
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+      draggedItem = null;
+    }
+
+    function updateSavedDataOrder() {
+        // Find all saved list containers
+        const savedLists = document.querySelectorAll('.saved-list');
+
+        savedLists.forEach(savedList => {
+            const date = savedList.closest('.saved-table-container').querySelector('h3').textContent;
+
+            // Re-order the data for this specific date
+            const newOrder = Array.from(savedList.children).map(li => li.dataset.invoiceNo);
+            const reorderedData = {};
+            newOrder.forEach(invoiceNo => {
+                if (savedData[date][invoiceNo]) {
+                    reorderedData[invoiceNo] = savedData[date][invoiceNo];
+                }
+            });
+            savedData[date] = reorderedData;
+        });
+        saveSavedToLocalStorage();
+    }
+
+    /**
+     * Opens the custom receipt modal.
+     */
+    function openModal() {
+        receiptModal.style.display = 'flex';
+        receiptNoInput.focus();
+    }
+
+    /**
+     * Closes the custom receipt modal.
+     */
+    function closeModal() {
+        receiptModal.style.display = 'none';
+        receiptNoInput.value = '';
+    }
+
+    /**
+     * Submits the receipt information from the modal.
+     */
+    function submitReceiptInfo() {
+        const receiptNo = receiptNoInput.value.trim();
+        const operator = operatorSelect.value;
+
+        if (!receiptNo || isNaN(parseInt(receiptNo, 10))) {
+            alert("Please enter a valid receipt number.");
+            return;
+        }
+
+        handleRightClick(rightClickedInvoice, receiptNo, operator);
+        closeModal();
+    }
+    // New functions for the full content edit modal
+    /**
+     * Opens the new edit modal with pre-populated content.
+     */
+    function openEditModal() {
+        if (!activeRow) {
+            feedbackText.textContent = "Please select a row to edit first.";
+            return;
+        }
+        const invoiceNo = activeRow.dataset.invoiceNo;
+        editContentInput.value = invoiceNo;
+        editModal.style.display = 'flex';
+        editContentInput.focus();
+    }
+
+    /**
+     * Closes the new edit modal.
+     */
+    function closeEditModal() {
+        editModal.style.display = 'none';
+        editContentInput.value = '';
+    }
+
+    /**
+     * Submits the edited content, ensuring the receipt number is constant.
+     */
+    function submitEditContent() {
+        const newContent = editContentInput.value.trim();
+        if (!newContent) {
+            alert("Content cannot be empty.");
+            return;
+        }
+
+        const oldInvoiceNo = activeRow.dataset.invoiceNo;
+        const date = getCurrentDate();
+
+        if (savedData[date] && savedData[date][oldInvoiceNo]) {
+            // Regex to find the receipt number at the end of the string
+            const receiptNoMatch = oldInvoiceNo.match(/Rece (\d+)$/);
+            const receiptNo = receiptNoMatch ? receiptNoMatch[1] : null;
+
+            let newInvoiceNo = newContent;
+
+            // If a receipt number was found, append it to the new content
+            if (receiptNo) {
+                // Ensure the new content does not already contain a receipt number
+                const newContentReceiptMatch = newContent.match(/Rece (\d+)$/);
+                if (!newContentReceiptMatch) {
+                    newInvoiceNo = `${newContent} - Rece ${receiptNo}`;
+                }
+            }
+
+            // Find the new customer data based on the new content's invoice number
+            const newInvoiceNumberOnly = newContent.split(/[-()]/)[0].trim();
+            const newCustomer = customerData[newInvoiceNumberOnly];
+
+            let updatedEntry = { ...savedData[date][oldInvoiceNo] };
+            if (newCustomer) {
+                updatedEntry.name = newCustomer.name;
+                updatedEntry.code = newCustomer.code;
+            }
+
+            // Update the data in local storage
+            const wasMarked = markedItems.includes(oldInvoiceNo);
+            if (wasMarked) {
+                const index = markedItems.indexOf(oldInvoiceNo);
+                if (index > -1) {
+                    markedItems.splice(index, 1);
+                }
+                markedItems.push(newInvoiceNo);
+                saveMarkedItems();
+            }
+
+            delete savedData[date][oldInvoiceNo];
+            savedData[date][newInvoiceNo] = updatedEntry;
+            saveSavedToLocalStorage();
+            renderSavedTables();
+            feedbackText.textContent = `Invoice content updated.`;
+        }
+        closeEditModal();
+        activeRow = null;
+    }
+
+    /**
+     * Handles the right-click event on a saved item.
+     */
+    function handleRightClick(originalInvoice, receiptInput, operator) {
+        processingActive = true;
+        currentReceiptNo = parseInt(receiptInput, 10);
+        receiptOperator = operator;
+
+        const today = getCurrentDate();
+        let oldInvoiceKey = null;
+        let savedUserInput = null;
+        for (const key in savedData[today]) {
+            if (savedData[today][key].originalInvoice === originalInvoice) {
+                oldInvoiceKey = key;
+                savedUserInput = savedData[today][key].savedUserInput;
+                break;
+            }
+        }
+
+        if (oldInvoiceKey) {
+            const { code, name } = savedData[today][oldInvoiceKey];
+            const newInvoiceKey = `NVAT ${savedUserInput} - Rece ${receiptInput}`;
+
+            // If the old key was marked, mark the new key too.
+            const wasMarked = markedItems.includes(oldInvoiceKey);
+            if (wasMarked) {
+              const index = markedItems.indexOf(oldInvoiceKey);
+              if (index > -1) {
+                markedItems.splice(index, 1);
+              }
+              if (!markedItems.includes(newInvoiceKey)) {
+                markedItems.push(newInvoiceKey);
+              }
+              saveMarkedItems();
+            }
+
+            delete savedData[today][oldInvoiceKey];
+            savedData[today][newInvoiceKey] = { code, name, originalInvoice, savedUserInput };
+            saveSavedToLocalStorage();
+            renderSavedTables();
+        }
+
+        // Show feedback message only if we are in the saved section
+        if (savedSection.style.display !== 'none') {
+            feedbackText.textContent = `Processing started. Press 'z' to end.`;
+        }
+    }
+
+    /**
+     * Toggles the visibility of the search and saved sections.
+     */
+    function toggleSections() {
+      if (searchSection.style.display !== 'none') {
+        searchSection.style.display = 'none';
+        savedSection.style.display = 'block';
+        feedbackText.textContent = ""; // Clear feedback when switching to saved
+      } else {
+        searchSection.style.display = 'block';
+        savedSection.style.display = 'none';
+        invoiceInput.value = '';
+        invoiceInput.focus();
+        feedbackText.textContent = ""; // Clear feedback when switching to search
+        resultBox.style.display = 'none';
+      }
+    }
+
+    /**
+     * Handles the click event on a saved item.
+     */
+    async function copyCodeAndMarkRow(event) {
+      // Prevent drag-and-drop from triggering this on click
+      if (draggedItem) return;
+
+      const item = event.currentTarget;
+      const code = item.dataset.code;
+      const invoiceNo = item.dataset.invoiceNo;
+      
+      item.classList.toggle('selected');
+
+      if (item.classList.contains('selected')) {
+          if (!selectedItems.includes(invoiceNo)) {
+              selectedItems.push(invoiceNo);
+          }
+      } else {
+          const index = selectedItems.indexOf(invoiceNo);
+          if (index > -1) {
+              selectedItems.splice(index, 1);
+          }
+      }
+      saveSelectedItems();
+
+      try {
+          await navigator.clipboard.writeText(code);
+          feedbackText.textContent = "Code copied to clipboard!";
+      } catch (err) {
+          feedbackText.textContent = "Failed to copy code. Please copy manually.";
+          console.error('Failed to copy text:', err);
+      }
+    }
+
+    /**
+     * Copies the invoice number from a right-clicked row.
+     */
+    async function copyInvoiceNoFromRow(e) {
+      const invoiceNo = e.currentTarget.dataset.invoiceNo;
+      try {
+        await navigator.clipboard.writeText(invoiceNo);
+        feedbackText.textContent = "Invoice number copied to clipboard!";
+      } catch (err) {
+        feedbackText.textContent = "Failed to copy invoice number.";
+        console.error('Failed to copy text:', err);
+      }
+    }
+    
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Toggle view on 's'
+        if (e.key === 's' || e.key === 'S') {
+            toggleSections();
+        }
+        // End auto-increment process on 'z'
+        if (e.key === 'z' || e.key === 'Z') {
+            if (processingActive) {
+                processingActive = false;
+                feedbackText.textContent = "Auto-increment process ended.";
+            }
+        }
+        // Save selected items as 'marked-premium' with 'a'
+        if (e.key === 'a' || e.key === 'A') {
+            e.preventDefault(); // Prevent default browser action
+            markSelectedItems();
+        }
+        // Open edit modal on 'e'
+        if (e.key === 'e' || e.key === 'E' && activeRow) {
+            e.preventDefault();
+            openEditModal();
+        }
+        // Perform search when Enter is pressed
+        if (e.key === 'Enter') {
+            if (searchSection.style.display !== 'none') {
+                searchInvoice();
+            }
+        }
+        // Add a new function to handle deleting a selected row on 'Delete' or 'Backspace'
+        if ((e.key === 'Delete' || e.key === 'Backspace') && activeRow) {
+            e.preventDefault();
+            deleteActiveRow();
+        }
+    });
+
+    /**
+     * Marks all currently selected items as 'premium' and saves them.
+     */
+    function markSelectedItems() {
+        const markedForSave = [...selectedItems];
+        markedItems = [...new Set([...markedItems, ...markedForSave])];
+        selectedItems = []; // Clear selected items
+        saveMarkedItems();
+        saveSelectedItems();
+        renderSavedTables();
+        feedbackText.textContent = "Items marked as premium and saved!";
+    }
+
+    /**
+     * Deletes the currently active row from the saved list.
+     */
+    function deleteActiveRow() {
+      if (!activeRow) return;
+
+      const invoiceNoToDelete = activeRow.dataset.invoiceNo;
+      const date = activeRow.closest('.saved-table-container').querySelector('h3').textContent;
+
+      if (savedData[date] && savedData[date][invoiceNoToDelete]) {
+        delete savedData[date][invoiceNoToDelete];
+        saveSavedToLocalStorage();
+        activeRow.remove();
+        activeRow = null;
+        feedbackText.textContent = `Invoice ${invoiceNoToDelete} deleted.`;
+      }
+    }
+
+    // Call init function to set up the app on page load
+    window.onload = loadFromLocalStorage;
+
+</script>
+</body>
+</html>
