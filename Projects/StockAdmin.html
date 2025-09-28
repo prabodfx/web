@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../Projects/fc/stockAdmin/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="../Projects/fc/stockAdmin/favicon.svg" />
+  <link rel="shortcut icon" href="../Projects/fc/stockAdmin/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../Projects/fc/stockAdmin/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Stock Admin" />
+  <link rel="manifest" href="../Projects/fc/stockAdmin/site.webmanifest" />
+  <title>Stock Admin | Prabodfx</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;500&family=Roboto+Mono:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #0d0d0d, #000000 80%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e0e0e0;
+      padding: 1rem;
+      position: relative;
+    }
+
+    /* New Login Page Styles */
+    .login-grid-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        grid-auto-rows: minmax(50px, 1fr);
+        z-index: 1;
+    }
+
+    .login-grid-item {
+        border: 1px solid rgba(0, 255, 255, 0.1);
+        transition: all 0.5s ease;
+    }
+
+    .login-grid-item.active {
+        background-color: #00ffffdd;
+        box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+        border-color: #00ffff;
+        transition: none;
+    }
+    
+    .login-card {
+        position: relative;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid #00ffff;
+        box-shadow: 0 0 20px #00ffff;
+        padding: 3rem 2rem;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+        animation: cyan-glow 1.5s infinite alternate;
+        font-family: 'Orbitron', sans-serif;
+        color: #00ffff;
+    }
+    .login-card h1 {
+        font-size: 2rem;
+        text-shadow: 0 0 5px #00ffff;
+        margin-bottom: 2rem;
+    }
+    .input-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: #00cccc;
+        font-family: 'Inter', sans-serif;
+    }
+    .input-group input {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: transparent;
+        border: 1px solid #00cccc;
+        color: #00ffff;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    .input-group input:focus {
+        outline: none;
+        border-color: #00ffff;
+        box-shadow: 0 0 8px #00ffff;
+    }
+    .login-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #00ffff;
+        color: #0d0d0d;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .login-btn:hover {
+        background: #00ffff;
+        box-shadow: 0 0 15px #00ffff;
+    }
+    @keyframes cyan-glow {
+        from { box-shadow: 0 0 10px #00ffff; }
+        to { box-shadow: 0 0 15px #00ffff, 0 0 10px #00cccc inset; }
+    }
+
+
+    /* Existing Admin Panel Styles */
+    .card {
+      background: rgba(15, 15, 15, 0.9);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
+      max-width: 480px;
+      width: 95%;
+      height: auto;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .main-dashboard {
+      background: rgba(15, 15, 15, 0.9);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      border-radius: 1.5rem;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
+      width: 95%;
+      max-width: 1400px;
+      min-height: 90vh;
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
+      flex-direction: column;
+    }
+
+    @media (min-width: 1024px) {
+      body {
+        height: 100vh;
+        overflow: hidden;
+      }
+      .main-dashboard {
+        flex-direction: row;
+        height: 90vh;
+      }
+    }
+
+    .header {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffaa;
+      text-shadow: 0 0 15px rgba(0, 255, 170, 0.8);
+      letter-spacing: 3px;
+      animation: glow 3s infinite;
+    }
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 15px rgba(0,255,170,0.8); }
+      50% { text-shadow: 0 0 25px rgba(0,255,170,1); }
+    }
+
+    .premium-input {
+      position: relative;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,170,0.4);
+      color: #e0e0e0;
+      transition: all 0.25s;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      outline: none;
+    }
+
+    .premium-input:focus {
+      border-color: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+      background: rgba(0,255,170,0.1);
+    }
+
+    .custom-dropdown-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .custom-dropdown-list {
+      position: absolute;
+      z-index: 10;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(15, 15, 15, 0.95);
+      border: 1px solid rgba(0, 255, 170, 0.4);
+      border-top: none;
+      border-radius: 0 0 0.5rem 0.5rem;
+      box-shadow: 0 10px 20px rgba(0, 255, 170, 0.2);
+      transform-origin: top;
+      transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+      transform: scaleY(0);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .custom-dropdown-list.active {
+      transform: scaleY(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-dropdown-list div {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      color: #e0e0e0;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .custom-dropdown-list div:hover {
+      background-color: rgba(0, 255, 170, 0.1);
+      color: #00ffaa;
+      text-shadow: 0 0 5px #00ffaa;
+    }
+
+    .premium-textarea {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,170,0.4);
+      color: #e0e0e0;
+      transition: all 0.25s;
+    }
+    .premium-textarea:focus {
+      border-color: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+      background: rgba(0,255,170,0.1);
+      outline: none;
+    }
+
+    .neon-button {
+      background: linear-gradient(90deg, #00ffaa, #00ffcc);
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      border-radius: 9999px;
+      box-shadow: 0 0 20px rgba(0,255,170,0.7);
+      transition: all 0.3s;
+    }
+    .neon-button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 35px rgba(0,255,170,1);
+    }
+
+    .status-message {
+      text-align: center;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+    }
+    .status-message.success {
+      color: #00ffaa;
+    }
+    .status-message.error {
+      color: #ff3333;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .form-fields {
+      flex: 1;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .scroll-container {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffaa #2d2d2d;
+    }
+    .scroll-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .scroll-container::-webkit-scrollbar-track {
+      background: #2d2d2d;
+      border-radius: 10px;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background-color: #00ffaa;
+      border-radius: 10px;
+      border: 2px solid #2d2d2d;
+    }
+
+    /* --- STYLES FOR NESTED DRAG AND DROP --- */
+    .item-group {
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0, 255, 170, 0.1);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: background-color 0.2s;
+    }
+    
+    .group-name {
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      color: #00ffaa;
+      text-shadow: 0 0 5px rgba(0, 255, 170, 0.5);
+      background-color: rgba(0, 255, 170, 0.1);
+      border-bottom: 1px solid rgba(0, 255, 170, 0.4);
+      cursor: grab; /* Indicates drag handle for the group */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .group-edit-handle {
+        cursor: pointer;
+        flex-grow: 1;
+        padding-right: 1rem;
+        user-select: none;
+    }
+    
+    .item-list-subgroup {
+        min-height: 10px;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px dashed rgba(0, 255, 170, 0.1);
+      align-items: center;
+      transition: background-color 0.15s;
+      cursor: pointer; /* Indicates clickability for edit */
+    }
+
+    .item-row:hover {
+      background: rgba(0, 255, 170, 0.05);
+    }
+    
+    .item-row:last-child {
+      border-bottom: none;
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        background: rgba(0, 255, 170, 0.3);
+        border: 1px dashed #00ffaa;
+    }
+    /* --- END NESTED DRAG AND DROP STYLES --- */
+
+    .item-group-header {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffaa;
+      background-color: rgba(0, 255, 170, 0.15);
+      border-bottom: 1px solid rgba(0, 255, 170, 0.6);
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .search-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,255,170,0.4);
+      color: #e0e0e0;
+      transition: all 0.25s;
+    }
+    .search-input:focus {
+      border-color: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+      background: rgba(0,255,170,0.1);
+      outline: none;
+    }
+
+    .delete-btn {
+      background-color: transparent;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 0.5rem;
+      color: #ff3333;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .delete-btn:hover {
+      background-color: #ff3333;
+      color: #0a0a0a;
+      box-shadow: 0 0 10px #ff3333;
+    }
+    
+    .delete-group-btn {
+        background-color: #550000;
+        border: 1px solid #ff3333;
+        color: #ffcccc;
+        font-weight: bold;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.25s ease;
+    }
+    .delete-group-btn:hover {
+        background-color: #ff3333;
+        color: #0a0a0a;
+        box-shadow: 0 0 15px #ff3333;
+    }
+
+    .actions-cell {
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+      width: 100%; 
+    }
+    
+    /* --- NEW HIDING LOGIC --- */
+    /* This class is added to the form when in "Item Row Click" mode (Group Rename) */
+    .hide-item-fields .field-hidden-on-item-rename {
+        display: none !important;
+    }
+  </style>
+</head>
+<body>
+    <div id="login-grid-container" class="login-grid-container"></div>
+
+    <div id="login-section" class="login-card">
+        <h1>ADMIN LOGIN</h1>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="username">GMAIL</label>
+                <input type="text" id="username" name="username" placeholder="Enter email" autocomplete="off" required>
+            </div>
+            <div class="input-group">
+                <label for="password">ACCESS KEY</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" autocomplete="off" required>
+            </div>
+            <button type="submit" class="login-btn">LOGIN</button>
+            <p id="error-message" class="hidden status-message text-red-500"></p>
+        </form>
+    </div>
+
+  <div id="admin-panel" class="hidden main-dashboard">
+    <div class="w-full lg:w-2/5 flex flex-col space-y-4">
+      <h1 class="header text-2xl text-center" id="form-header">ADD NEW ITEM</h1>
+      <p class="text-gray-400 text-center text-sm" id="form-subheader">Enter item details below</p>
+      <div class="form-container">
+        <form id="item-form" class="flex flex-col space-y-3 flex-1">
+          <div class="form-fields flex-1 pr-2">
+            <div class="custom-dropdown-container field-hidden-on-item-rename" id="item-code-container">
+              <label for="item-code" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Code</label>
+              <input type="text" id="item-code" class="premium-input w-full rounded-md px-3 py-2">
+              <div id="item-codes-list" class="custom-dropdown-list"></div>
+            </div>
+            <div class="custom-dropdown-container">
+              <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name</label>
+              <input type="text" id="item-name" required class="premium-input w-full rounded-md px-3 py-2">
+              <div id="item-names-list" class="custom-dropdown-list"></div>
+            </div>
+            <div class="field-hidden-on-item-rename" id="description-container">
+              <label for="description" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Description</label>
+              <textarea id="description" class="premium-textarea w-full rounded-md px-3 py-2 h-24 resize-none"></textarea>
+            </div>
+            <div class="field-hidden-on-item-rename" id="price-container">
+              <label for="price" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Price</label>
+              <input type="number" id="price" step="0.01" class="premium-input w-full rounded-md px-3 py-2">
+            </div>
+            <div class="field-hidden-on-item-rename" id="disc-rate-container">
+              <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate</label>
+              <input type="number" id="disc-rate" step="any" class="premium-input w-full rounded-md px-3 py-2 mb-3">
+            </div>
+          </div>
+          <button type="submit" id="submit-btn" class="neon-button w-full py-2 text-base mt-auto">ADD ITEM</button>
+          <button type="button" id="clear-btn" class="text-center text-gray-400 mt-2 text-sm hover:text-[#00ffaa] transition-colors">Clear Form</button>
+          <p id="item-status-message" class="hidden status-message"></p>
+        </form>
+      </div>
+    </div>
+
+    <div class="w-full lg:w-3/5 flex flex-col space-y-4">
+      <h1 class="header text-2xl text-center">CURRENT INVENTORY</h1>
+      <input type="text" id="search-input" placeholder="Search by name or code..." class="search-input w-full rounded-md px-3 py-2">
+      <div id="item-list-container" class="scroll-container flex-1">
+        <div class="item-group-header">
+            <span class="font-bold">Item Code</span>
+            <span class="font-bold text-center">Price</span>
+            <span class="font-bold text-center">Disc Rate</span>
+            <span class="font-bold text-center">Action</span>
+        </div>
+        <div id="grouped-item-list">
+          <p id="loading-message" class="text-center text-gray-500">Loading items...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+  <script>
+    // IMPORTANT: Replace these with your actual Firebase configuration details
+    const FIREBASE_API_KEY = "AIzaSyDwkzabAX7MoXz4iCsJ_y383ZW7USwmW1Y";
+    const FIREBASE_PROJECT_ID = "stock-b07d3";
+
+    const firebaseConfig = {
+      apiKey: FIREBASE_API_KEY,
+      authDomain: `${FIREBASE_PROJECT_ID}.firebaseapp.com`,
+      projectId: FIREBASE_PROJECT_ID,
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = app.auth();
+    const db = app.firestore();
+
+    // DOM Elements
+    const loginSection = document.getElementById('login-section');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginForm = document.getElementById('login-form');
+    const itemForm = document.getElementById('item-form');
+    const itemStatusMessage = document.getElementById('item-status-message');
+    const submitBtn = document.getElementById('submit-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const formHeader = document.getElementById('form-header');
+    const formSubheader = document.getElementById('form-subheader');
+    const searchInput = document.getElementById('search-input'); 
+    const errorMessage = document.getElementById('error-message'); 
+    const loginGridContainer = document.getElementById('login-grid-container');
+    const groupedItemList = document.getElementById('grouped-item-list'); 
+
+    let currentEditDocId = null; // for individual item edit
+    let currentEditGroupName = null; // for group rename
+    let allItems = [];
+    let groupSortableInstance;
+    let itemSortableInstances = [];
+
+    // Utility Functions
+    const showSection = (section) => {
+      loginSection.classList.add('hidden');
+      adminPanel.classList.add('hidden');
+      loginGridContainer.classList.add('hidden'); 
+      section.classList.remove('hidden');
+      if (section === adminPanel) {
+        enableAutoFocus(itemForm);
+      } else {
+        enableAutoFocus(loginForm);
+      }
+    };
+
+    const enableAutoFocus = (form) => {
+      const inputs = form.querySelectorAll("input, textarea");
+      if (inputs.length > 0) inputs[0].focus();
+    };
+
+    const displayStatus = (message, type, element) => {
+      element.textContent = message;
+      element.className = `status-message ${type === 'success' ? 'success' : 'error'}`;
+      element.classList.remove('hidden');
+      setTimeout(() => {
+          element.classList.add('hidden');
+      }, 5000);
+    };
+
+    const clearForm = () => {
+      itemForm.reset();
+      currentEditDocId = null;
+      currentEditGroupName = null; // Reset group edit state
+      
+      // FIX: Remove the hiding class to restore all form fields
+      itemForm.classList.remove('hide-item-fields');
+      
+      submitBtn.textContent = 'ADD ITEM';
+      formHeader.textContent = 'ADD NEW ITEM';
+      formSubheader.textContent = 'Enter item details below';
+      itemStatusMessage.classList.add('hidden');
+      enableAutoFocus(itemForm);
+    };
+
+    // Firebase Realtime Listener
+    const setupRealtimeListener = () => {
+      db.collection("items").orderBy("orderIndex", "asc").onSnapshot((snapshot) => {
+        allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderItems(allItems);
+      }, (error) => {
+        console.error("Error setting up listener:", error);
+        displayStatus("Failed to load inventory. Please try again.", 'error', itemStatusMessage);
+      });
+    };
+
+    // UI Rendering and Drag/Drop Setup
+    const renderItems = (items) => {
+      // Clean up previous Sortable instances
+      if (groupSortableInstance) groupSortableInstance.destroy();
+      itemSortableInstances.forEach(instance => instance.destroy());
+      itemSortableInstances = [];
+
+      const searchTerm = searchInput.value.toLowerCase();
+      let filteredItems = items.filter(item =>
+        (item.itemName && item.itemName.toLowerCase().includes(searchTerm)) ||
+        (item.itemCode && item.itemCode.toLowerCase().includes(searchTerm))
+      );
+
+      // 1. Group items by itemName
+      const groupedItems = filteredItems.reduce((acc, item) => {
+        const name = item.itemName || 'General';
+        if (!acc[name]) {
+          acc[name] = [];
+        }
+        acc[name].push(item);
+        return acc;
+      }, {});
+      
+      // 2. Get the unique group names in the order they should appear based on the *smallest orderIndex* in the group
+      const orderedGroupNames = Object.keys(groupedItems).sort((a, b) => {
+          const minOrderA = Math.min(...groupedItems[a].map(item => item.orderIndex));
+          const minOrderB = Math.min(...groupedItems[b].map(item => item.orderIndex));
+          return minOrderA - minOrderB;
+      });
+
+      groupedItemList.innerHTML = '';
+      if (filteredItems.length === 0) {
+        groupedItemList.innerHTML = '<p class="text-center text-gray-500">No items found.</p>';
+        return;
+      }
+
+      // 3. Render the grouped and ordered list
+      orderedGroupNames.forEach(groupName => {
+        const groupItems = groupedItems[groupName].sort((a, b) => a.orderIndex - b.orderIndex); 
+
+        // Outer Group Container
+        const itemGroupDiv = document.createElement('div');
+        itemGroupDiv.className = 'item-group';
+        itemGroupDiv.dataset.groupName = groupName;
+        
+        // Group Header (Name Row) - Includes EDIT handle and DELETE button
+        const groupHeaderDiv = document.createElement('div');
+        groupHeaderDiv.className = 'group-name';
+        groupHeaderDiv.innerHTML = `
+            <span class="group-edit-handle" data-group-name="${groupName}">Group Name: ${groupName}</span>
+            <button class="delete-group-btn" data-group-name="${groupName}">Delete Group</button>
+        `;
+        itemGroupDiv.appendChild(groupHeaderDiv);
+        
+        // Inner Container: (for NESTED Sortable list of individual items)
+        const itemSubgroupList = document.createElement('div');
+        itemSubgroupList.className = 'item-list-subgroup';
+        itemSubgroupList.dataset.groupName = groupName;
+        itemGroupDiv.appendChild(itemSubgroupList);
+
+
+        // Render each item row into the subgroup container
+        groupItems.forEach(item => {
+          const itemRowDiv = document.createElement('div');
+          itemRowDiv.className = 'item-row';
+          itemRowDiv.dataset.id = item.id;
+          itemRowDiv.dataset.name = item.itemName;
+          itemRowDiv.innerHTML = `
+            <div>${item.itemCode}</div>
+            <div class="font-mono text-center">${item.price !== null ? `Rs.${parseFloat(item.price).toFixed(2)}` : 'N/A'}</div>
+            <div class="actions-cell">
+                <span class="text-red-400 text-center w-full">${item.discRate !== null ? `${parseFloat(item.discRate).toFixed(2)}%` : 'N/A'}</span>
+            </div>
+            <div class="actions-cell justify-center">
+                <button class="delete-btn" data-id="${item.id}">Delete</button>
+            </div>
+          `;
+          itemSubgroupList.appendChild(itemRowDiv);
+        });
+
+        groupedItemList.appendChild(itemGroupDiv);
+      });
+      
+      addTableEventListeners();
+      initSortable();
+    };
+
+
+    const initSortable = () => {
+        const mainList = document.getElementById('grouped-item-list');
+        
+        // 1. Group Sorting (Outer Sortable) - Moves the entire item-group
+        groupSortableInstance = Sortable.create(mainList, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            group: 'nested-groups',
+            draggable: '.item-group', 
+            handle: '.group-name', // Drag handle is the container for name/button
+            filter: '.delete-group-btn', // Prevent drag when clicking delete button
+            onEnd: function (evt) {
+                updateAllOrdersInFirebase();
+            }
+        });
+
+        // 2. Individual Item Sorting (Nested Sortable) - Moves individual item-row
+        const subgroupLists = document.querySelectorAll('.item-list-subgroup');
+        subgroupLists.forEach(sublist => {
+            const itemSortable = Sortable.create(sublist, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                group: {
+                    name: 'nested-items',
+                    put: true, // Allow dropping items into other item lists
+                }, 
+                draggable: '.item-row', 
+                onEnd: function (evt) {
+                    const newGroupName = evt.to.dataset.groupName;
+                    const movedItemId = evt.item.dataset.id;
+                    const originalGroupName = evt.item.dataset.name;
+
+                    // If the item moved groups, update its item.itemName field in Firebase
+                    if (newGroupName !== originalGroupName) {
+                        db.collection("items").doc(movedItemId).update({ itemName: newGroupName });
+                        // Update the DOM dataset immediately to prevent re-sort issues
+                        evt.item.dataset.name = newGroupName;
+                    }
+                    
+                    updateAllOrdersInFirebase();
+                }
+            });
+            itemSortableInstances.push(itemSortable);
+        });
+    };
+
+    // Function to re-index all items based on the new DOM structure
+    const updateAllOrdersInFirebase = async () => {
+        const batch = db.batch();
+        const itemsRef = db.collection("items");
+        let globalOrderIndex = 0;
+
+        const newGroupElements = Array.from(groupedItemList.querySelectorAll('.item-group'));
+
+        newGroupElements.forEach(groupElement => {
+            const subgroupList = groupElement.querySelector('.item-list-subgroup');
+            const itemRowElements = Array.from(subgroupList.querySelectorAll('.item-row'));
+            
+            itemRowElements.forEach(itemRow => {
+                const docId = itemRow.dataset.id;
+                const docRef = itemsRef.doc(docId);
+                
+                // Set the new order index
+                batch.update(docRef, { orderIndex: globalOrderIndex });
+                globalOrderIndex++;
+            });
+        });
+
+        try {
+            await batch.commit();
+            // Do not show success message here as it fires frequently during drag/drop
+        } catch (error) {
+            console.error("Batch update failed:", error);
+            displayStatus("Failed to save new order. Try again.", 'error', itemStatusMessage);
+        }
+    };
+
+
+    // --- GROUP MANAGEMENT HANDLERS (Used by Group Header Click and Item Row Click) ---
+    
+    const handleGroupEditClick = (groupName) => {
+        const item = allItems.find(i => i.itemName === groupName); 
+        if (!item) return;
+
+        // 1. Reset item edit state and set group edit state
+        currentEditDocId = null; 
+        currentEditGroupName = groupName;
+        
+        // 2. FIX: ADD THE CLASS TO HIDE ITEM-SPECIFIC FIELDS
+        itemForm.classList.add('hide-item-fields');
+        
+        // 3. Prefill the form for group rename (only care about item-name input)
+        document.getElementById('item-code').value = '';
+        document.getElementById('item-name').value = groupName;
+        document.getElementById('description').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('disc-rate').value = '';
+        
+        // 4. Update button/header text
+        submitBtn.textContent = `RENAME GROUP: ${groupName}`;
+        formHeader.textContent = 'RENAME ITEM GROUP';
+        formSubheader.textContent = `Renaming all items in the group "${groupName}"`;
+        enableAutoFocus(document.getElementById('item-name')); // Focus on name field
+    };
+    
+    const handleGroupDelete = async (groupName) => {
+        if (confirm(`Are you sure you want to delete the ENTIRE GROUP: ${groupName}? All associated items will be permanently deleted.`)) {
+            try {
+                const itemsToDelete = allItems.filter(item => item.itemName === groupName);
+                if (itemsToDelete.length === 0) {
+                    displayStatus(`Group "${groupName}" not found.`, 'error', itemStatusMessage);
+                    return;
+                }
+
+                const batch = db.batch();
+                itemsToDelete.forEach(item => {
+                    const docRef = db.collection("items").doc(item.id);
+                    batch.delete(docRef);
+                });
+                
+                await batch.commit();
+                displayStatus(`Group "${groupName}" and all ${itemsToDelete.length} items deleted successfully!`, 'success', itemStatusMessage);
+                clearForm();
+            } catch (err) {
+                console.error("Error deleting group batch: ", err);
+                displayStatus("Failed to delete group. Try again.", 'error', itemStatusMessage);
+            }
+        }
+    };
+
+    // --- ITEM ROW CLICK HANDLER (MODIFIED to perform Group Rename) ---
+
+    const handleRowClick = async (e) => {
+      const itemRow = e.target.closest('.item-row');
+      // Ignore clicks on delete button
+      if (!itemRow || e.target.classList.contains('delete-btn')) return;
+
+      const groupName = itemRow.dataset.name; 
+      
+      if (groupName) {
+        // This is the core of the requested change: Item Row Click triggers Group Rename
+        handleGroupEditClick(groupName);
+      }
+    };
+
+
+    const handleDelete = async (e) => {
+      e.stopPropagation();
+      const docId = e.target.dataset.id;
+      if (confirm('Are you sure you want to delete this individual item?')) {
+        try {
+          await db.collection("items").doc(docId).delete();
+          displayStatus("Item deleted successfully!", 'success', itemStatusMessage);
+          clearForm();
+        } catch (err) {
+          console.error("Error deleting document: ", err);
+          displayStatus("Failed to delete item. Try again.", 'error', itemStatusMessage);
+        }
+      }
+    };
+
+    const addTableEventListeners = () => {
+      groupedItemList.removeEventListener('click', handleListClick);
+      groupedItemList.addEventListener('click', handleListClick);
+    };
+    
+    // Unified click handler using event delegation
+    const handleListClick = (e) => {
+        // Group Delete Button Click
+        if (e.target.classList.contains('delete-group-btn')) {
+            e.stopPropagation(); 
+            const groupName = e.target.dataset.groupName;
+            handleGroupDelete(groupName);
+        // Group Name Edit Handle Click (The text part of the header)
+        } else if (e.target.classList.contains('group-edit-handle')) {
+            e.stopPropagation(); 
+            const groupName = e.target.dataset.groupName;
+            handleGroupEditClick(groupName);
+        // Individual Item Delete Button Click
+        } else if (e.target.classList.contains('delete-btn')) {
+            handleDelete(e);
+        // Individual Item Row Click (for edit)
+        } else if (e.target.closest('.item-row')) {
+            handleRowClick(e);
+        }
+    };
+
+    // CORE LOGIN LOGIC (Verified and Correct)
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMessage.classList.add('hidden');
+      const username = loginForm.username.value;
+      const password = loginForm.password.value;
+      
+      try {
+        await auth.signInWithEmailAndPassword(username, password);
+        showSection(adminPanel);
+        clearForm();
+        setupRealtimeListener();
+      } catch (err) {
+        console.error("Login Error:", err);
+        displayStatus("Invalid GMAIL or ACCESS KEY.", 'error', errorMessage);
+      }
+    });
+
+    itemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      itemStatusMessage.classList.add('hidden');
+      const itemName = itemForm['item-name'].value.trim();
+      const itemCode = itemForm['item-code'].value.trim();
+
+      // Ensure Item Name is always required
+      if (!itemName) {
+        displayStatus("Item Name is required.", 'error', itemStatusMessage);
+        return;
+      }
+      
+      // --- HANDLE GROUP RENAME (Applies to Item Row Click) ---
+      if (currentEditGroupName) {
+        const oldGroupName = currentEditGroupName;
+        const newGroupName = itemName;
+
+        if (oldGroupName === newGroupName) {
+            displayStatus("Group name is the same. No changes applied.", 'error', itemStatusMessage);
+            clearForm();
+            return;
+        }
+        
+        const itemsToRename = allItems.filter(item => item.itemName === oldGroupName);
+        const batch = db.batch();
+
+        itemsToRename.forEach(item => {
+            const docRef = db.collection("items").doc(item.id);
+            // Only update the itemName field
+            batch.update(docRef, { itemName: newGroupName });
+        });
+
+        try {
+            await batch.commit();
+            displayStatus(`Group renamed from "${oldGroupName}" to "${newGroupName}" successfully!`, 'success', itemStatusMessage);
+        } catch (err) {
+            console.error("Error renaming group batch: ", err);
+            displayStatus("Failed to rename group. Try again.", 'error', itemStatusMessage);
+        }
+        clearForm();
+        return; 
+      }
+      // --- END GROUP RENAME HANDLING ---
+      
+
+      // --- HANDLE ADD NEW ITEM (Only runs when not in Group Rename mode) ---
+
+      // NEW FIX: Require Item Code only when adding a new item
+      if (!itemCode) {
+        displayStatus("Item Code is required for new items.", 'error', itemStatusMessage);
+        return;
+      }
+
+      let itemData = {
+        itemName: itemName,
+        itemCode: itemCode,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      // Get values from the form, setting to null if blank.
+      const formDescription = itemForm.description.value.trim() || null;
+      const formPrice = parseFloat(itemForm.price.value) || null;
+      const formDiscRate = parseFloat(itemForm['disc-rate'].value) || null;
+
+      // --- Add New Item Logic ---
+      
+      itemData.description = formDescription;
+      itemData.price = formPrice;
+      itemData.discRate = formDiscRate;
+
+      itemData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      
+      // Determine new orderIndex based on the last item's index
+      const maxOrder = allItems.length > 0 ? Math.max(...allItems.map(item => item.orderIndex)) : -1;
+      itemData.orderIndex = maxOrder + 1;
+      
+      try {
+          await db.collection("items").add(itemData);
+          displayStatus("Item submitted successfully!", 'success', itemStatusMessage);
+      } catch (err) {
+          console.error("Error submitting document: ", err);
+          displayStatus("Failed to submit item. Try again.", 'error', itemStatusMessage);
+      }
+      
+      clearForm();
+    });
+
+    searchInput.addEventListener('input', () => {
+      renderItems(allItems);
+    });
+
+    clearBtn.addEventListener('click', clearForm);
+
+    const dropdowns = {
+      'item-code': document.getElementById('item-code-list'),
+      'item-name': document.getElementById('item-names-list')
+    };
+
+    const populateCustomDatalist = (inputElement, dropdownList, items) => {
+      const uniqueItems = Array.from(new Set(items.map(item => {
+        const value = inputElement.id === 'item-name' ? item.itemName : item.itemCode;
+        if (value) {
+          const foundItem = allItems.find(i => (inputElement.id === 'item-name' ? i.itemName : i.itemCode) === value);
+          return JSON.stringify(foundItem);
+        }
+        return null;
+      }))).filter(Boolean).map(itemStr => JSON.parse(itemStr));
+      
+      dropdownList.innerHTML = '';
+      
+      if (uniqueItems.length === 0) {
+          const noResultsDiv = document.createElement('div');
+          noResultsDiv.textContent = 'No matching items';
+          noResultsDiv.style.cursor = 'default';
+          noResultsDiv.style.color = '#888';
+          dropdownList.appendChild(noResultsDiv);
+          dropdownList.classList.add('active');
+          return;
+      }
+      
+      uniqueItems.forEach(item => {
+        const div = document.createElement('div');
+        const value = inputElement.id === 'item-name' ? item.itemName : item.itemCode;
+        div.textContent = value;
+        div.dataset.value = value;
+        
+        if (item.description) {
+            const descriptionSpan = document.createElement('span');
+            descriptionSpan.textContent = ` - ${item.description}`;
+            descriptionSpan.style.color = '#888';
+            descriptionSpan.style.fontSize = '0.8em';
+            div.appendChild(descriptionSpan);
+        }
+
+        div.addEventListener('click', (e) => {
+            inputElement.value = e.currentTarget.dataset.value;
+            dropdownList.classList.remove('active');
+        });
+        dropdownList.appendChild(div);
+      });
+    };
+
+    Object.keys(dropdowns).forEach(inputId => {
+      const input = document.getElementById(inputId);
+      const dropdownList = dropdowns[inputId];
+
+      input.addEventListener('input', () => {
+        const value = input.value.toLowerCase();
+        const items = allItems.filter(item => {
+          if (inputId === 'item-code') return item.itemCode && item.itemCode.toLowerCase().includes(value);
+          if (inputId === 'item-name') return item.itemName && item.itemName.toLowerCase().includes(value);
+          return false;
+        });
+        populateCustomDatalist(input, dropdownList, items);
+        if (items.length > 0) {
+          dropdownList.classList.add('active');
+        } else {
+          dropdownList.classList.remove('active');
+        }
+      });
+      
+      input.addEventListener('click', () => {
+        populateCustomDatalist(input, dropdownList, allItems);
+        if (allItems.length > 0) {
+          dropdownList.classList.add('active');
+        } else {
+          dropdownList.classList.remove('active');
+        }
+      });
+      
+      input.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          input.value = '';
+          dropdownList.classList.remove('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdownList.contains(e.target)) {
+          dropdownList.classList.remove('active');
+        }
+      });
+    });
+
+    // Login page animation logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const gridContainer = document.getElementById('login-grid-container');
+        let lastHoveredItem = null;
+
+        document.addEventListener('mousemove', (e) => {
+            const hoveredItem = document.elementFromPoint(e.clientX, e.clientY);
+            if (hoveredItem && hoveredItem.classList.contains('login-grid-item')) {
+                if (hoveredItem !== lastHoveredItem) {
+                    if (lastHoveredItem) {
+                        lastHoveredItem.classList.remove('active');
+                    }
+                    hoveredItem.classList.add('active');
+                    lastHoveredItem = hoveredItem;
+                    setTimeout(() => {
+                        hoveredItem.classList.remove('active');
+                    }, 500);
+                }
+            }
+        });
+
+        function createGrid() {
+            gridContainer.innerHTML = ''; 
+            const numCols = Math.ceil(window.innerWidth / 50);
+            const numRows = Math.ceil(window.innerHeight / 50);
+            const numSquares = numCols * numRows;
+            for (let i = 0; i < numSquares; i++) {
+                const square = document.createElement('div');
+                square.classList.add('login-grid-item');
+                gridContainer.appendChild(square);
+            }
+        }
+        
+        createGrid();
+        window.addEventListener('resize', createGrid);
+    });
+
+    // Ctrl+Z navigation to public view
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'z') {
+            e.preventDefault();
+            window.location.href = 'Stock.html'; 
+        }
+    });
+
+    enableAutoFocus(loginForm);
+  </script>
+</body>
+</html>
