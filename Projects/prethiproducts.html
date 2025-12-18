@@ -4,93 +4,149 @@
 <meta charset="UTF-8">
 <title>PRiTHI PRODUCTS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
 
 <style>
-    *{margin:0;padding:0;box-sizing:border-box}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-    body {
-        margin: 0;
-        background: linear-gradient(135deg, #fff5f8 0%, #ffd6eb 50%, #e0c3fc 100%);
-        overflow-x: hidden;
-        font-family: 'Poppins', sans-serif;
-        height: 100vh;
+html,body{
+    width:100%;
+    height:100%;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#fff5f8 0%,#ffd6eb 50%,#e0c3fc 100%);
+    overflow-x:hidden;
+}
+
+/* ===== BACKGROUND CANVAS ===== */
+#bgCanvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    pointer-events:none;
+}
+
+/* ===== NAV ===== */
+nav{
+    position:relative;
+    z-index:10;
+    margin:20px auto;
+    width:min(95%,1200px);
+    padding:14px 26px;
+    background:rgba(255,255,255,.4);
+    backdrop-filter:blur(10px);
+    border-radius:50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px solid rgba(255,255,255,.5);
+}
+
+nav ul{
+    display:flex;
+    gap:25px;
+    list-style:none;
+}
+
+nav li{
+    font-size:14px;
+    color:#8e44ad;
+    font-weight:500;
+}
+
+/* ===== HERO ===== */
+section{
+    position:relative;
+    z-index:5;
+    min-height:calc(100vh - 120px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding-inline:16px;
+}
+
+/* ===== CURVE TEXT ===== */
+svg{
+    width:100%;
+    max-width:900px;
+    height:auto;
+}
+
+text{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(38px,8vw,78px);
+    letter-spacing:6px;
+    fill:#6a004b;
+    filter:drop-shadow(0 5px 10px rgba(106,0,75,.25));
+}
+
+/* ===== BOUQUET IMAGE ===== */
+.bouquet{
+    width:clamp(220px,45vw,480px);
+    max-width:90%;
+    margin-top:-8vh;
+    filter:drop-shadow(0 20px 30px rgba(0,0,0,.15));
+    animation:float 6s ease-in-out infinite;
+}
+
+/* FLOAT MOTION */
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-22px)}
+}
+
+/* ===== TAGLINE ===== */
+.tagline{
+    margin-top:12px;
+    font-size:clamp(10px,2.5vw,13px);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#8e44ad;
+}
+
+/* ===== TABLETS ===== */
+@media (min-width:768px){
+    .bouquet{
+        width:clamp(300px,38vw,520px);
+        margin-top:-10vh;
     }
+}
 
-    #bgCanvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
+/* ===== LAPTOPS ===== */
+@media (min-width:1024px){
+    .bouquet{
+        width:clamp(380px,30vw,600px);
+        margin-top:-12vh;
     }
+}
 
-    /* ===== NAV ===== */
-    nav {
-        position: relative;
-        z-index: 10;
-        margin: 20px auto;
-        width: 90%;
-        padding: 15px 30px;
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(10px);
-        border-radius: 50px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.5);
+/* ===== LARGE SCREENS / TV ===== */
+@media (min-width:1600px){
+    section{
+        min-height:90vh;
     }
-
-    nav ul { display: flex; gap: 25px; list-style: none; }
-    nav li { font-size: 14px; color: #8e44ad; font-weight: 500; cursor: pointer; }
-
-    /* ===== HERO SECTION ===== */
-    section {
-        position: relative;
-        z-index: 5;
-        height: calc(100vh - 100px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+    .bouquet{
+        width:680px;
+        margin-top:-14vh;
     }
-
-    svg { width: 100%; max-width: 800px; height: auto; }
-    
-    text {
-        font-family: 'Playfair Display', serif;
-        font-size: 75px;
-        letter-spacing:6px;
-        fill: #6a004b;
-        filter: drop-shadow(0 5px 10px rgba(106, 0, 75, 0.2));
+    text{
+        font-size:82px;
     }
-
-    .bouquet {
-        width: 450px;
-        max-width: 80%;
-        margin-top: -100px;
-        filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
-        animation: float 5s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
-    }
-
-    .tagline {
-        color: #8e44ad;
-        margin-top: 10px;
-        letter-spacing: 2px;
-        font-weight: 300;
-        text-transform: uppercase;
-        font-size: 12px;
-    }
+}
 </style>
 </head>
+
 <body>
 
 <canvas id="bgCanvas"></canvas>
@@ -101,11 +157,11 @@
         <li>Boutique</li>
         <li>Contact</li>
     </ul>
-    <div style="color: #8e44ad; font-weight: bold;">Sign In</div>
+    <div style="color:#8e44ad;font-weight:bold;">Sign In</div>
 </nav>
 
 <section>
-    <svg viewBox="0 0 1000 200">
+    <svg viewBox="0 0 1000 200" preserveAspectRatio="xMidYMid meet">
         <defs>
             <path id="curve" d="M100,150 Q500,20 900,150"/>
         </defs>
@@ -116,86 +172,85 @@
         </text>
     </svg>
 
-    <img src="bouquet.png" class="bouquet" alt="Bouquet">
-    <div class="tagline">Crafted with Care • Delivered with Joy</div>
+    <img src="bouquet.png" class="bouquet" alt="Flower Bouquet">
+
+    <div class="tagline">
+        Crafted with Care • Delivered with Joy
+    </div>
 </section>
 
 <script>
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let particles=[];
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+function resize(){
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+}
+window.addEventListener('resize',resize);
+resize();
+
+class Particle{
+    constructor(type){
+        this.type=type;
+        this.reset();
     }
-    window.addEventListener('resize', resize);
-    resize();
-
-    class Particle {
-        constructor(type) {
-            this.type = type; // 'petal' or 'shine'
-            this.init();
-        }
-
-        init() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height - canvas.height;
-            this.size = this.type === 'petal' ? Math.random() * 8 + 4 : Math.random() * 2 + 1;
-            this.speed = Math.random() * 1.5 + 0.5;
-            this.velX = Math.random() * 1 - 0.5;
-            this.opacity = Math.random() * 0.6 + 0.2;
-            this.rotation = Math.random() * 360;
-            this.rotationSpeed = Math.random() * 2 - 1;
-        }
-
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation * Math.PI / 180);
-            
-            if (this.type === 'petal') {
-                ctx.fillStyle = `rgba(255, 182, 193, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.quadraticCurveTo(this.size, -this.size, this.size * 2, 0);
-                ctx.quadraticCurveTo(this.size, this.size, 0, 0);
-                ctx.fill();
-            } else {
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = "#fff";
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.restore();
-        }
-
-        update() {
-            this.y += this.speed;
-            this.x += this.velX + Math.sin(this.y / 50); // Swaying motion
-            this.rotation += this.rotationSpeed;
-            if (this.y > canvas.height + 20) this.init();
-        }
+    reset(){
+        this.x=Math.random()*canvas.width;
+        this.y=Math.random()*canvas.height-canvas.height;
+        this.size=this.type==='petal'?Math.random()*8+4:Math.random()*2+1;
+        this.speed=Math.random()*1.5+.5;
+        this.vx=Math.random()*1-.5;
+        this.opacity=Math.random()*.6+.2;
+        this.rot=Math.random()*360;
+        this.rotSpd=Math.random()*2-1;
     }
-
-    function createParticles() {
-        for(let i=0; i<40; i++) particles.push(new Particle('petal'));
-        for(let i=0; i<70; i++) particles.push(new Particle('shine'));
+    draw(){
+        ctx.save();
+        ctx.translate(this.x,this.y);
+        ctx.rotate(this.rot*Math.PI/180);
+        if(this.type==='petal'){
+            ctx.fillStyle=`rgba(255,182,193,${this.opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.quadraticCurveTo(this.size,-this.size,this.size*2,0);
+            ctx.quadraticCurveTo(this.size,this.size,0,0);
+            ctx.fill();
+        }else{
+            ctx.shadowBlur=8;
+            ctx.shadowColor='#fff';
+            ctx.fillStyle=`rgba(255,255,255,${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(0,0,this.size,0,Math.PI*2);
+            ctx.fill();
+        }
+        ctx.restore();
     }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        requestAnimationFrame(animate);
+    update(){
+        this.y+=this.speed;
+        this.x+=this.vx+Math.sin(this.y/50);
+        this.rot+=this.rotSpd;
+        if(this.y>canvas.height+30) this.reset();
     }
+}
 
-    createParticles();
-    animate();
+function init(){
+    for(let i=0;i<40;i++)particles.push(new Particle('petal'));
+    for(let i=0;i<70;i++)particles.push(new Particle('shine'));
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        p.update();
+        p.draw();
+    });
+    requestAnimationFrame(animate);
+}
+
+init();
+animate();
 </script>
 
 </body>
