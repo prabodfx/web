@@ -2,222 +2,489 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folder Sync</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Page Not Found - Let's get you back home.">
+    <title>404 - Page Not Found</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- 1. RESET & BASE STYLES --- */
-        * {
+        /* --- 1. Global Variables & Reset --- */
+        :root {
+            /* Palette */
+            --bg-top: #A6C8FF;
+            --bg-bottom: #D4F1FF;
+            --text-dark: #101828;
+            --text-light: #475467;
+            --primary-accent: #1A1A1A;
+            --white: #ffffff;
+
+            /* Glassmorphism */
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-blur: blur(16px);
+
+            /* Typography */
+            --font-main: 'Manrope', sans-serif;
+            
+            /* Animation Constants */
+            --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #0f172a; /* Deep dark blue */
-            color: #ffffff;
+            font-family: var(--font-main);
+            width: 100%;
             height: 100vh;
-            width: 100vw;
-            overflow: hidden; /* Prevent scrollbars */
+            /* Fix for mobile browser UI bars */
+            height: 100dvh; 
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            color: var(--text-dark);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            flex-direction: column;
         }
 
-        /* --- 2. ANIMATED BACKGROUND --- */
-        .bg-glow {
+        /* --- 2. Navbar (Premium Layout) --- */
+        nav {
             position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.4) 0%, rgba(15, 23, 42, 0) 70%);
-            border-radius: 50%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--white);
+            letter-spacing: -0.02em;
+            cursor: default;
+        }
+
+        .star-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-top);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.4s var(--ease-elastic);
+        }
+
+        .logo:hover .star-icon {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .star-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .admin-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* --- 3. Main Stage (Layout Core) --- */
+        main {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* The 404 Background Text */
+        .error-bg {
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: pulse-glow 6s ease-in-out infinite alternate;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        @keyframes pulse-glow {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
-        }
-
-        /* --- 3. GLASS CARD CONTAINER --- */
-        .container {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem 4rem;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            max-width: 90%;
-            width: 450px;
-            animation: float-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        @keyframes float-in {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- 4. TYPOGRAPHY --- */
-        .logo-text {
             font-weight: 800;
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #ffffff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+            color: var(--white);
+            opacity: 0.2;
+            z-index: 1;
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
         }
 
-        .subtitle {
-            font-weight: 300;
-            color: #94a3b8;
-            font-size: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        /* --- 5. PREMIUM BUTTON --- */
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-            color: white;
-            font-weight: 600;
-            padding: 18px 40px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4), 0 4px 6px -2px rgba(79, 70, 229, 0.2);
+        /* The Monster Wrapper */
+        .monster-container {
             position: relative;
-            overflow: hidden;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Placeholder background while loading sequence */
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
         }
 
-        /* Button Hover Effects */
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.5), 0 10px 10px -5px rgba(79, 70, 229, 0.2);
-            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-        }
-
-        .download-btn:active {
-            transform: translateY(1px);
-        }
-
-        /* Icon styling */
-        .btn-icon {
-            margin-right: 12px;
-            font-size: 1.2rem;
-        }
-
-        /* Shine Effect Overlay */
-        .download-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        .monster-sequence {
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            transition: 0.5s;
+            object-fit: contain;
+            filter: drop-shadow(0 40px 60px rgba(0, 30, 80, 0.15));
+            will-change: src;
         }
 
-        .download-btn:hover::after {
-            left: 100%;
+        /* Text Content */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* --- 6. FOOTER/VERSION --- */
-        .footer-text {
-            margin-top: 2rem;
-            font-size: 0.75rem;
-            color: #64748b;
+        h1 {
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            min-height: 1.1em; /* Prevent layout shift while typing */
         }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 480px) {
-            .container { padding: 2rem; }
-            .logo-text { font-size: 2rem; }
+        p {
+            color: var(--text-light);
+            font-weight: 500;
+            line-height: 1.6;
+            min-height: 1.6em; /* Prevent layout shift while typing */
         }
+
+        /* Typewriter Cursor */
+        .cursor::after {
+            content: "";
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background-color: var(--text-dark);
+            margin-left: 4px;
+            vertical-align: text-bottom;
+            animation: blink 0.9s infinite;
+        }
+
+        @keyframes blink { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0; } 
+        }
+
+        /* CTA Button */
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--white);
+            padding: 16px 32px;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s var(--ease-elastic);
+        }
+
+        .home-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+        }
+
+        .home-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .arrow-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--text-dark);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .home-btn:hover .arrow-icon {
+            transform: rotate(-45deg);
+        }
+
+        /* --- 4. Atmosphere (Clouds) - FIXED --- */
+        .cloud-system {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 200px;
+            filter: blur(50px);
+            opacity: 0.8;
+            will-change: transform; /* Added for smoother performance */
+            animation: floatClouds 60s infinite ease-in-out; /* Changed from linear to ease-in-out for better feel */
+        }
+        
+        @keyframes floatClouds {
+            0% { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(150px, 20px, 0) scale(1.1); } /* Increased movement from -30px to 150px */
+            100% { transform: translate3d(0, 0, 0); }
+        }
+
+        /* Cloud Placement */
+        .c1 { width: 400px; height: 180px; top: 10%; left: -100px; }
+        .c2 { width: 500px; height: 300px; bottom: 10%; right: -150px; animation-duration: 80s; animation-direction: reverse; }
+        .c3 { width: 250px; height: 100px; top: 30%; right: 10%; opacity: 0.3; }
+
+        /* =========================================
+           5. RESPONSIVE BREAKPOINTS (MANUAL TUNING)
+           ========================================= */
+
+        /* --- BASE STYLES (< 600px - Mobile) --- */
+        .error-bg { font-size: 45vh; opacity: 0.5; top: 45%; }
+        .monster-container { width: 480px; height: 480px; margin-bottom: -50px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        p { font-size: 15px; max-width: 90%; margin-bottom: 24px; }
+        .home-btn { padding: 14px 28px; font-size: 15px; }
+
+        /* --- SMALL TABLET (≥ 600px) --- */
+        @media (min-width: 600px) {
+            .error-bg { font-size: 50vh; opacity: 0.5; }
+            .monster-container { width: 520px; height: 520px; margin-bottom: -100px; }
+            h1 { font-size: 42px; margin-bottom: 12px; }
+            p { font-size: 16px; max-width: 450px; }
+        }
+
+        /* --- TABLET PORTRAIT (≥ 768px) --- */
+        @media (min-width: 768px) {
+            nav { padding: 30px 40px; }
+            .error-bg { font-size: 60vh; }
+            .monster-container { width: 620px; height: 620px; margin-bottom: -150px; }
+            h1 { font-size: 45px; margin-bottom: 16px; }
+            p { font-size: 18px; max-width: 500px; margin-bottom: 32px; }
+            .home-btn { margin-bottom: 50px;}
+        }
+
+        /* --- DESKTOP / LAPTOP (≥ 992px) --- */
+        @media (min-width: 992px) {
+            nav { padding: 32px 5%; }
+            .error-bg { font-size: 80vh; }
+            .monster-container { width: 700px; height: 700px; margin-bottom: -250px; }
+            h1 { font-size: 45px; }
+            p { font-size: 1px; max-width: 550px; }
+            .home-btn { padding: 18px 40px; font-size: 17px; margin-bottom: 50px;}
+        }
+
+        /* --- LARGE DESKTOP (≥ 1200px) --- */
+        @media (min-width: 1200px) {
+            .error-bg { font-size: 90vh; } /* Fixed pixel size for stability */
+            .monster-container { width: 720px; height: 720px; margin-bottom: -270px; }
+            h1 { font-size: 46px; }
+            p { font-size: 20px; max-width: 600px; }
+            .home-btn { padding: 18px 40px; font-size: 17px; margin-bottom: 50px;}
+        }
+
+        /* --- TV / 4K DISPLAYS (≥ 1920px) --- */
+        @media (min-width: 1920px) {
+            nav { padding: 60px 8%; }
+            .logo { font-size: 32px; gap: 16px; }
+            .star-icon { width: 60px; height: 60px; border-radius: 16px; }
+            .star-icon svg { width: 32px; height: 32px; }
+            .admin-btn { padding: 20px 40px; font-size: 20px; border-radius: 16px; }
+
+            /* Massive Scaling */
+            .error-bg { font-size: 50vw; opacity: 0.15; } /* Relative to width now */
+            .monster-container { width: 900px; height: 900px; margin-bottom: -80px; }
+            
+            .content-wrapper { gap: 20px; }
+            h1 { font-size: 120px; }
+            p { font-size: 32px; max-width: 900px; margin-bottom: 60px; }
+            
+            .home-btn { 
+                padding: 28px 60px; 
+                font-size: 24px; 
+                border-radius: 200px;
+                gap: 20px;
+            }
+            .arrow-icon { width: 48px; height: 48px; }
+            .arrow-icon svg { width: 20px; height: 20px; }
+        }
+        
+        /* Landscape Mobile Fix (Height constraints) */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .error-bg { font-size: 80vh; opacity: 0.1; top: 50%; }
+            .monster-container { width: 220px; height: 220px; margin-bottom: -10px; }
+            h1 { font-size: 28px; margin-bottom: 4px; }
+            p { display: none; } /* Hide paragraph to save space */
+            .home-btn { padding: 10px 20px; font-size: 14px; margin-top: 10px; }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
+    <nav>
+        <div class="logo">
+            <div class="star-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>
+            </div>
+            PRABOD{fx}
+        </div>
+        <a href="#" class="admin-btn">ADMIN</a>
+    </nav>
 
-    <div class="container">
-        <h1 class="logo-text">Folder Sync</h1>
+    <main>
+        <div class="cloud-system">
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div class="cloud c3"></div>
+        </div>
         
-        <p class="subtitle">Securely sync your files across devices.</p>
+        <div class="error-bg" aria-hidden="true">404</div>
 
-        <a href="https://github.com/prabodfx/web/raw/refs/heads/main/soon/AutoSyncFolders.zip" class="download-btn" id="dlButton">
-            <span class="btn-icon">↓</span>
-            Download Now
-        </a>
-    </div>
+        <div class="monster-container">
+            <img id="monster" class="monster-sequence" src="Sequence/Sequence 01000.png" alt="Animated Monster Character" loading="eager">
+        </div>
+
+        <div class="content-wrapper">
+            <h1 id="text-h1"></h1>
+            <p id="text-p"></p>
+            
+            <a href="/" class="home-btn" id="home-btn">
+                <span class="arrow-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+                Back Home
+            </a>
+        </div>
+    </main>
 
     <script>
-        // Optional: Adds a "Ripple" effect when clicked for extra premium feel
-        const btn = document.getElementById('dlButton');
+        // --- 1. Optimized Animation Engine (RequestAnimationFrame) ---
+        const img = document.getElementById("monster");
+        const startFrame = 1000;
+        const endFrame = 1120;
+        const frameRate = 30; // Target FPS
+        
+        let currentFrame = startFrame;
+        let lastTime = 0;
+        const frameInterval = 1000 / frameRate;
 
-        btn.addEventListener('click', function(e) {
-            // If you want the link to open immediately, comment out the preventDefault
-            // e.preventDefault(); 
+        const animate = (timestamp) => {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
 
-            let x = e.clientX - e.target.offsetLeft;
-            let y = e.clientY - e.target.offsetTop;
-
-            let ripples = document.createElement('span');
-            ripples.style.left = x + 'px';
-            ripples.style.top = y + 'px';
-            
-            // Add ripple styling dynamically
-            ripples.style.position = 'absolute';
-            ripples.style.background = 'rgba(255,255,255,0.3)';
-            ripples.style.transform = 'translate(-50%, -50%)';
-            ripples.style.pointerEvents = 'none';
-            ripples.style.borderRadius = '50%';
-            ripples.style.animation = 'animateRipple 1s linear infinite';
-            
-            this.appendChild(ripples);
-
-            setTimeout(() => {
-                ripples.remove()
-            }, 1000);
-        });
-
-        // Inject Ripple Keyframes
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
-            @keyframes animateRipple {
-                0% { width: 0px; height: 0px; opacity: 1; }
-                100% { width: 500px; height: 500px; opacity: 0; }
+            if (deltaTime >= frameInterval) {
+                const paddedNumber = currentFrame.toString().padStart(5, '0');
+                img.src = `Sequence/Sequence ${paddedNumber}.png`;
+                
+                currentFrame++;
+                if (currentFrame > endFrame) currentFrame = startFrame;
+                
+                lastTime = timestamp;
             }
-        `;
-        document.head.appendChild(styleSheet);
+            requestAnimationFrame(animate);
+        };
+
+        // --- 2. Professional Typewriter Logic ---
+        const h1 = document.getElementById('text-h1');
+        const p = document.getElementById('text-p');
+        const btn = document.getElementById('home-btn');
+
+        const typeWriter = (element, text, speed) => {
+            return new Promise(resolve => {
+                element.innerHTML = "";
+                element.classList.add('cursor');
+                
+                let i = 0;
+                const typeChar = () => {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        // Randomize typing speed slightly for human feel
+                        const randomSpeed = speed + (Math.random() * 30 - 15);
+                        setTimeout(typeChar, randomSpeed > 0 ? randomSpeed : speed);
+                    } else {
+                        element.classList.remove('cursor');
+                        resolve();
+                    }
+                };
+                typeChar();
+            });
+        };
+
+        // --- 3. Sequence Initialization ---
+        const init = async () => {
+            // Start the visual loop immediately
+            requestAnimationFrame(animate);
+
+            // Staggered Text Reveal
+            await new Promise(r => setTimeout(r, 600)); // Initial load buffer
+            
+            await typeWriter(h1, "Oops, we lost the map...", 45);
+            
+            await new Promise(r => setTimeout(r, 150)); // Breathing room
+            
+            await typeWriter(p, "Let's get you back to familiar territory.", 20);
+            
+            // Final Reveal
+            btn.classList.add('show');
+        };
+
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
