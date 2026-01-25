@@ -427,7 +427,7 @@
     }
     
     /* --- NEW HIDING LOGIC --- */
-    /* This class is added to the form when in "Item Row Click" mode (Group Rename) */
+    /* This class is added to the form when in "Group Rename" mode */
     .hide-item-fields .field-hidden-on-item-rename {
         display: none !important;
     }
@@ -465,7 +465,7 @@
               <div id="item-codes-list" class="custom-dropdown-list"></div>
             </div>
             <div class="custom-dropdown-container">
-              <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name</label>
+              <label for="item-name" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Item Name (Group Name)</label>
               <input type="text" id="item-name" required class="premium-input w-full rounded-md px-3 py-2">
               <div id="item-names-list" class="custom-dropdown-list"></div>
             </div>
@@ -478,7 +478,7 @@
               <input type="number" id="price" step="0.01" class="premium-input w-full rounded-md px-3 py-2">
             </div>
             <div class="field-hidden-on-item-rename" id="disc-rate-container">
-              <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate</label>
+              <label for="disc-rate" class="block text-sm font-semibold text-[#00ffaa] text-left mb-1">Disc Rate (%)</label>
               <input type="number" id="disc-rate" step="any" class="premium-input w-full rounded-md px-3 py-2 mb-3">
             </div>
           </div>
@@ -578,7 +578,7 @@
       currentEditDocId = null;
       currentEditGroupName = null; // Reset group edit state
       
-      // FIX: Remove the hiding class to restore all form fields
+      // Remove the hiding class to restore all form fields for normal adding/editing
       itemForm.classList.remove('hide-item-fields');
       
       submitBtn.textContent = 'ADD ITEM';
@@ -586,6 +586,9 @@
       formSubheader.textContent = 'Enter item details below';
       itemStatusMessage.classList.add('hidden');
       enableAutoFocus(itemForm);
+      
+      // Reset dropdowns
+      document.querySelectorAll('.custom-dropdown-list').forEach(list => list.classList.remove('active'));
     };
 
     // Firebase Realtime Listener
@@ -665,12 +668,18 @@
           const itemRowDiv = document.createElement('div');
           itemRowDiv.className = 'item-row';
           itemRowDiv.dataset.id = item.id;
-          itemRowDiv.dataset.name = item.itemName;
+          // Store original data for easy retrieval on click
+          itemRowDiv.dataset.code = item.itemCode || '';
+          itemRowDiv.dataset.name = item.itemName || '';
+          itemRowDiv.dataset.desc = item.description || '';
+          itemRowDiv.dataset.price = item.price || '';
+          itemRowDiv.dataset.rate = item.discRate || '';
+
           itemRowDiv.innerHTML = `
             <div>${item.itemCode}</div>
-            <div class="font-mono text-center">${item.price !== null ? `Rs.${parseFloat(item.price).toFixed(2)}` : 'N/A'}</div>
+            <div class="font-mono text-center">${item.price !== null && item.price !== undefined ? `Rs.${parseFloat(item.price).toFixed(2)}` : 'N/A'}</div>
             <div class="actions-cell">
-                <span class="text-red-400 text-center w-full">${item.discRate !== null ? `${parseFloat(item.discRate).toFixed(2)}%` : 'N/A'}</span>
+                <span class="text-red-400 text-center w-full">${item.discRate !== null && item.discRate !== undefined ? `${parseFloat(item.discRate).toFixed(2)}%` : 'N/A'}</span>
             </div>
             <div class="actions-cell justify-center">
                 <button class="delete-btn" data-id="${item.id}">Delete</button>
@@ -765,17 +774,14 @@
     };
 
 
-    // --- GROUP MANAGEMENT HANDLERS (Used by Group Header Click and Item Row Click) ---
+    // --- GROUP MANAGEMENT HANDLERS (Clicked header "Group Name: X") ---
     
     const handleGroupEditClick = (groupName) => {
-        const item = allItems.find(i => i.itemName === groupName); 
-        if (!item) return;
-
         // 1. Reset item edit state and set group edit state
         currentEditDocId = null; 
         currentEditGroupName = groupName;
         
-        // 2. FIX: ADD THE CLASS TO HIDE ITEM-SPECIFIC FIELDS
+        // 2. ADD THE CLASS TO HIDE ITEM-SPECIFIC FIELDS (Matches image_0.png style)
         itemForm.classList.add('hide-item-fields');
         
         // 3. Prefill the form for group rename (only care about item-name input)
@@ -817,18 +823,42 @@
         }
     };
 
-    // --- ITEM ROW CLICK HANDLER (MODIFIED to perform Group Rename) ---
+    // --- SINGLE ITEM EDIT HANDLER (Clicked an item row) ---
+
+    const handleItemEditClick = (docId) => {
+        const itemToEdit = allItems.find(i => i.id === docId);
+        if (!itemToEdit) return;
+
+        // 1. Set item edit state and reset group edit state
+        currentEditDocId = docId;
+        currentEditGroupName = null;
+
+        // 2. ENSURE all fields are visible (Matches image_1.png style)
+        itemForm.classList.remove('hide-item-fields');
+
+        // 3. Prefill the form with item data
+        document.getElementById('item-code').value = itemToEdit.itemCode || '';
+        document.getElementById('item-name').value = itemToEdit.itemName || '';
+        document.getElementById('description').value = itemToEdit.description || '';
+        document.getElementById('price').value = itemToEdit.price !== null && itemToEdit.price !== undefined ? itemToEdit.price : '';
+        document.getElementById('disc-rate').value = itemToEdit.discRate !== null && itemToEdit.discRate !== undefined ? itemToEdit.discRate : '';
+
+        // 4. Update button/header text
+        submitBtn.textContent = 'UPDATE ITEM';
+        formHeader.textContent = 'EDIT ITEM DETAILS';
+        formSubheader.textContent = `Editing item code: ${itemToEdit.itemCode}`;
+        enableAutoFocus(document.getElementById('item-code'));
+    };
 
     const handleRowClick = async (e) => {
       const itemRow = e.target.closest('.item-row');
       // Ignore clicks on delete button
       if (!itemRow || e.target.classList.contains('delete-btn')) return;
 
-      const groupName = itemRow.dataset.name; 
-      
-      if (groupName) {
-        // This is the core of the requested change: Item Row Click triggers Group Rename
-        handleGroupEditClick(groupName);
+      const docId = itemRow.dataset.id;
+      if (docId) {
+        // Clicked an individual item row -> Trigger Single Item Edit mode
+        handleItemEditClick(docId);
       }
     };
 
@@ -860,7 +890,7 @@
             e.stopPropagation(); 
             const groupName = e.target.dataset.groupName;
             handleGroupDelete(groupName);
-        // Group Name Edit Handle Click (The text part of the header)
+        // Group Name Edit Handle Click (The text part of the header) -> Triggers Group Rename
         } else if (e.target.classList.contains('group-edit-handle')) {
             e.stopPropagation(); 
             const groupName = e.target.dataset.groupName;
@@ -868,13 +898,13 @@
         // Individual Item Delete Button Click
         } else if (e.target.classList.contains('delete-btn')) {
             handleDelete(e);
-        // Individual Item Row Click (for edit)
+        // Individual Item Row Click (for edit) -> Triggers Single Item Edit
         } else if (e.target.closest('.item-row')) {
             handleRowClick(e);
         }
     };
 
-    // CORE LOGIN LOGIC (Verified and Correct)
+    // CORE LOGIN LOGIC
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMessage.classList.add('hidden');
@@ -892,22 +922,31 @@
       }
     });
 
+    // MAIN FORM SUBMISSION HANDLER (Handles Add, Group Rename, and Single Item Edit)
     itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       itemStatusMessage.classList.add('hidden');
-      const itemName = itemForm['item-name'].value.trim();
-      const itemCode = itemForm['item-code'].value.trim();
+      
+      const itemNameVal = itemForm['item-name'].value.trim();
+      const itemCodeVal = itemForm['item-code'].value.trim();
+      // Get values from the form, setting to null if blank or NaN.
+      const formDescription = itemForm.description.value.trim() || null;
+      const priceInputStr = itemForm.price.value;
+      const formPrice = priceInputStr !== "" && !isNaN(parseFloat(priceInputStr)) ? parseFloat(priceInputStr) : null;
+      const discInputStr = itemForm['disc-rate'].value;
+      const formDiscRate = discInputStr !== "" && !isNaN(parseFloat(discInputStr)) ? parseFloat(discInputStr) : null;
 
-      // Ensure Item Name is always required
-      if (!itemName) {
-        displayStatus("Item Name is required.", 'error', itemStatusMessage);
+
+      // Ensure Item Name is always required (used as Group Name)
+      if (!itemNameVal) {
+        displayStatus("Item Name / Group Name is required.", 'error', itemStatusMessage);
         return;
       }
       
-      // --- HANDLE GROUP RENAME (Applies to Item Row Click) ---
+      // --- MODE 1: HANDLE GROUP RENAME ---
       if (currentEditGroupName) {
         const oldGroupName = currentEditGroupName;
-        const newGroupName = itemName;
+        const newGroupName = itemNameVal;
 
         if (oldGroupName === newGroupName) {
             displayStatus("Group name is the same. No changes applied.", 'error', itemStatusMessage);
@@ -920,7 +959,7 @@
 
         itemsToRename.forEach(item => {
             const docRef = db.collection("items").doc(item.id);
-            // Only update the itemName field
+            // Only update the itemName field during group rename
             batch.update(docRef, { itemName: newGroupName });
         });
 
@@ -937,32 +976,52 @@
       // --- END GROUP RENAME HANDLING ---
       
 
-      // --- HANDLE ADD NEW ITEM (Only runs when not in Group Rename mode) ---
+      // --- MODE 2: HANDLE SINGLE ITEM EDIT ---
+      if (currentEditDocId) {
+          if (!itemCodeVal) {
+             displayStatus("Item Code is required.", 'error', itemStatusMessage);
+             return;
+          }
 
-      // NEW FIX: Require Item Code only when adding a new item
-      if (!itemCode) {
+          const updateData = {
+              itemCode: itemCodeVal,
+              itemName: itemNameVal,
+              description: formDescription,
+              price: formPrice,
+              discRate: formDiscRate,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          try {
+              await db.collection("items").doc(currentEditDocId).update(updateData);
+              displayStatus("Item updated successfully!", 'success', itemStatusMessage);
+          } catch (err) {
+              console.error("Error updating document: ", err);
+              displayStatus("Failed to update item. Try again.", 'error', itemStatusMessage);
+          }
+          clearForm();
+          return;
+      }
+      // --- END SINGLE ITEM EDIT HANDLING ---
+
+
+      // --- MODE 3: HANDLE ADD NEW ITEM (Default if no edit mode set) ---
+
+      // Require Item Code when adding a new item
+      if (!itemCodeVal) {
         displayStatus("Item Code is required for new items.", 'error', itemStatusMessage);
         return;
       }
 
       let itemData = {
-        itemName: itemName,
-        itemCode: itemCode,
+        itemName: itemNameVal,
+        itemCode: itemCodeVal,
+        description: formDescription,
+        price: formPrice,
+        discRate: formDiscRate,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      
-      // Get values from the form, setting to null if blank.
-      const formDescription = itemForm.description.value.trim() || null;
-      const formPrice = parseFloat(itemForm.price.value) || null;
-      const formDiscRate = parseFloat(itemForm['disc-rate'].value) || null;
-
-      // --- Add New Item Logic ---
-      
-      itemData.description = formDescription;
-      itemData.price = formPrice;
-      itemData.discRate = formDiscRate;
-
-      itemData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       
       // Determine new orderIndex based on the last item's index
       const maxOrder = allItems.length > 0 ? Math.max(...allItems.map(item => item.orderIndex)) : -1;
@@ -986,25 +1045,28 @@
     clearBtn.addEventListener('click', clearForm);
 
     const dropdowns = {
-      'item-code': document.getElementById('item-code-list'),
+      'item-code': document.getElementById('item-codes-list'), // Fixed ID ref
       'item-name': document.getElementById('item-names-list')
     };
 
     const populateCustomDatalist = (inputElement, dropdownList, items) => {
-      const uniqueItems = Array.from(new Set(items.map(item => {
-        const value = inputElement.id === 'item-name' ? item.itemName : item.itemCode;
-        if (value) {
-          const foundItem = allItems.find(i => (inputElement.id === 'item-name' ? i.itemName : i.itemCode) === value);
-          return JSON.stringify(foundItem);
-        }
-        return null;
-      }))).filter(Boolean).map(itemStr => JSON.parse(itemStr));
+      // Only show unique suggestions based on the input type
+      const uniqueValues = new Set();
+      const uniqueItems = [];
+      
+      items.forEach(item => {
+          const value = inputElement.id === 'item-name' ? item.itemName : item.itemCode;
+          if (value && !uniqueValues.has(value)) {
+              uniqueValues.add(value);
+              uniqueItems.push(item);
+          }
+      });
       
       dropdownList.innerHTML = '';
       
       if (uniqueItems.length === 0) {
           const noResultsDiv = document.createElement('div');
-          noResultsDiv.textContent = 'No matching items';
+          noResultsDiv.textContent = 'No matching suggestions';
           noResultsDiv.style.cursor = 'default';
           noResultsDiv.style.color = '#888';
           dropdownList.appendChild(noResultsDiv);
@@ -1018,12 +1080,13 @@
         div.textContent = value;
         div.dataset.value = value;
         
-        if (item.description) {
-            const descriptionSpan = document.createElement('span');
-            descriptionSpan.textContent = ` - ${item.description}`;
-            descriptionSpan.style.color = '#888';
-            descriptionSpan.style.fontSize = '0.8em';
-            div.appendChild(descriptionSpan);
+        // Optionally add description hint for codes
+        if (inputElement.id === 'item-code' && item.itemName) {
+            const descSpan = document.createElement('span');
+            descSpan.textContent = ` (${item.itemName})`;
+            descSpan.style.color = '#888';
+            descSpan.style.fontSize = '0.8em';
+            div.appendChild(descSpan);
         }
 
         div.addEventListener('click', (e) => {
@@ -1039,6 +1102,9 @@
       const dropdownList = dropdowns[inputId];
 
       input.addEventListener('input', () => {
+        // Don't show dropdowns during group rename mode
+        if (currentEditGroupName && inputId !== 'item-name') return;
+
         const value = input.value.toLowerCase();
         const items = allItems.filter(item => {
           if (inputId === 'item-code') return item.itemCode && item.itemCode.toLowerCase().includes(value);
@@ -1046,7 +1112,7 @@
           return false;
         });
         populateCustomDatalist(input, dropdownList, items);
-        if (items.length > 0) {
+        if (items.length > 0 || value.length > 0) {
           dropdownList.classList.add('active');
         } else {
           dropdownList.classList.remove('active');
@@ -1054,15 +1120,17 @@
       });
       
       input.addEventListener('click', () => {
+         // Don't show dropdowns during group rename mode
+        if (currentEditGroupName && inputId !== 'item-name') return;
+
         populateCustomDatalist(input, dropdownList, allItems);
         if (allItems.length > 0) {
           dropdownList.classList.add('active');
-        } else {
-          dropdownList.classList.remove('active');
         }
       });
       
       input.addEventListener('dblclick', (e) => {
+          if (currentEditGroupName && inputId !== 'item-name') return;
           e.preventDefault();
           input.value = '';
           dropdownList.classList.remove('active');
@@ -1114,7 +1182,7 @@
 
     // Ctrl+Z navigation to public view
     document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'z') {
+        if (e.ctrlKey && e.key === 'q') {
             e.preventDefault();
             window.location.href = 'Stock.html'; 
         }
