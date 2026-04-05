@@ -17,9 +17,6 @@
       --main-color: #f00;
       --main-glow: 0 0 15px var(--main-color);
       --main-glow-hover: 0 0 30px var(--main-color);
-      --green-color: #00ff00;
-      --green-glow: 0 0 15px var(--green-color);
-      --green-glow-hover: 0 0 30px var(--green-color);
     }
 
     @keyframes imagePulse {
@@ -84,8 +81,7 @@
 
     html, body {
       height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       overflow-x: hidden;
       background: transparent;
       color: #fff;
@@ -137,138 +133,6 @@
       cursor: pointer;
       display: none;
       z-index: 1001;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      backdrop-filter: blur(20px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000000;
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    .modal-overlay.fade-out {
-      animation: fadeOut 0.3s ease-in-out forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; visibility: hidden; }
-    }
-
-    .modal-card {
-      width: 90%;
-      max-width: 360px;
-      padding: 36px 28px 30px;
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(255, 0, 0, 0.16), rgba(90, 0, 0, 0.14));
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 20px 40px rgba(255, 0, 0, 0.25),
-        0 0 0 1px rgb(255, 0, 0);
-      border: 1px solid rgb(255, 0, 0);
-      backdrop-filter: blur(28px);
-      text-align: center;
-      color: white;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .modal-card:hover {
-      transform: scale(1.015);
-      box-shadow:
-        inset 0 1px 0 rgb(255, 0, 0),
-        0 28px 60px rgba(255, 0, 0, 0.443);
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      font-size: 26px;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      line-height: 1;
-      opacity: 0.8;
-      transition: opacity 0.2s ease;
-    }
-
-    .close-btn:hover {
-      opacity: 1;
-    }
-
-    .modal-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 18px;
-      background: linear-gradient(to right, #ff0000, #ffffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .modal-text {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 28px;
-      line-height: 1.6;
-      padding: 0 10px;
-    }
-
-    .ok-btn {
-      padding: 13px 36px;
-      background: white;
-      color: #cc0000;
-      font-weight: 600;
-      font-size: 16px;
-      border: none;
-      border-radius: 100px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(255, 0, 0, 0.25);
-      transition: transform 0.2s ease, background 0.3s ease;
-    }
-
-    .ok-btn:hover {
-      background: #fff2f2;
-      transform: scale(1.06);
-    }
-
-    @media (max-width: 400px) {
-      .modal-card {
-        padding: 30px 22px 24px;
-        border-radius: 22px;
-        background: linear-gradient(140deg, rgb(0, 0, 0), rgb(255, 0, 0));
-      }
-      .modal-overlay {
-        background: linear-gradient(145deg, rgba(255, 0, 0, 0.20), rgba(90, 0, 0, 0.14));
-      }
-      
-      .modal-card {
-        max-width: 70%;
-      }
-
-      .modal-title {
-        font-size: 24px;
-        font-weight: 1000;
-        background: linear-gradient(to right, #ff0000, #ffffff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .modal-text {
-        font-size: 15px;
-        font-weight: bold;
-      }
     }
 
     nav {
@@ -363,7 +227,7 @@
       flex: 1;
       order: 1;
       padding-top: 1rem;
-      max-width: 600px;
+      max-width: 550px;
     }
 
     .main-title2 {
@@ -374,6 +238,7 @@
     .main-title {
       font-size: 3rem;
       font-weight: bold;
+      margin-top: 0.1rem;
     }
 
     .highlight {
@@ -382,8 +247,8 @@
     }
 
     .description {
-      margin-top: 1rem;
-      font-size: 1.1rem;
+      margin-top: 1.8rem;
+      font-size: 1.2rem;
       color: #ccc;
     }
 
@@ -409,7 +274,6 @@
       height: 100%;
       border-radius: 50%;
       z-index: 0;
-      color: white;
     }
 
     .image-wrapper img {
@@ -417,6 +281,7 @@
       height: 100%;
       object-fit: cover;
       position: relative;
+      object-position: 50% 7%;
       z-index: 1;
       transition: opacity 0.8s ease-in-out;
       opacity: 100%;
@@ -424,7 +289,7 @@
     }
 
     .image-wrapper:hover {
-      transform: scale(1) !important;
+      transform: scale(1.05) !important;
       box-shadow: 0 0 140px var(--main-color) !important;
     }
 
@@ -477,76 +342,19 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
       opacity: 0; 
       transform: translateY(30px); 
-      animation: fadeInUp 2s ease forwards 1.4s;      
+      animation: fadeInUp 2s ease forwards 1.4s;
       pointer-events: none;
     }
-
     .cv-button.jiggle-active {
       animation: iconJiggle 2s ease infinite;
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
     }
 
     .cv-button:hover {
-      animation: none !important; 
-      transform: scale(1.05) translateY(0) !important; 
+      animation: none !important;
+      transform: scale(1.05) translateY(0) !important;
       box-shadow: var(--main-glow-hover) !important;
       transition: transform 0.3s ease, box-shadow 0.3s ease; 
-    }
-
-    @media (max-width: 768px) {
-      nav { display: none; }
-      .menu-toggle { 
-        display: block;
-        z-index: 100000 !important; 
-        position: fixed;
-        top: 0.6rem;
-        right: 1rem;
-       }
-
-      .modal-card {
-        max-width: 70%;
-      }
-      
-      .container {
-        flex-direction: row;
-        justify-content: space-between;
-      }
-      .hero {
-        flex-direction: column;
-        align-items: center;
-        text-align: left;
-      }
-      .image-wrapper {
-        width: 250px;
-        height: 250px;
-        order: 1;
-        margin-bottom: 1rem;
-      }
-      .text-area {
-        order: 2;
-        padding-top: 0;
-        max-width: 100%;
-        text-align: left;
-      }
-      .corner-name {
-        margin-right: auto;
-      }
-      .social-icons {
-        justify-content: center;
-      }
-      .cv-button {
-        margin: 2rem auto 0;
-        display: block;
-      }
-      .main-title2 {
-        font-size: 2.3rem;
-        white-space: nowrap;
-        margin-bottom: 0.3rem;
-      }
-      .main-title {
-        font-size: 2.6rem;
-        white-space: nowrap;
-      }
     }
 
     .crazy-glitch {
@@ -568,7 +376,7 @@
       opacity: 0.8;
       clip: rect(0, 900px, 0, 0);
       will-change: transform, clip;
-      transform: translateZ(0);
+      transform: translateZ(0); 
     }
 
     .crazy-glitch::before {
@@ -586,7 +394,7 @@
     .glitch-glow {
       animation: glitchGlow 2.5s infinite ease-in-out;
       will-change: transform, text-shadow;
-      transform: translateZ(0);
+      transform: translateZ(0); 
     }
 
     @keyframes glitchBase {
@@ -642,313 +450,160 @@
     .image-wrapper img {
       width: 100%;
       height: 100%;
-      object-position: 50% 7%;
       object-fit: cover;
       position: relative;
       z-index: 1;
       transition: opacity 0.8s ease-in-out;
       opacity: 100%;
-      scale: 1;
+      scale: 1.01;
     }
 
     .image-wrapper img[src] {
       opacity: 1;
     }
 
-    #accessModalOverlay {
+    /* === MOBILE RESPONSIVE === */
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .menu-toggle { 
+        display: block;
+        z-index: 100000 !important; 
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: center;
+        top: 0.6rem;
+        right: 1rem;
+       }
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .hero {
+        flex-direction: column;
         align-items: center;
-        z-index: 1000001; 
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
+        text-align: left;
+      }
+      .image-wrapper {
+        width: 250px;
+        height: 250px;
+        order: 1;
+        margin-bottom: 1rem;
+      }
+      .text-area {
+        order: 2;
+        padding-top: 0;
+        max-width: 100%;
+        text-align: left;
+      }
+      .corner-name {
+        margin-right: auto;
+      }
+      .social-icons {
+        justify-content: center;
+      }
+      .cv-button {
+        margin: 2rem auto 0;
+        display: block;
+      }
+      .main-title2 {
+        font-size: 2.3rem;
+        white-space: nowrap;
+        margin-bottom: 0.3rem;
+      }
+      .main-title {
+        font-size: 2.6rem;
+        white-space: nowrap;
+      }
     }
 
-    #accessModalOverlay.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .access-modal-card {
-        width: 65%;
-        max-width: 450px;
-        padding: 30px;
-        border-radius: 15px;
-        background: #1a1a1a;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        text-align: center;
-        color: white;
-        position: relative;
-        border: 1px solid var(--main-color); /* Default to red */
-        animation: fadeIn 0.4s ease-in-out;
-    }
-
-    .access-modal-card.access-granted {
-        border: 1px solid var(--green-color);
-        background: linear-gradient(145deg, rgba(0, 255, 0, 0.16), rgba(0, 90, 0, 0.14));
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.15),
-            0 20px 40px rgba(0, 255, 0, 0.25),
-            0 0 0 1px rgb(0, 255, 0);
-    }
-
-    .access-modal-card.access-denied {
-        border: 1px solid var(--main-color);
-        background: linear-gradient(145deg, rgba(255, 0, 0, 0.16), rgba(90, 0, 0, 0.14));
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.15),
-            0 20px 40px rgba(255, 0, 0, 0.25),
-            0 0 0 1px rgb(255, 0, 0);
-    }
-
-
-    .access-modal-title {
-        font-size: 2em;
-        font-weight: bold;
-        color: var(--main-color); /* Default to red */
-        margin-bottom: 15px;
-    }
-
-    .access-modal-title.access-granted {
-        color: var(--green-color);
-    }
-
-    .access-modal-text {
-        font-size: 1.1em;
-        line-height: 1.5;
-        margin-bottom: 25px;
-    }
-
-    .access-modal-button {
-        padding: 10px 25px;
-        background: var(--main-color); 
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background 0.3s ease;
-        display: block; 
-        margin: 0 auto; 
-    }
-
-    .access-modal-button:hover {
-        background: #ff0000;
-        box-shadow: 0 10px 10px rgba(255, 0, 0, 0.5);
-        scale: 1.05;
-    }
-
-    .access-modal-button.access-granted {
-        background: var(--green-color);
-    }
-
-    .access-modal-button.access-granted:hover {
-        background: #00cc00;
-    }
-
-    .access-modal-close-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 2em; /* Increased size */
-        color: white;
-        cursor: pointer;
+    /* === TV / 4K / ULTRA-WIDE RESPONSIVE (NEW ADDITION) === */
+    @media (min-width: 1920px) {
+      .container, .hero {
+        max-width: 1800px; /* Greatly expands max width */
+      }
+      .text-area {
+        max-width: 900px; /* Gives text more breathing room */
+      }
+      .main-title2 {
+        font-size: 4rem; /* Scales up titles for readability at a distance */
+      }
+      .main-title {
+        font-size: 5rem;
+      }
+      .description {
+        font-size: 1.8rem;
+        line-height: 1.6;
+        margin-top: 6rem;
+      }
+      .corner-name {
+        font-size: 1.5rem;
+        padding: 12px 30px;
+      }
+      nav a {
+        font-size: 1.5rem;
+      }
+      .image-wrapper {
+        width: 600px; /* Considerably larger image for big screens */
+        height: 600px;
+      }
+      .social-icons {
+        margin-top: 3rem;
+        gap: 1.5rem;
+      }
+      .social-icons a {
+        width: 80px; /* Larger hit areas and visuals */
+        height: 80px;
+      }
+      .cv-button {
+        font-size: 1.5rem;
+        padding: 1.2rem 3rem;
+        margin-top: 3.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="modal-overlay">
-    <div class="modal-card">
-      <div class="close-btn" onclick="closeModal()">×</div>
-      <div class="modal-title">WELCOME</div><br>
-      <div class="modal-text">
-        Texts and Some Things on this Website <br>
-        allow you to Secretly go to other pages <br>
-        without using Navigations. ✨
-      </div>
-      <br>
-      <button class="ok-btn" onclick="closeModal()">Got it</button>
-    </div>
-  </div>
-
-  <div id="accessModalOverlay">
-    <div class="access-modal-card">
-      <div class="access-modal-close-btn" onclick="closeAccessModal()">×</div>
-      <div class="access-modal-title" id="accessModalTitle"></div>
-      <div class="access-modal-text" id="accessModalText"></div>
-      <button class="access-modal-button" id="accessModalButton"></button>
-    </div>
-  </div>
-
-  <script>
-    function closeModal() {
-      const overlay = document.querySelector('.modal-overlay');
-      overlay.classList.add('fade-out');
-      setTimeout(() => {
-        overlay.style.display = 'none';
-      }, 300);
-    }
-
-    function showAccessModal(title, text, isGranted) {
-        const accessModalOverlay = document.getElementById('accessModalOverlay');
-        const accessModalCard = accessModalOverlay.querySelector('.access-modal-card');
-        const accessModalTitle = document.getElementById('accessModalTitle');
-        const accessModalText = document.getElementById('accessModalText');
-        const accessModalButton = document.getElementById('accessModalButton');
-
-        accessModalTitle.textContent = title;
-        accessModalText.innerHTML = text; 
-        
-        // Reset classes
-        accessModalCard.classList.remove('access-granted', 'access-denied');
-        accessModalTitle.classList.remove('access-granted');
-        accessModalButton.classList.remove('access-granted');
-
-        if (isGranted) {
-            accessModalCard.classList.add('access-granted');
-            accessModalTitle.classList.add('access-granted');
-            accessModalButton.style.display = 'none'; // Hide the button for Access Granted
-            
-            // Automatically redirect after a short delay
-            setTimeout(() => {
-                window.location.href = 'https://github.com/prabodfx/cv/raw/main/Prabod%20CV.pdf'; // REPLACE THIS WITH YOUR DESIRED REDIRECTION URL
-            }, 1500); // 1.5 seconds delay
-            
-        } else {
-            accessModalCard.classList.add('access-denied');
-            accessModalButton.style.display = 'block'; // Ensure button is visible for Access Denied
-            accessModalButton.textContent = 'ADMIN';
-            accessModalButton.onclick = () => window.location.href = 'https://wa.me/94740463381?text=Send%20Me%20a%20CV%20📌'; // Redirect for Access Denied
-        }
-
-        accessModalOverlay.classList.add('show');
-    }
-
-    function closeAccessModal() {
-        const accessModalOverlay = document.getElementById('accessModalOverlay');
-        accessModalOverlay.classList.remove('show');
-    }
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === "Escape") {
-        closeModal();
-        closeAccessModal();
-      }
-    });
-    
-    // Define toggleMenu in the global scope
-    window.toggleMenu = function() {
-      const nav = document.getElementById("mobileNav");
-      const icon = document.getElementById("menuIcon");
-      nav.classList.toggle("active");
-      icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
-    }
-  </script>
 <canvas id="galaxy"></canvas>
 <div class="container">
   <div class="corner-name">Prabod Saranga</div>
   <nav>
-    <a href="nav/index.html" class="nav-item active">Home</a> 
-    <a href="nav/skill.html" class="nav-item">Skill</a>
-    <a href="nav/about.html" class="nav-item">About</a>
-    <a href="nav/service.html" class="nav-item">Service</a>
-    <a href="nav/contact.html" class="nav-item">Contact</a>
-    <a href="nav/projects.html" class="nav-item">Projects</a>
+    <a href="index.html" class="nav-item active">Home</a>  
+    <a href="skill.html" class="nav-item">Skill</a>
+    <a href="about.html" class="nav-item">About</a>
+    <a href="service.html" class="nav-item">Service</a>
+    <a href="contact.html" class="nav-item">Contact</a>
+    <a href="projects.html" class="nav-item">Projects</a>
   </nav>
 </div>
 <button class="menu-toggle" onclick="toggleMenu()" id="menuIcon">☰</button>
 <div class="mobile-nav" id="mobileNav">
-  <a href="nav/index.html" class="nav-item active">Home</a> 
-  <a href="nav/skill.html" class="nav-item">Skill</a>
-  <a href="nav/about.html" class="nav-item">About</a>
-  <a href="nav/service.html" class="nav-item">Service</a>
-  <a href="nav/contact.html" class="nav-item">Contact</a>
-  <a href="nav/projects.html" class="nav-item">Projects</a>
+  <a href="index.html" class="nav-item active">Home</a>  
+  <a href="skill.html" class="nav-item">Skill</a>
+  <a href="about.html" class="nav-item">About</a>
+  <a href="service.html" class="nav-item">Service</a>
+  <a href="contact.html" class="nav-item">Contact</a>
+  <a href="projects.html" class="nav-item">Projects</a>
 </div>
 <section class="hero">
   <div class="text-area">
     <div class="main-title2">Hey I'm <span class="highlight glitch-glow">PRABOD</span></div>
-    <div class="main-title" onclick="location.href='nav/skill.html';" style="cursor:default;">I'm a  <span class="highlight crazy-glitch" data-text="DESIGNER">DESIGNER</span></div>
+    <div class="main-title" onclick="location.href='skill.html';" style="cursor:default;">I'm a&nbsp;&nbsp;<span class="highlight crazy-glitch" data-text="DESIGNER">DESIGNER</span></div>
     <p class="description">I'm Prabod Saranga — I'm a passionate web designer focused on crafting clean, modern, and responsive websites. I specialize in photo editing — enhancing visuals with precision and emotion — and creative video editing.</p>
     <div class="social-icons">
-      <a href="https://www.pinterest.com/prabodsarangaekanayaka/_profile/_saved/" target="_blank"><img src="res/icon/pinterest.svg" alt="Pinterest"></a>
-      <a href="https://github.com/prabodfx" target="_blank"><img src="res/icon/github.svg" alt="GitHub"></a>
-      <a href="https://www.youtube.com/channel/UCMs5MpxhmgEVHzNUApwvSLw" target="_blank"><img src="res/icon/youtube.svg" alt="YouTube"></a>
-      <a href="https://x.com/prabodfx" target="_blank"><img src="res/icon/x.svg" alt="X"></a>
+      <a href="https://www.pinterest.com/prabodsarangaekanayaka/_profile/_saved/" target="_blank"><img src="../res/icon/pinterest.svg" alt="Pinterest"></a>
+      <a href="https://github.com/prabodfx" target="_blank"><img src="../res/icon/github.svg" alt="GitHub"></a>
+      <a href="https://www.youtube.com/channel/UCMs5MpxhmgEVHzNUApwvSLw" target="_blank"><img src="../res/icon/youtube.svg" alt="YouTube"></a>
+      <a href="https://x.com/prabodfx" target="_blank"><img src="../res/icon/x.svg" alt="X"></a>
     </div>
-    <a style="text-decoration:none;"> 
-      <button class="cv-button" id="cvDownloadButton">Download CV</button>
+    <a href="https://raw.githubusercontent.com/prabodfx/web/main/soon/Prabod.pdf" style="text-decoration:none;">
+      <button class="cv-button">Download CV</button>
     </a>
   </div>
   <div class="image-wrapper">
     <canvas id="infernoCanvas"></canvas>
-    <img src="res/my/main.webp" />
+    <img src="../res/my/main.webp" />
   </div>
 </section>
 
-<script type="module">
-  // SDK Functions
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCuEHBo1bBN1GZ8F3awXp2csXAqP4cDQFA",
-    authDomain: "feedback-da745.firebaseapp.com",
-    projectId: "feedback-da745",
-    storageBucket: "feedback-da745.firebasestorage.app",
-    messagingSenderId: "1090923781039",
-    appId: "1:1090923781039:web:ebc26d77f78fe9a132ad5a",
-    measurementId: "G-1VM7BBYELF"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-
-  const AUTHORIZED_UIDS = [
-    '0WSkrKPXKiPlnyTuuT8IhBYuWc92',     
-    'HTLavvWLDZg5Rl8VwuXhJhJ1cu63',
-    '3QRBVTi3YJQIlsYwb54tLe38qdN2',
-    'coXvqI4xYgMw0YDxomGBYMPMhY72'
-  ];
-
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-
-      console.log("User is signed in:", user.uid);
-    } else {
-
-      console.log("No user signed in. Signing in anonymously...");
-      signInAnonymously(auth)
-        .then(() => {
-          console.log("Anonymous user signed in.");
-        })
-        .catch((error) => {
-          console.error("Error signing in anonymously:", error);
-        });
-    }
-  });
-
-  document.getElementById('cvDownloadButton').addEventListener('click', (event) => {
-    const user = auth.currentUser;
-    if (user && AUTHORIZED_UIDS.includes(user.uid)) {
-      showAccessModal('Access Granted', 'You have access to download the CV.<br>Redirecting...', true); // true for access granted
-    } else {
-      showAccessModal('Access Denied', 'Only Super Users have permission to download the CV.<br><br>Please Contact The Admin.', false); // false for access denied
-      event.preventDefault(); 
-    }
-  });
-
+<script>
   const galaxyCanvas = document.getElementById('galaxy'), ctxGalaxy = galaxyCanvas.getContext('2d');
   let stars = [], w, h;
 
@@ -983,18 +638,20 @@
     requestAnimationFrame(drawGalaxy);
   }
 
+  // Get the CV button element
   const cvButton = document.querySelector('.cv-button');
 
-
+  // Use animationend to trigger jiggle animation, enable pointer events, and ensure visibility after fadeInUp finishes
   cvButton.addEventListener('animationend', (event) => {
     if (event.animationName === 'fadeInUp') {
-      cvButton.classList.add('jiggle-active'); 
-      cvButton.style.pointerEvents = 'auto';   
-      cvButton.style.opacity = '1';           
+      cvButton.classList.add('jiggle-active'); // Add the 'jiggle-active' class to start iconJiggle
+      cvButton.style.pointerEvents = 'auto';   // Enable pointer events after animation ends
+      cvButton.style.opacity = '1';           // Explicitly ensure opacity is 1
     }
   });
 
 
+  // Inferno Animation
   const infernoCanvas = document.getElementById('infernoCanvas');
   const ctxInferno = infernoCanvas.getContext('2d');
   const imgWrapper = document.querySelector('.image-wrapper');
@@ -1093,6 +750,7 @@
     cx = baseSize / 2;
     cy = baseSize / 2;
 
+    // Auto close mobile nav on desktop
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
     if (window.innerWidth > 768 && nav.classList.contains("active")) {
@@ -1112,6 +770,14 @@
   drawGalaxy();
   drawInferno();
 
+  function toggleMenu() {
+    const nav = document.getElementById("mobileNav");
+    const icon = document.getElementById("menuIcon");
+    nav.classList.toggle("active");
+    icon.textContent = nav.classList.contains("active") ? "✖" : "☰";
+  }
+
+  // Close mobile menu on outside click
   document.addEventListener('click', function(e) {
     const nav = document.getElementById("mobileNav");
     const icon = document.getElementById("menuIcon");
@@ -1121,6 +787,7 @@
     }
   });
 
+  // Glitch Text
   const glitchText = document.querySelector('.crazy-glitch');
   const titles = ["DESIGNER", "EDITOR", "DEVELOPER"];
   let index = 0;
@@ -1132,11 +799,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
