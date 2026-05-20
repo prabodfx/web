@@ -48,6 +48,7 @@
             inset: 0;
             z-index: -1;
             overflow: hidden;
+            transform: translateZ(0); /* Cache backdrop canvas layer */
             background:
                 radial-gradient(ellipse 60% 50% at 18% 15%, rgba(100,160,230,0.65) 0%, transparent 55%),
                 radial-gradient(ellipse 50% 45% at 82% 80%, rgba(55,110,195,0.55) 0%, transparent 55%),
@@ -71,6 +72,8 @@
             pointer-events: none; 
             animation: drift 22s ease-in-out infinite; 
             will-change: transform; /* Hardware acceleration optimization */
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         .o1 { width: 500px; height: 500px; top: -180px; left: -140px; background: radial-gradient(circle,rgba(100,160,230,0.32) 0%,transparent 70%); filter: blur(80px); }
         
@@ -85,8 +88,8 @@
         }
         
         @keyframes drift {
-            0%, 100% { transform: translate(0,0); }
-            50% { transform: translate(20px,-16px); }
+            0%, 100% { transform: translate3d(0,0,0); }
+            50% { transform: translate3d(20px,-16px,0); }
         }
 
         .wrap {
@@ -124,7 +127,8 @@
                 0 2px 8px rgba(0,0,0,0.12),
                 inset 0 1px 0 rgba(255,255,255,0.55);
             animation: fadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            cursor: pointer; /* Visual indicator that it's now interactive */
+            cursor: pointer;
+            touch-action: manipulation; /* Erases touch click delays natively */
         }
 
         .logo::after {
@@ -223,7 +227,9 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-            will-change: transform, opacity; /* Optimizes UI rendering pipeline */
+            will-change: transform, opacity; 
+            transform: translateZ(0); /* Fluid render layout pass */
+            backface-visibility: hidden;
             background: rgba(255,255,255,0.11);
             backdrop-filter: blur(28px) saturate(180%);
             -webkit-backdrop-filter: blur(28px) saturate(180%);
@@ -289,7 +295,7 @@
                 0 0 45px rgba(255, 255, 255, 0.3), 
                 inset 0 1px 0 rgba(255,255,255,0.8),
                 inset 0 0 25px rgba(150, 200, 255, 0.4);
-            transform: scale(1.02);
+            transform: scale(1.02) translateZ(0);
             z-index: 99999 !important; 
         }
 
@@ -399,8 +405,8 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translate3d(0,20px,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
         }
 
         @media (max-width: 600px) {
@@ -494,13 +500,10 @@
             }
         }
 
-        // Click/Tap on the Title Header triggers Paste directly
+        // Direct, single event bridge to execute accurately once on mobile & desktop
         if (brandHeader) {
             brandHeader.addEventListener('click', (event) => {
-                event.stopPropagation();
-                handlePasteEvent();
-            });
-            brandHeader.addEventListener('touchend', (event) => {
+                event.preventDefault();
                 event.stopPropagation();
                 handlePasteEvent();
             });
@@ -519,10 +522,8 @@
             const tapLength = currentTime - lastTapTime;
             
             if (tapLength < 350 && tapLength > 0) {
-                // event.preventDefault() removed here to guarantee the system recognizes a valid 
-                // user gesture, allowing navigator.clipboard.readText() to execute successfully on mobile.
                 handlePasteEvent();
-                lastTapTime = 0; // Reset tap state to block triple-tap ghost triggers
+                lastTapTime = 0; 
             } else {
                 lastTapTime = currentTime;
             }
