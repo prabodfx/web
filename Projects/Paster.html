@@ -1,659 +1,662 @@
-<!Doctype Html>
-<Html Lang="En">
-<Head>
-    <Meta Charset="Utf-8"/>
-    <Meta Name="Viewport" Content="Width=Device-Width, Initial-Scale=1.0"/>
-    <Link Rel="Icon" Type="Image/Png" Href="../Projects/Fc/Paster/Favicon-96x96.Png" Sizes="96x96" />
-    <Link Rel="Icon" Type="Image/Svg+Xml" Href="../Projects/Fc/Paster/Favicon.Svg" />
-    <Link Rel="Shortcut Icon" Href="../Projects/Fc/Paster/Favicon.Ico" />
-    <Link Rel="Apple-Touch-Icon" Sizes="180x180" Href="../Projects/Fc/Paster/Apple-Touch-Icon.Png" />
-    <Meta Name="Apple-Mobile-Web-App-Title" Content="Paster" />
-    <Link Rel="Manifest" Href="../Projects/Fc/Paster/Site.Webmanifest" />
-    <Title>Auto Paste | Prabodfx</Title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/png" href="../Projects/fc/paster/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../Projects/fc/paster/favicon.svg" />
+    <link rel="shortcut icon" href="../Projects/fc/paster/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../Projects/fc/paster/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Paster" />
+    <link rel="manifest" href="../Projects/fc/paster/site.webmanifest" />
+    <title>Auto Paste | Prabodfx</title>
     
-    <Link Rel="Preconnect" Href="Https://Fonts.Googleapis.Com">
-    <Link Rel="Preconnect" Href="Https://Fonts.Gstatic.Com" Crossorigin>
-    <Link Href="Https://Fonts.Googleapis.Com/Css2?Family=Syne:Wght=700;800&Family=Outfit:Wght=300;400;500;600;700&Display=Swap" Rel="Stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght=700;800&family=Outfit:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <Style>
-        :Root {
-            --Transition-Smooth: All 0.4s Cubic-Bezier(0.16, 1, 0.3, 1);
+    <style>
+        :root {
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
-            Box-Sizing: Border-Box;
-            Margin: 0;
-            Padding: 0;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        Html, Body {
-            Height: 100%; 
+        html, body {
+            height: 100%; 
         }
 
-        Body {
-            Font-Family: 'Outfit', Sans-Serif;
-            Color: Rgba(235, 245, 255, 0.97);
-            Overflow-Y: Auto;
-            Position: Relative;
-            -Webkit-User-Select: None;
-            User-Select: None; 
-            Background-Color: #1e3f85; 
-            Touch-Action: Manipulation;
-            Display: Flex;
-            Flex-Direction: Column;
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: rgba(235, 245, 255, 0.97);
+            overflow-y: auto;
+            position: relative;
+            -webkit-user-select: none;
+            user-select: none; 
+            background-color: #1e3f85; 
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
         }
 
-        .Fixed-Scene {
-            Position: Fixed;
-            Inset: 0;
-            Z-Index: -1;
-            Overflow: Hidden;
-            Background:
-                Radial-Gradient(Ellipse 60% 50% At 18% 15%, Rgba(100,160,230,0.65) 0%, Transparent 55%),
-                Radial-Gradient(Ellipse 50% 45% At 82% 80%, Rgba(55,110,195,0.55) 0%, Transparent 55%),
-                Radial-Gradient(Ellipse 45% 40% At 55% 40%, Rgba(140,190,240,0.30) 0%, Transparent 50%),
-                Linear-Gradient(148deg, #2a5298 0%, #3a6bbf 28%, #2d5aab 58%, #1e3f85 100%);
+        .fixed-scene {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 60% 50% at 18% 15%, rgba(100,160,230,0.65) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 45% at 82% 80%, rgba(55,110,195,0.55) 0%, transparent 55%),
+                radial-gradient(ellipse 45% 40% at 55% 40%, rgba(140,190,240,0.30) 0%, transparent 50%),
+                linear-gradient(148deg, #2a5298 0%, #3a6bbf 28%, #2d5aab 58%, #1e3f85 100%);
         }
 
-        .Fixed-Scene::Before {
-            Content: ''; Position: Absolute; Inset: 0;
-            Background: Linear-Gradient(112deg,
-                Transparent 28%,
-                Rgba(255,255,255,0.06) 40%,
-                Rgba(255,255,255,0.03) 48%,
-                Transparent 60%);
-            Pointer-Events: None;
+        .fixed-scene::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(112deg,
+                transparent 28%,
+                rgba(255,255,255,0.06) 40%,
+                rgba(255,255,255,0.03) 48%,
+                transparent 60%);
+            pointer-events: none;
         }
 
-        .Orb { 
-            Position: Absolute; 
-            Border-Radius: 50%; 
-            Pointer-Events: None; 
-            Animation: Drift 22s Ease-In-Out Infinite; 
-            Will-Change: Transform; /* Hardware Acceleration Optimization */
+        .orb { 
+            position: absolute; 
+            border-radius: 50%; 
+            pointer-events: none; 
+            animation: drift 22s ease-in-out infinite; 
+            will-change: transform; /* Hardware acceleration optimization */
         }
-        .O1 { Width: 500px; Height: 500px; Top: -180px; Left: -140px; Background: Radial-Gradient(Circle,Rgba(100,160,230,0.32) 0%,Transparent 70%); Filter: Blur(80px); }
+        .o1 { width: 500px; height: 500px; top: -180px; left: -140px; background: radial-gradient(circle,rgba(100,160,230,0.32) 0%,transparent 70%); filter: blur(80px); }
         
-        .O2 { 
-            Width: 120vmax; 
-            Height: 120vmax; 
-            Bottom: -20%; 
-            Right: -10%; 
-            Background: Radial-Gradient(Circle,Rgba(50,100,200,0.25) 0%,Transparent 70%); 
-            Filter: Blur(130px); 
-            Animation-Duration: 35s; 
+        .o2 { 
+            width: 120vmax; 
+            height: 120vmax; 
+            bottom: -20%; 
+            right: -10%; 
+            background: radial-gradient(circle,rgba(50,100,200,0.25) 0%,transparent 70%); 
+            filter: blur(130px); 
+            animation-duration: 35s; 
         }
         
-        @Keyframes Drift {
-            0%, 100% { Transform: Translate(0,0); }
-            50% { Transform: Translate(20px,-16px); }
+        @keyframes drift {
+            0%, 100% { transform: translate(0,0); }
+            50% { transform: translate(20px,-16px); }
         }
 
-        .Wrap {
-            Width: 100%;
-            Max-Width: 1400px; 
-            Margin: 0 Auto;
-            Padding: 48px 24px;
-            Position: Relative;
-            Z-Index: 2;
-            Flex: 1; 
-            Display: Flex;
-            Flex-Direction: Column;
-            Gap: 1.5rem;
+        .wrap {
+            width: 100%;
+            max-width: 1400px; 
+            margin: 0 auto;
+            padding: 48px 24px;
+            position: relative;
+            z-index: 2;
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .Logo {
-            Margin: 0 Auto;
-            Width: Max-Content;
-            Padding: 13px 52px;
-            Border-Radius: 100px;
-            Display: Flex;
-            Align-Items: Center;
-            Gap: 12px;
-            Position: Relative;
-            Overflow: Hidden;
-            Background: Rgba(255,255,255,0.12);
-            Backdrop-Filter: Blur(40px) Saturate(180%);
-            -Webkit-Backdrop-Filter: Blur(40px) Saturate(180%);
-            Border-Top: 1px Solid Rgba(255,255,255,0.65);
-            Border-Left: 1px Solid Rgba(255,255,255,0.32);
-            Border-Right: 1px Solid Rgba(140,185,255,0.18);
-            Border-Bottom: 1px Solid Rgba(90,140,235,0.24);
-            Box-Shadow:
-                0 8px 32px Rgba(0,0,0,0.20),
-                0 2px 8px Rgba(0,0,0,0.12),
-                Inset 0 1px 0 Rgba(255,255,255,0.55);
-            Animation: Fadedown 0.8s Cubic-Bezier(0.16, 1, 0.3, 1) Forwards;
+        .logo {
+            margin: 0 auto;
+            width: max-content;
+            padding: 13px 52px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.65);
+            border-left: 1px solid rgba(255,255,255,0.32);
+            border-right: 1px solid rgba(140,185,255,0.18);
+            border-bottom: 1px solid rgba(90,140,235,0.24);
+            box-shadow:
+                0 8px 32px rgba(0,0,0,0.20),
+                0 2px 8px rgba(0,0,0,0.12),
+                inset 0 1px 0 rgba(255,255,255,0.55);
+            animation: fadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .Logo::After {
-            Content: ''; Position: Absolute; Top: -60%; Left: -30%;
-            Width: 14%; Height: 220%;
-            Background: Linear-Gradient(90deg,Transparent,Rgba(255,255,255,0.40),Transparent);
-            Transform: Skewx(-16deg);
-            Animation: Sw 9s Cubic-Bezier(.25,1,.5,1) Infinite;
+        .logo::after {
+            content: ''; position: absolute; top: -60%; left: -30%;
+            width: 14%; height: 220%;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);
+            transform: skewX(-16deg);
+            animation: sw 9s cubic-bezier(.25,1,.5,1) infinite;
         }
 
-        @Keyframes Sw { 0% { Left: -30%; } 100% { Left: 130%; } }
+        @keyframes sw { 0% { left: -30%; } 100% { left: 130%; } }
 
-        .Dot {
-            Width: 7px; Height: 7px; Border-Radius: 50%;
-            Background: Radial-Gradient(Circle At 35% 35%,Rgba(255,255,255,0.95),Rgba(150,200,255,0.85));
-            Box-Shadow: 0 0 10px Rgba(160,210,255,0.85),0 0 4px Rgba(255,255,255,0.65);
+        .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%,rgba(255,255,255,0.95),rgba(150,200,255,0.85));
+            box-shadow: 0 0 10px rgba(160,210,255,0.85),0 0 4px rgba(255,255,255,0.65);
         }
 
-        .Logo H1 {
-            Font-Family: 'Syne', Sans-Serif; Font-Size: 21px;
-            Letter-Spacing: 13px; Margin-Right: -13px; Font-Weight: 800;
-            Background: Linear-Gradient(135deg,Rgba(255,255,255,0.98) 0%,Rgba(200,225,255,0.92) 50%,Rgba(255,255,255,0.98) 100%);
-            -Webkit-Background-Clip: Text; Color: Transparent;
+        .logo h1 {
+            font-family: 'Syne', sans-serif; font-size: 21px;
+            letter-spacing: 13px; margin-right: -13px; font-weight: 800;
+            background: linear-gradient(135deg,rgba(255,255,255,0.98) 0%,rgba(200,225,255,0.92) 50%,rgba(255,255,255,0.98) 100%);
+            -webkit-background-clip: text; color: transparent;
         }
 
-        .Panel {
-            Padding: 24px;
-            Border-Radius: 28px;
-            Display: Flex;
-            Flex-Direction: Column;
-            Position: Relative;
-            Flex: 1; 
-            Background: Rgba(255,255,255,0.10);
-            Backdrop-Filter: Blur(60px) Saturate(200%);
-            -Webkit-Backdrop-Filter: Blur(60px) Saturate(200%);
-            Border-Top: 1px Solid Rgba(255,255,255,0.60);
-            Border-Left: 1px Solid Rgba(255,255,255,0.28);
-            Border-Right: 1px Solid Rgba(120,170,255,0.15);
-            Border-Bottom: 1px Solid Rgba(80,130,230,0.22);
-            Box-Shadow:
-                0 40px 80px Rgba(0,0,0,0.25),
-                0 12px 28px Rgba(0,0,0,0.15),
-                Inset 0 1px 0 Rgba(255,255,255,0.50),
-                Inset 0 0 60px Rgba(120,175,255,0.05);
-            Transition: Opacity 0.3s Ease;
-            Overflow: Hidden;
+        .panel {
+            padding: 24px;
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            flex: 1; 
+            background: rgba(255,255,255,0.10);
+            backdrop-filter: blur(60px) saturate(200%);
+            -webkit-backdrop-filter: blur(60px) saturate(200%);
+            border-top: 1px solid rgba(255,255,255,0.60);
+            border-left: 1px solid rgba(255,255,255,0.28);
+            border-right: 1px solid rgba(120,170,255,0.15);
+            border-bottom: 1px solid rgba(80,130,230,0.22);
+            box-shadow:
+                0 40px 80px rgba(0,0,0,0.25),
+                0 12px 28px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.50),
+                inset 0 0 60px rgba(120,175,255,0.05);
+            transition: opacity 0.3s ease;
+            overflow: hidden;
         }
 
-        .Panel::Before {
-            Content: ''; Position: Absolute; Top: 0; Left: 8%; Right: 8%; Height: 1px;
-            Background: Linear-Gradient(90deg,Transparent,Rgba(255,255,255,0.85) 30%,Rgba(255,255,255,0.85) 70%,Transparent);
+        .panel::before {
+            content: ''; position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.85) 30%,rgba(255,255,255,0.85) 70%,transparent);
         }
 
-        .Hint-Text {
-            Position: Absolute;
-            Top: 50%;
-            Left: 50%;
-            Transform: Translate(-50%, -50%);
-            Text-Align: Center;
-            Font-Size: 14px;
-            Font-Weight: 500;
-            Letter-Spacing: 3px;
-            Color: Rgba(180, 215, 255, 0.75);
-            Text-Transform: Uppercase;
-            Animation: Fadeincenter 1s Cubic-Bezier(0.16, 1, 0.3, 1) 0.2s Forwards;
-            Opacity: 0;
-            Transition: Opacity 0.4s Ease, Visibility 0.4s Ease;
-            Z-Index: 0;
-            Pointer-Events: None;
+        .hint-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: rgba(180, 215, 255, 0.75);
+            text-transform: uppercase;
+            animation: fadeInCenter 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+            opacity: 0;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .Hint-Text.Hidden {
-            Opacity: 0;
-            Visibility: Hidden;
+        .hint-text.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
 
-        @Keyframes Fadeincenter {
-            From { Opacity: 0; Transform: Translate(-50%, -30%); }
-            To { Opacity: 1; Transform: Translate(-50%, -50%); }
+        @keyframes fadeInCenter {
+            from { opacity: 0; transform: translate(-50%, -30%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
-        .Card-Stream {
-            Display: Flex;
-            Flex-Direction: Column;
-            Gap: 16px;
-            Width: 100%;
-            Position: Relative;
-            Z-Index: 1;
-            Padding-Bottom: 24px;
+        .card-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            padding-bottom: 24px;
         }
 
-        .Glass-Card {
-            Min-Height: 100px;
-            Border-Radius: 16px;
-            Cursor: Pointer;
-            Position: Relative;
-            Overflow: Hidden;
-            Transition: All 0.3s Cubic-Bezier(0.16,1,0.3,1);
-            Will-Change: Transform, Opacity; /* Optimizes Ui Rendering Pipeline */
-            Background: Rgba(255,255,255,0.11);
-            Backdrop-Filter: Blur(28px) Saturate(180%);
-            -Webkit-Backdrop-Filter: Blur(28px) Saturate(180%);
-            Border-Top: 1px Solid Rgba(255,255,255,0.62);
-            Border-Left: 1px Solid Rgba(255,255,255,0.30);
-            Border-Right: 1px Solid Rgba(120,170,250,0.18);
-            Border-Bottom: 1px Solid Rgba(80,130,225,0.26);
-            Box-Shadow:
-                0 8px 28px Rgba(0,0,0,0.18),
-                0 2px 8px Rgba(0,0,0,0.10),
-                Inset 0 1px 0 Rgba(255,255,255,0.52),
-                Inset 0 -1px 0 Rgba(90,145,235,0.16),
-                Inset 1px 0 0 Rgba(255,255,255,0.20),
-                Inset -1px 0 0 Rgba(90,145,235,0.10);
+        .glass-card {
+            min-height: 100px;
+            border-radius: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            will-change: transform, opacity; /* Optimizes UI rendering pipeline */
+            background: rgba(255,255,255,0.11);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.62);
+            border-left: 1px solid rgba(255,255,255,0.30);
+            border-right: 1px solid rgba(120,170,250,0.18);
+            border-bottom: 1px solid rgba(80,130,225,0.26);
+            box-shadow:
+                0 8px 28px rgba(0,0,0,0.18),
+                0 2px 8px rgba(0,0,0,0.10),
+                inset 0 1px 0 rgba(255,255,255,0.52),
+                inset 0 -1px 0 rgba(90,145,235,0.16),
+                inset 1px 0 0 rgba(255,255,255,0.20),
+                inset -1px 0 0 rgba(90,145,235,0.10);
             
-            Display: Flex;
-            Flex-Direction: Row; 
-            Align-Items: Center; 
-            Justify-Content: Space-Between;
-            Gap: 2rem;
-            Padding: 22px 24px;
-            Animation: Slideup 0.5s Cubic-Bezier(0.16, 1, 0.3, 1) Forwards;
+            display: flex;
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: space-between;
+            gap: 2rem;
+            padding: 22px 24px;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .Glass-Card.Is-Long {
-            Align-Items: Flex-Start;
+        .glass-card.is-long {
+            align-items: flex-start;
         }
 
-        .Glass-Card::Before {
-            Content: ''; Position: Absolute; Top: 0; Left: 5%; Right: 5%; Height: 1px;
-            Background: Linear-Gradient(90deg,Transparent,Rgba(255,255,255,0.90) 35%,Rgba(255,255,255,0.90) 65%,Transparent);
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 1px;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.90) 35%,rgba(255,255,255,0.90) 65%,transparent);
         }
         
-        .Glass-Card::After {
-            Content: ''; Position: Absolute; Inset: 0;
-            Background: Radial-Gradient(Ellipse 60% 50% At 15% -5%,Rgba(190,220,255,0.10),Transparent 60%);
-            Opacity: 0; Transition: Opacity 0.3s Ease; Pointer-Events: None;
+        .glass-card::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 60% 50% at 15% -5%,rgba(190,220,255,0.10),transparent 60%);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
         }
 
-        .Glass-Card:Hover {
-            Transform: Translatey(-4px) Scale(1.005);
-            Background: Rgba(255,255,255,0.18);
-            Border-Top: 1px Solid Rgba(255,255,255,0.85);
-            Border-Left: 1px Solid Rgba(255,255,255,0.48);
-            Border-Right: 1px Solid Rgba(130,180,255,0.28);
-            Border-Bottom: 1px Solid Rgba(85,140,230,0.38);
-            Box-Shadow:
-                0 20px 40px Rgba(0,0,0,0.24),
-                0 8px 20px Rgba(0,0,0,0.14),
-                Inset 0 1px 0 Rgba(255,255,255,0.72),
-                Inset 0 -1px 0 Rgba(90,145,235,0.24),
-                Inset 1px 0 0 Rgba(255,255,255,0.32),
-                Inset -1px 0 0 Rgba(90,145,235,0.16);
-            Z-Index: 99990 !Important; 
+        .glass-card:hover {
+            transform: translateY(-4px) scale(1.005);
+            background: rgba(255,255,255,0.18);
+            border-top: 1px solid rgba(255,255,255,0.85);
+            border-left: 1px solid rgba(255,255,255,0.48);
+            border-right: 1px solid rgba(130,180,255,0.28);
+            border-bottom: 1px solid rgba(85,140,230,0.38);
+            box-shadow:
+                0 20px 40px rgba(0,0,0,0.24),
+                0 8px 20px rgba(0,0,0,0.14),
+                inset 0 1px 0 rgba(255,255,255,0.72),
+                inset 0 -1px 0 rgba(90,145,235,0.24),
+                inset 1px 0 0 rgba(255,255,255,0.32),
+                inset -1px 0 0 rgba(90,145,235,0.16);
+            z-index: 99990 !important; 
         }
-        .Glass-Card:Hover::After { Opacity: 1; }
+        .glass-card:hover::after { opacity: 1; }
 
-        .Glass-Card.Highlighted {
-            Background: Rgba(255, 255, 255, 0.25); 
-            Border: 1px Solid Rgba(255, 255, 255, 0.95) !Important; 
-            Box-Shadow: 
-                0 25px 60px Rgba(0,0,0,0.5),
-                0 0 45px Rgba(255, 255, 255, 0.3), 
-                Inset 0 1px 0 Rgba(255,255,255,0.8),
-                Inset 0 0 25px Rgba(150, 200, 255, 0.4);
-            Transform: Scale(1.02);
-            Z-Index: 99999 !Important; 
-        }
-
-        .Card-Text-Node {
-            Font-Size: 16px;
-            Font-Weight: 400;
-            Line-Height: 1.55; 
-            Color: Rgba(235,245,255,0.97);
-            White-Space: Pre-Wrap;
-            Word-Break: Break-Word;
-            Flex: 1;
-            User-Select: Text;
-            Transition: Color 0.3s Ease, Font-Weight 0.3s Ease, Opacity 0.15s Ease;
-            Z-Index: 2; 
+        .glass-card.highlighted {
+            background: rgba(255, 255, 255, 0.25); 
+            border: 1px solid rgba(255, 255, 255, 0.95) !important; 
+            box-shadow: 
+                0 25px 60px rgba(0,0,0,0.5),
+                0 0 45px rgba(255, 255, 255, 0.3), 
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 0 25px rgba(150, 200, 255, 0.4);
+            transform: scale(1.02);
+            z-index: 99999 !important; 
         }
 
-        /* Changes Color, Makes Text Bold, And Adds High-Contrast Glow When Card Is Highlighted */
-        .Glass-Card.Highlighted .Card-Text-Node {
-            Color: #F0f9ff;
-            Font-Weight: 700;
-            Text-Shadow: 0 0 10px Rgba(255, 255, 255, 0.5), 0 2px 4px Rgba(0, 0, 0, 0.3);
+        .card-text-node {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.55; 
+            color: rgba(235,245,255,0.97);
+            white-space: pre-wrap;
+            word-break: break-word;
+            flex: 1;
+            user-select: text;
+            transition: color 0.3s ease, font-weight 0.3s ease, opacity 0.15s ease;
+            z-index: 2; 
         }
 
-        Body.Short-Mode .Card-Text-Node {
-            Display: -Webkit-Box;
-            -Webkit-Line-Clamp: 2;
-            -Webkit-Box-Orient: Vertical;
-            Overflow: Hidden;
-            Text-Overflow: Ellipsis;
-            White-Space: Normal;
+        /* Changes color, makes text bold, and adds high-contrast glow when card is highlighted */
+        .glass-card.highlighted .card-text-node {
+            color: #f0f9ff;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .Card-Meta {
-            Display: Flex;
-            Align-Items: Center;
-            Gap: 12px;
-            Flex-Shrink: 0;
-            Position: Relative;
-            Z-Index: 10;
+        body.short-mode .card-text-node {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
         }
 
-        .Glass-Card.Is-Long .Card-Meta {
-            Margin-Top: 2px;
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
         }
 
-        .Case-Number {
-            Padding: 5px 15px;
-            Border-Radius: 100px;
-            Font-Size: 12px;
-            Font-Weight: 800;
-            Letter-Spacing: 0.8px;
-            Color: #Ffffff; 
-            Background: #Ff3333; 
-            Backdrop-Filter: Blur(12px);
-            -Webkit-Backdrop-Filter: Blur(12px);
-            Border: 1px Solid #Ff4d4d;
-            Box-Shadow: 0 0 10px Rgba(255, 50, 50, 0.4), Inset 0 1px 0 Rgba(255,255,255,0.3);
-            Transition: Transform 0.2s Cubic-Bezier(0.16, 1, 0.3, 1), Box-Shadow 0.2s Ease;
-            Text-Align: Center;
-            Min-Width: 40px;
-            Cursor: Pointer;
+        .glass-card.is-long .card-meta {
+            margin-top: 2px;
         }
 
-        .Case-Number:Hover {
-            Transform: Scale(1.08);
-            Box-Shadow: 0 0 15px Rgba(255, 50, 50, 0.6), Inset 0 1px 0 Rgba(255,255,255,0.4);
+        .case-number {
+            padding: 5px 15px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            color: #ffffff; 
+            background: #ff3333; 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #ff4d4d;
+            box-shadow: 0 0 10px rgba(255, 50, 50, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+            text-align: center;
+            min-width: 40px;
+            cursor: pointer;
         }
 
-        .Feedback-Badge {
-            Position: Absolute;
-            Right: 60px;
-            Padding: 5px 15px;
-            Border-Radius: 100px;
-            Font-Size: 12px;
-            Font-Weight: 600;
-            Letter-Spacing: 0.8px;
-            Color: Rgba(220,238,255,0.95);
-            Background: Rgba(100, 180, 255, 0.7);
-            Border: 1px Solid Rgba(255,255,255,0.6);
-            Backdrop-Filter: Blur(12px);
-            -Webkit-Backdrop-Filter: Blur(12px);
-            Opacity: 0;
-            Transform: Scale(0.9) Translatex(10px);
-            White-Space: Nowrap;
-            Pointer-Events: None;
-            Box-Shadow: 0 4px 15px Rgba(50, 120, 220, 0.4);
-            Transition: Var(--Transition-Smooth);
+        .case-number:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(255, 50, 50, 0.6), inset 0 1px 0 rgba(255,255,255,0.4);
         }
 
-        .Glass-Card.Copied .Feedback-Badge {
-            Opacity: 1;
-            Transform: Scale(1) Translatex(0);
+        .feedback-badge {
+            position: absolute;
+            right: 60px;
+            padding: 5px 15px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: rgba(220,238,255,0.95);
+            background: rgba(100, 180, 255, 0.7);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: scale(0.9) translateX(10px);
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(50, 120, 220, 0.4);
+            transition: var(--transition-smooth);
         }
 
-        .Flash-Clear {
-            Opacity: 0 !Important;
-            Transform: Translatey(15px);
+        .glass-card.copied .feedback-badge {
+            opacity: 1;
+            transform: scale(1) translateX(0);
         }
 
-        .Mobile-Short-Btn {
-            Display: None;
+        .flash-clear {
+            opacity: 0 !important;
+            transform: translateY(15px);
         }
 
-        @Keyframes Fadedown {
-            From { Opacity: 0; Transform: Translatey(-15px); }
-            To { Opacity: 1; Transform: Translatey(0); }
+        .mobile-short-btn {
+            display: none;
         }
 
-        @Keyframes Slideup {
-            From { Opacity: 0; Transform: Translatey(20px); }
-            To { Opacity: 1; Transform: Translatey(0); }
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @Media (Max-Width: 600px) {
-            .Wrap { Padding: 32px 16px; }
-            .Logo { Padding: 12px 32px; }
-            .Logo H1 { Font-Size: 18px; Letter-Spacing: 8px; Margin-Right: -8px; }
-            .Hint-Text { Font-Size: 12px; Letter-Spacing: 2px; }
-            .Glass-Card { Padding: 18px 16px; Gap: 1rem; }
-            .Card-Text-Node { Font-Size: 14px; }
-            .Panel { Padding: 24px 16px 16px; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            .Mobile-Short-Btn {
-                Display: Flex;
-                Position: Fixed;
-                Bottom: 24px;
-                Right: 24px;
-                Z-Index: 999;
-                Width: 56px;
-                Height: 56px;
-                Border-Radius: 50%;
-                Background: Rgba(255, 255, 255, 0.15);
-                Backdrop-Filter: Blur(20px) Saturate(180%);
-                -Webkit-Backdrop-Filter: Blur(20px) Saturate(180%);
-                Border-Top: 1px Solid Rgba(255, 255, 255, 0.6);
-                Border-Left: 1px Solid Rgba(255, 255, 255, 0.3);
-                Border-Right: 1px Solid Rgba(120, 170, 250, 0.2);
-                Border-Bottom: 1px Solid Rgba(80, 130, 225, 0.3);
-                Align-Items: Center;
-                Justify-Content: Center;
-                Box-Shadow: 0 12px 36px Rgba(0, 0, 0, 0.35), Inset 0 1px 0 Rgba(255,255,255,0.4);
-                Cursor: Pointer;
-                Font-Family: 'Syne', Sans-Serif;
-                Font-Size: 16px;
-                Font-Weight: 800;
-                Color: #Ffffff;
-                Transition: Transform 0.2s Ease, Background 0.2s Ease;
+        @media (max-width: 600px) {
+            .wrap { padding: 32px 16px; }
+            .logo { padding: 12px 32px; }
+            .logo h1 { font-size: 18px; letter-spacing: 8px; margin-right: -8px; }
+            .hint-text { font-size: 12px; letter-spacing: 2px; }
+            .glass-card { padding: 18px 16px; gap: 1rem; }
+            .card-text-node { font-size: 14px; }
+            .panel { padding: 24px 16px 16px; }
+
+            .mobile-short-btn {
+                display: flex;
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                z-index: 999;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                border-top: 1px solid rgba(255, 255, 255, 0.6);
+                border-left: 1px solid rgba(255, 255, 255, 0.3);
+                border-right: 1px solid rgba(120, 170, 250, 0.2);
+                border-bottom: 1px solid rgba(80, 130, 225, 0.3);
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+                cursor: pointer;
+                font-family: 'Syne', sans-serif;
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                transition: transform 0.2s ease, background 0.2s ease;
             }
-            .Mobile-Short-Btn:Active {
-                Transform: Scale(0.9);
-                Background: Rgba(255, 255, 255, 0.25);
+            .mobile-short-btn:active {
+                transform: scale(0.9);
+                background: rgba(255, 255, 255, 0.25);
             }
         }
-    </Style>
-</Head>
-<Body>
+    </style>
+</head>
+<body>
 
-    <Div Class="Fixed-Scene">
-        <Div Class="Orb O1"></Div>
-        <Div Class="Orb O2"></Div>
-    </Div>
+    <div class="fixed-scene">
+        <div class="orb o1"></div>
+        <div class="orb o2"></div>
+    </div>
 
-    <Div Class="Wrap">
-        <Header Class="Logo Brand-Header">
-            <Div Class="Dot"></Div>
-            <H1>Paster</H1>
-            <Div Class="Dot"></Div>
-        </Header>
+    <div class="wrap">
+        <header class="logo brand-header">
+            <div class="dot"></div>
+            <h1>PASTER</h1>
+            <div class="dot"></div>
+        </header>
 
-        <Main Class="Panel">
-            <Div Class="Hint-Text" Id="Hinttext">Double Tap Or Double Click To Paste</Div>
-            <Div Class="Card-Stream" Id="Cardstream"></Div>
-        </Main>
-    </Div>
+        <main class="panel">
+            <div class="hint-text" id="hintText">Double tap or double click to Paste</div>
+            <div class="card-stream" id="cardStream"></div>
+        </main>
+    </div>
 
-    <Div Class="Mobile-Short-Btn" Id="Mobileshortbtn">S</Div>
+    <div class="mobile-short-btn" id="mobileShortBtn">S</div>
 
-    <Script>
-        Const Cardstream = Document.Getelementbyid('Cardstream');
-        Const Hinttext = Document.Getelementbyid('Hinttext');
-        Const Mobileshortbtn = Document.Getelementbyid('Mobileshortbtn');
-        Const Allcards = []; 
+    <script>
+        const cardStream = document.getElementById('cardStream');
+        const hintText = document.getElementById('hintText');
+        const mobileShortBtn = document.getElementById('mobileShortBtn');
+        const allCards = []; 
 
-        Function Totitlecase(Str) {
-            Return Str.Tolowercase().Replace(/\B\W/G, S => S.Touppercase());
+        function toTitleCase(str) {
+            return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
         }
 
-        Async Function Handlepasteevent() {
-            Try {
-                Const Text = Await Navigator.Clipboard.Readtext();
-                If (!Text || Text.Trim() === "") Return;
+        async function handlePasteEvent() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (!text || text.trim() === "") return;
                 
-                Const Newcard = Appendglasscard(Text);
-                Newcard.Element.Classlist.Add('Highlighted');
+                const newCard = appendGlassCard(text);
+                newCard.element.classList.add('highlighted');
                 
-                If (Hinttext) {
-                    Hinttext.Classlist.Add('Hidden');
+                if (hintText) {
+                    hintText.classList.add('hidden');
                 }
-            } Catch (Err) {
-                Console.Error("Clipboard Engine Failure: ", Err);
+            } catch (err) {
+                console.error("Clipboard engine failure: ", err);
             }
         }
 
-        Document.Body.Addeventlistener('Dblclick', (Event) => {
-            If (Event.Target.Closest('.Glass-Card')) Return;
-            Handlepasteevent();
+        document.body.addEventListener('dblclick', (event) => {
+            if (event.target.closest('.glass-card')) return;
+            handlePasteEvent();
         });
 
-        Let Lasttaptime = 0;
-        Document.Body.Addeventlistener('Touchend', (Event) => {
-            If (Event.Target.Closest('.Glass-Card') || Event.Target.Closest('#Mobileshortbtn')) Return;
+        let lastTapTime = 0;
+        document.body.addEventListener('touchend', (event) => {
+            if (event.target.closest('.glass-card') || event.target.closest('#mobileShortBtn')) return;
             
-            Const Currenttime = New Date().Gettime();
-            Const Taplength = Currenttime - Lasttaptime;
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
             
-            If (Taplength < 500 && Taplength > 0) {
-                Event.Preventdefault(); 
-                Handlepasteevent();
+            if (tapLength < 350 && tapLength > 0) {
+                // event.preventDefault() removed here to guarantee the system recognizes a valid 
+                // user gesture, allowing navigator.clipboard.readText() to execute successfully on mobile.
+                handlePasteEvent();
+                lastTapTime = 0; // Reset tap state to block triple-tap ghost triggers
+            } else {
+                lastTapTime = currentTime;
             }
-            Lasttaptime = Currenttime;
         });
 
-        Let Lastrightclicktime = 0;
-        Document.Body.Addeventlistener('Contextmenu', (E) => {
-            E.Preventdefault();
-            Const Now = Date.Now();
-            If (Now - Lastrightclicktime < 400) {
-                Cardstream.Classlist.Add('Flash-Clear');
-                Settimeout(() => {
-                    Cardstream.Innerhtml = '';
-                    Allcards.Length = 0; 
-                    Cardstream.Classlist.Remove('Flash-Clear');
-                    If (Hinttext) {
-                        Hinttext.Classlist.Remove('Hidden');
+        let lastRightClickTime = 0;
+        document.body.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const now = Date.now();
+            if (now - lastRightClickTime < 400) {
+                cardStream.classList.add('flash-clear');
+                setTimeout(() => {
+                    cardStream.innerHTML = '';
+                    allCards.length = 0; 
+                    cardStream.classList.remove('flash-clear');
+                    if (hintText) {
+                        hintText.classList.remove('hidden');
                     }
                 }, 300);
-                Lastrightclicktime = 0;
-            } Else {
-                Lastrightclicktime = Now;
+                lastRightClickTime = 0;
+            } else {
+                lastRightClickTime = now;
             }
         });
 
-        Document.Addeventlistener('Keydown', (E) => {
-            If (E.Key.Tolowercase() === 'S') {
-                E.Preventdefault();
-                Document.Body.Classlist.Toggle('Short-Mode');
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                document.body.classList.toggle('short-mode');
             }
 
-            Const Isarrowkey = ['Arrowup', 'Arrowdown', 'Arrowleft', 'Arrowright'].Includes(E.Code);
-            Const Activecards = Allcards.Filter(C => C.Element.Classlist.Contains('Highlighted'));
+            const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code);
+            const activeCards = allCards.filter(c => c.element.classList.contains('highlighted'));
             
-            If (Isarrowkey && Allcards.Length > 0) {
-                E.Preventdefault();
-                Allcards.Foreach(Card => Card.Cyclecase());
+            if (isArrowKey && allCards.length > 0) {
+                e.preventDefault();
+                allCards.forEach(card => card.cycleCase());
             }
             
-            If (E.Code === 'Space' && Activecards.Length > 0) {
-                E.Preventdefault();
-                Activecards.Foreach(Card => Card.Cyclecase());
+            if (e.code === 'Space' && activeCards.length > 0) {
+                e.preventDefault();
+                activeCards.forEach(card => card.cycleCase());
             }
         });
 
-        If (Mobileshortbtn) {
-            Mobileshortbtn.Addeventlistener('Click', (E) => {
-                E.Stoppropagation();
-                Document.Body.Classlist.Toggle('Short-Mode');
-                If (Document.Body.Classlist.Contains('Short-Mode')) {
-                    Mobileshortbtn.Textcontent = 'Full';
-                } Else {
-                    Mobileshortbtn.Textcontent = 'S';
+        if (mobileShortBtn) {
+            mobileShortBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.body.classList.toggle('short-mode');
+                if (document.body.classList.contains('short-mode')) {
+                    mobileShortBtn.textContent = 'Full';
+                } else {
+                    mobileShortBtn.textContent = 'S';
                 }
             });
         }
 
-        Function Appendglasscard(Initialcontent) {
-            Const Cardelement = Document.Createelement('Div');
-            Cardelement.Classname = 'Glass-Card';
+        function appendGlassCard(initialContent) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'glass-card';
             
-            Cardelement.Style.Zindex = 10000 - Allcards.Length;
+            cardElement.style.zIndex = 10000 - allCards.length;
 
-            If (Initialcontent.Length > 60) {
-                Cardelement.Classlist.Add('Is-Long');
+            if (initialContent.length > 60) {
+                cardElement.classList.add('is-long');
             }
 
-            Const Textdisplay = Document.Createelement('Div');
-            Textdisplay.Classname = 'Card-Text-Node';
-            Textdisplay.Textcontent = Initialcontent; 
+            const textDisplay = document.createElement('div');
+            textDisplay.className = 'card-text-node';
+            textDisplay.textContent = initialContent; 
 
-            Const Metacontainer = Document.Createelement('Div');
-            Metacontainer.Classname = 'Card-Meta';
+            const metaContainer = document.createElement('div');
+            metaContainer.className = 'card-meta';
 
-            Const Badge = Document.Createelement('Div');
-            Badge.Classname = 'Feedback-Badge';
-            Badge.Textcontent = 'Copied';
+            const badge = document.createElement('div');
+            badge.className = 'feedback-badge';
+            badge.textContent = 'COPIED';
 
-            Const Caseindicator = Document.Createelement('Div');
-            Caseindicator.Classname = 'Case-Number';
-            Caseindicator.Textcontent = 'N'; 
+            const caseIndicator = document.createElement('div');
+            caseIndicator.className = 'case-number';
+            caseIndicator.textContent = 'N'; 
 
-            Metacontainer.Appendchild(Badge);
-            Metacontainer.Appendchild(Caseindicator);
-            Cardelement.Appendchild(Textdisplay);
-            Cardelement.Appendchild(Metacontainer);
+            metaContainer.appendChild(badge);
+            metaContainer.appendChild(caseIndicator);
+            cardElement.appendChild(textDisplay);
+            cardElement.appendChild(metaContainer);
 
-            Let Currentstateindex = 3; 
-            Const Originalrawtext = Initialcontent;
+            let currentStateIndex = 3; 
+            const originalRawText = initialContent;
 
-            Const Cyclecase = () => {
-                Currentstateindex = (Currentstateindex + 1) % 4;
-                Textdisplay.Style.Opacity = '0';
+            const cycleCase = () => {
+                currentStateIndex = (currentStateIndex + 1) % 4;
+                textDisplay.style.opacity = '0';
 
-                Let Newtext = "";
+                let newText = "";
 
-                If (Currentstateindex === 0) {
-                    Newtext = Originalrawtext.Touppercase();
-                    Caseindicator.Textcontent = 'U';
-                } Else If (Currentstateindex === 1) {
-                    Newtext = Originalrawtext.Tolowercase();
-                    Caseindicator.Textcontent = 'L';
-                } Else If (Currentstateindex === 2) {
-                    Newtext = Totitlecase(Originalrawtext);
-                    Caseindicator.Textcontent = 'T';
-                } Else If (Currentstateindex === 3) {
-                    Newtext = Originalrawtext;
-                    Caseindicator.Textcontent = 'N';
+                if (currentStateIndex === 0) {
+                    newText = originalRawText.toUpperCase();
+                    caseIndicator.textContent = 'U';
+                } else if (currentStateIndex === 1) {
+                    newText = originalRawText.toLowerCase();
+                    caseIndicator.textContent = 'L';
+                } else if (currentStateIndex === 2) {
+                    newText = toTitleCase(originalRawText);
+                    caseIndicator.textContent = 'T';
+                } else if (currentStateIndex === 3) {
+                    newText = originalRawText;
+                    caseIndicator.textContent = 'N';
                 }
 
-                Settimeout(() => {
-                    Textdisplay.Textcontent = Newtext;
-                    Textdisplay.Style.Opacity = '1';
+                setTimeout(() => {
+                    textDisplay.textContent = newText;
+                    textDisplay.style.opacity = '1';
                 }, 100);
 
-                Return Newtext; 
+                return newText; 
             };
 
-            Const Cardobject = { Element: Cardelement, Cyclecase };
-            Allcards.Push(Cardobject);
+            const cardObject = { element: cardElement, cycleCase };
+            allCards.push(cardObject);
 
-            Caseindicator.Addeventlistener('Click', (E) => {
-                E.Stoppropagation(); 
-                Const Newtext = Cyclecase();
+            caseIndicator.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                const newText = cycleCase();
                 
-                Navigator.Clipboard.Writetext(Newtext).Then(() => {
-                    Cardelement.Classlist.Add('Copied');
-                    Settimeout(() => Cardelement.Classlist.Remove('Copied'), 1000);
-                }).Catch(Err => Console.Error("Clipboard Writing Faulted: ", Err));
+                navigator.clipboard.writeText(newText).then(() => {
+                    cardElement.classList.add('copied');
+                    setTimeout(() => cardElement.classList.remove('copied'), 1000);
+                }).catch(err => console.error("Clipboard writing faulted: ", err));
             });
 
-            Cardelement.Addeventlistener('Click', (E) => {
-                E.Stoppropagation();
+            cardElement.addEventListener('click', (e) => {
+                e.stopPropagation();
                 
-                Cardelement.Classlist.Toggle('Highlighted');
+                cardElement.classList.toggle('highlighted');
 
-                Navigator.Clipboard.Writetext(Textdisplay.Textcontent)
-                    .Then(() => {
-                        Cardelement.Classlist.Add('Copied');
-                        Settimeout(() => Cardelement.Classlist.Remove('Copied'), 1000);
+                navigator.clipboard.writeText(textDisplay.textContent)
+                    .then(() => {
+                        cardElement.classList.add('copied');
+                        setTimeout(() => cardElement.classList.remove('copied'), 1000);
                     })
-                    .Catch(Err => Console.Error("Clipboard Writing Faulted: ", Err));
+                    .catch(err => console.error("Clipboard writing faulted: ", err));
             });
 
-            Cardstream.Prepend(Cardelement);
+            cardStream.prepend(cardElement);
             
-            Return Cardobject;
+            return cardObject;
         }
-    </Script>
-</Body>
-</Html>
+    </script>
+</body>
+</html>
