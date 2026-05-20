@@ -484,7 +484,14 @@
             return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
         }
 
+        let lastPasteTime = 0; // Tracks the exact time of the last paste
+
         async function handlePasteEvent() {
+            // Check if we just pasted in the last 500ms. If so, ignore this ghost click!
+            const now = Date.now();
+            if (now - lastPasteTime < 500) return; 
+            lastPasteTime = now;
+
             try {
                 const text = await navigator.clipboard.readText();
                 if (!text || text.trim() === "") return;
