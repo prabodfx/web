@@ -124,6 +124,7 @@
                 0 2px 8px rgba(0,0,0,0.12),
                 inset 0 1px 0 rgba(255,255,255,0.55);
             animation: fadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            cursor: pointer; /* Visual indicator that it's now interactive */
         }
 
         .logo::after {
@@ -452,7 +453,7 @@
     </div>
 
     <div class="wrap">
-        <header class="logo brand-header">
+        <header class="logo brand-header" id="brandHeader">
             <div class="dot"></div>
             <h1>PASTER</h1>
             <div class="dot"></div>
@@ -470,6 +471,7 @@
         const cardStream = document.getElementById('cardStream');
         const hintText = document.getElementById('hintText');
         const mobileShortBtn = document.getElementById('mobileShortBtn');
+        const brandHeader = document.getElementById('brandHeader');
         const allCards = []; 
 
         function toTitleCase(str) {
@@ -492,14 +494,26 @@
             }
         }
 
+        // Click/Tap on the Title Header triggers Paste directly
+        if (brandHeader) {
+            brandHeader.addEventListener('click', (event) => {
+                event.stopPropagation();
+                handlePasteEvent();
+            });
+            brandHeader.addEventListener('touchend', (event) => {
+                event.stopPropagation();
+                handlePasteEvent();
+            });
+        }
+
         document.body.addEventListener('dblclick', (event) => {
-            if (event.target.closest('.glass-card')) return;
+            if (event.target.closest('.glass-card') || event.target.closest('#brandHeader')) return;
             handlePasteEvent();
         });
 
         let lastTapTime = 0;
         document.body.addEventListener('touchend', (event) => {
-            if (event.target.closest('.glass-card') || event.target.closest('#mobileShortBtn')) return;
+            if (event.target.closest('.glass-card') || event.target.closest('#mobileShortBtn') || event.target.closest('#brandHeader')) return;
             
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTapTime;
