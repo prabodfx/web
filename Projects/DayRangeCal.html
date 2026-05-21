@@ -27,91 +27,88 @@
   </script>
   <style>
     input { font-size: 16px; }
-    /* Prevent bouncing on mobile browsers */
-    html, body {
-      position: fixed;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-    }
   </style>
 </head>
-<body class="bg-slate-900 text-white font-inter h-screen w-screen overflow-hidden flex flex-col justify-between p-4 sm:p-6 md:p-8 select-none">
+<body class="bg-slate-900 text-white font-inter min-h-screen p-4">
 
-  <header class="w-full flex-shrink-0 text-center">
-    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text 
-       bg-gradient-to-r from-blue-400 to-purple-600 leading-tight pb-1">
-      Day Range Count
-    </h1>
-  </header>
-
-  <main class="w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-center overflow-hidden my-4">
-    <section class="bg-gray-800 bg-opacity-70 backdrop-blur-md rounded-3xl p-5 sm:p-6 md:p-8 w-full shadow-lg border border-gray-700 flex flex-col justify-between max-h-full overflow-hidden gap-4 sm:gap-6">
+  <div class="min-h-screen w-full flex items-center justify-center">
+    <main class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center space-y-8">
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left flex-shrink-0">
-        <div>
-          <label for="from" class="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5">From</label>
-          <div class="relative">
-            <input id="from" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" aria-label="From date"
-              placeholder="MMDD or YYYYMMDD"
-              class="w-full px-4 py-2.5 sm:py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white font-bold text-sm sm:text-base"
-              maxlength="10" autofocus>
+      <section class="space-y-2">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text 
+           bg-gradient-to-r from-blue-400 to-purple-600 leading-[1.2] pb-1">
+          Day Range Count
+        </h1>
+      </section>
+  
+      <section class="bg-gray-800 bg-opacity-70 backdrop-blur-md rounded-3xl p-6 sm:p-8 w-full shadow-lg border border-gray-700">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+          <div>
+            <label for="from" class="block text-sm font-medium text-slate-300 mb-2 text-left">From</label>
+            <div class="relative">
+              <input id="from" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" aria-label="From date"
+                placeholder="MMDD or YYYYMMDD"
+                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white font-bold"
+                maxlength="10" autofocus>
+            </div>
+          </div>
+          <div>
+            <label for="to" class="block text-sm font-medium text-slate-300 mb-2 text-left">To</label>
+            <div class="relative">
+              <input id="to" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" aria-label="To date"
+                placeholder="MMDD or YYYYMMDD"
+                class="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white font-bold"
+                maxlength="10">
+            </div>
           </div>
         </div>
-        <div>
-          <label for="to" class="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5">To</label>
-          <div class="relative">
-            <input id="to" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" aria-label="To date"
-              placeholder="MMDD or YYYYMMDD"
-              class="w-full px-4 py-2.5 sm:py-3 rounded-2xl bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 text-white font-bold text-sm sm:text-base"
-              maxlength="10">
+  
+        <div class="flex flex-wrap justify-center gap-4 mt-6">
+          <button id="calc"
+            class="btn bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto">
+            Calculate
+          </button>
+          <button id="single"
+            class="btn bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-600 transition-all duration-200 w-full sm:w-auto">
+            Count With Today
+          </button>
+          <button id="swap"
+            class="btn bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-600 transition-all duration-200 w-full sm:w-auto">
+            Swap
+          </button>
+        </div>
+  
+        <div id="result-container" class="mt-6 p-4 sm:p-6 rounded-2xl bg-gray-900 border border-gray-700">
+          <div id="status" class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-3"
+            style="background: linear-gradient(90deg, #22c55e, #a3e635); color: #06101f;">
+            Ready
+          </div>
+          <div class="text-6xl sm:text-7xl font-extrabold flex items-baseline justify-center gap-2 mb-2">
+            <span id="days">—</span>
+            <span id="days-unit" class="text-xl sm:text-2xl text-slate-400 font-medium">Days</span>
+          </div>
+          <div class="text-red-500 text-sm mt-1" id="error" style="display:none"></div>
+          <div class="text-slate-500 text-xs mt-3">
+            <span id="example" class="inline-flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-800 transition-colors">
+              Example : 2004-08-06 =<div class="text-slate-400 text-sm" id="explain">7683 days</div>
+            </span>
           </div>
         </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row justify-center gap-3 flex-shrink-0">
-        <button id="calc"
-          class="btn bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2.5 sm:py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base w-full sm:w-auto">
-          Calculate
-        </button>
-        <button id="single"
-          class="btn bg-gray-700 text-gray-300 font-bold py-2.5 sm:py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-600 transition-all duration-200 text-sm sm:text-base w-full sm:w-auto">
-          Count With Today
-        </button>
-      </div>
-
-      <div id="result-container" class="flex-1 flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-900 border border-gray-700 min-h-[140px] sm:min-h-[180px] overflow-hidden relative">
-        <div id="status" class="inline-flex items-center gap-2 text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-full absolute top-3"
-          style="background: linear-gradient(90deg, #22c55e, #a3e635); color: #06101f;">
-          Ready
-        </div>
-        
-        <div class="text-4xl sm:text-6xl md:text-7xl font-extrabold flex items-baseline justify-center flex-wrap gap-2 my-auto max-w-full overflow-hidden text-center">
-          <span id="days" class="break-all tracking-tight leading-none">—</span>
-          <span id="days-unit" class="text-lg sm:text-xl md:text-2xl text-slate-400 font-medium whitespace-nowrap">Days</span>
-        </div>
-        
-        <div class="text-red-500 text-xs sm:text-sm mt-1 absolute bottom-8 text-center px-4" id="error" style="display:none"></div>
-        
-        <div class="text-slate-500 text-[10px] sm:text-xs absolute bottom-2.5">
-          <span id="example" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full cursor-pointer hover:bg-gray-800 transition-colors">
-            Example : 2004-08-06 =<div class="text-slate-400 font-semibold" id="explain">7683 days</div>
-          </span>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="w-full flex-shrink-0 text-center text-slate-500 text-[10px] sm:text-xs opacity-85">
-    Prabodfx Creations
-  </footer>
-
+      </section>
+  
+      <footer class="text-slate-500 text-xs opacity-80">
+        Prabodfx Creations
+      </footer>
+    </main>
+  </div>
+  
   <script>
     const el = {
       from: document.getElementById('from'),
       to: document.getElementById('to'),
       calc: document.getElementById('calc'),
       single: document.getElementById('single'),
+      swap: document.getElementById('swap'),
       days: document.getElementById('days'),
       daysUnit: document.getElementById('days-unit'),
       status: document.getElementById('status'),
@@ -121,6 +118,11 @@
     };
 
     const inputModes = { from: 'date', to: 'date' };
+    
+    let lastFocusedInput = el.to; 
+
+    el.from.addEventListener('focus', () => { lastFocusedInput = el.from; });
+    el.to.addEventListener('focus', () => { lastFocusedInput = el.to; });
 
     function setStatus(msg, ok = true) {
       el.status.textContent = msg;
@@ -143,6 +145,21 @@
         inputEl.classList.remove('text-blue-400');
         inputEl.classList.add('text-white');
       }
+    }
+
+    function toggleModeForInput(inputEl) {
+      const currentId = inputEl.id;
+      const otherId = currentId === 'from' ? 'to' : 'from';
+      
+      if (inputModes[currentId] === 'date') {
+        if (inputModes[otherId] === 'number') return;
+        setInputMode(currentId, 'number');
+        // Do NOT clear value when changing to Numbers mode
+      } else {
+        setInputMode(currentId, 'date');
+        inputEl.value = ''; // CLEAR value when changing back to Days mode
+      }
+      render();
     }
 
     function isValidYMD(y, m, d) {
@@ -208,40 +225,10 @@
         return;
       }
 
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
+
       const digits = v.replace(/\D/g, '');
       const today = new Date();
-
-      if (digits.length === 3) {
-        const y = today.getFullYear();
-        const m = Number(digits.slice(0,2));
-        const d = Number(digits.slice(2,3));
-        if (isValidYMD(y, m, d)) {
-          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          if (next && !next.value && inputModes[next.id] === 'date') next.focus();
-          finishIfBothValid();
-          return;
-        }
-        const mm = Number(digits.slice(0,1));
-        const dd = Number(digits.slice(1,3));
-        if (isValidYMD(y, mm, dd)) {
-          input.value = `${y}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-          if (next && !next.value && inputModes[next.id] === 'date') next.focus();
-          finishIfBothValid();
-          return;
-        }
-      }
-
-      if (digits.length === 4) {
-        const y = today.getFullYear();
-        const m = Number(digits.slice(0, 2));
-        const d = Number(digits.slice(2, 4));
-        if (isValidYMD(y, m, d)) {
-          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          if (next && !next.value && inputModes[next.id] === 'date') next.focus();
-          finishIfBothValid();
-          return;
-        }
-      }
 
       if (digits.length === 8) {
         const y = Number(digits.slice(0, 4));
@@ -258,28 +245,65 @@
       input.value = digits;
     }
 
-    function autoFormatOnEnter(input) {
+    function applyFinalFormat(input) {
       if (inputModes[input.id] === 'number') return;
+      const v = input.value;
+      
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
 
-      const digits = input.value.replace(/\D/g, '');
+      const digits = v.replace(/\D/g, '');
+      if (!digits) return;
+
       const today = new Date();
+      const currY = today.getFullYear();
+      let y, m, d;
+      let formatted = false;
+
       if (digits.length === 2) {
-        const y = today.getFullYear();
-        const m = Number(digits.slice(0,1));
-        const d = Number(digits.slice(1,2));
-        if (isValidYMD(y, m, d)) {
-          input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          return;
+        y = currY; m = Number(digits.slice(0,1)); d = Number(digits.slice(1,2));
+        if (isValidYMD(y, m, d)) formatted = true;
+      } else if (digits.length === 3) {
+        // Pattern: 112 -> currY-01-12 (M-DD Priority)
+        y = currY; m = Number(digits.slice(0,1)); d = Number(digits.slice(1,3));
+        if (isValidYMD(y, m, d)) formatted = true;
+        else {
+            m = Number(digits.slice(0,2)); d = Number(digits.slice(2,3));
+            if (isValidYMD(y, m, d)) formatted = true;
         }
+      } else if (digits.length === 4) {
+        const firstTwo = Number(digits.slice(0,2));
+        if (firstTwo > 12) {
+            // Pattern: 2411 -> 2024-01-01 (YY-M-D)
+            y = 2000 + firstTwo; m = Number(digits.slice(2,3)); d = Number(digits.slice(3,4));
+            if (isValidYMD(y, m, d)) formatted = true;
+        } else {
+            // Priority: MMDD
+            y = currY; m = firstTwo; d = Number(digits.slice(2,4));
+            if (isValidYMD(y, m, d)) formatted = true;
+            else {
+                y = 2000 + firstTwo; m = Number(digits.slice(2,3)); d = Number(digits.slice(3,4));
+                if (isValidYMD(y, m, d)) formatted = true;
+            }
+        }
+      } else if (digits.length === 6) {
+        const firstFour = Number(digits.slice(0,4));
+        if (firstFour >= 1900 && firstFour <= 2100) {
+            // Pattern: 199956 -> 1999-05-06 (YYYY-M-D)
+            y = firstFour; m = Number(digits.slice(4,5)); d = Number(digits.slice(5,6));
+            if (isValidYMD(y, m, d)) formatted = true;
+        }
+        if (!formatted) {
+            // YY-MM-DD
+            y = 2000 + Number(digits.slice(0,2)); m = Number(digits.slice(2,4)); d = Number(digits.slice(4,6));
+            if (isValidYMD(y, m, d)) formatted = true;
+        }
+      } else if (digits.length === 8) {
+        y = Number(digits.slice(0,4)); m = Number(digits.slice(4,6)); d = Number(digits.slice(6,8));
+        if (isValidYMD(y, m, d)) formatted = true;
       }
-      if (digits.length === 3) {
-        const y = today.getFullYear();
-        const mm = Number(digits.slice(0,1));
-        const dd = Number(digits.slice(1,3));
-        if (isValidYMD(y, mm, dd)) {
-          input.value = `${y}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-          return;
-        }
+
+      if (formatted) {
+        input.value = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       }
     }
 
@@ -347,23 +371,27 @@
     el.from.addEventListener('input', () => { autoFormat(el.from, el.to); render(); });
     el.to.addEventListener('input', () => { autoFormat(el.to, null); render(); });
 
-    el.from.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        autoFormatOnEnter(el.from);
-        finishIfBothValid();
-        el.to.focus();
-      }
-    });
+    el.from.addEventListener('blur', () => { applyFinalFormat(el.from); render(); finishIfBothValid(); });
+    el.to.addEventListener('blur', () => { applyFinalFormat(el.to); render(); finishIfBothValid(); });
 
-    el.to.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    function handleModeShortcuts(e, inp) {
+      if (e.key === '.' || e.key === ' ' || e.key === '-') {
+        if (e.key === '-' && inputModes[inp.id] === 'number' && inp.value === '') {
+          return;
+        }
         e.preventDefault();
-        autoFormatOnEnter(el.to);
-        finishIfBothValid();
-        el.from.focus();
+        toggleModeForInput(inp);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        applyFinalFormat(inp);
+        render();
+        const nextInp = inp === el.from ? el.to : el.from;
+        if (!finishIfBothValid()) nextInp.focus();
       }
-    });
+    }
+
+    el.from.addEventListener('keydown', (e) => handleModeShortcuts(e, el.from));
+    el.to.addEventListener('keydown', (e) => handleModeShortcuts(e, el.to));
     
     el.calc.addEventListener('click', e => { 
       e.preventDefault(); 
@@ -405,34 +433,16 @@
       finishIfBothValid();
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.code === "Space") {
-        const active = document.activeElement;
-        if (active === el.from || active === el.to) {
-          e.preventDefault(); 
-          
-          const currentId = active.id;
-          const otherId = currentId === 'from' ? 'to' : 'from';
-          
-          if (inputModes[currentId] === 'date') {
-            if (inputModes[otherId] === 'number') {
-              return;
-            }
-            setInputMode(currentId, 'number');
-          } else {
-            setInputMode(currentId, 'date');
-            active.value = '';
-          }
-          render();
-        }
-      }
+    el.swap.addEventListener('click', e => {
+      e.preventDefault();
+      toggleModeForInput(lastFocusedInput);
+      lastFocusedInput.focus();
     });
 
     el.example.addEventListener('click', () => {
       setInputMode('from', 'date');
       setInputMode('to', 'date');
-      el.from.value = '0819';
-      autoFormat(el.from, el.to);
+      el.from.value = '2024-08-19';
       el.to.value = '2004-08-06';
       render();
       finishIfBothValid();
