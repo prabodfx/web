@@ -368,8 +368,28 @@
       }
     }
 
-    el.from.addEventListener('input', () => { autoFormat(el.from, el.to); render(); });
-    el.to.addEventListener('input', () => { autoFormat(el.to, null); render(); });
+    function handleMobileInput(e, inp, next) {
+      // Catch exact dynamic character entry on physical and virtual mobile keyboards
+      const char = e.data || inp.value.slice(-1);
+
+      if (char === '.' || char === ' ' || char === '-') {
+        if (char === '-' && inputModes[inp.id] === 'number' && inp.value === '-') {
+          // Allow keyboard to initiate negative numbers in day offset mode
+        } else {
+          // Instantly pop the token character from viewport string values and pivot state modes
+          if (inp.value.endsWith(char)) {
+            inp.value = inp.value.slice(0, -1);
+          }
+          toggleModeForInput(inp);
+          return;
+        }
+      }
+      autoFormat(inp, next);
+      render();
+    }
+
+    el.from.addEventListener('input', (e) => { handleMobileInput(e, el.from, el.to); });
+    el.to.addEventListener('input', (e) => { handleMobileInput(e, el.to, null); });
 
     el.from.addEventListener('blur', () => { applyFinalFormat(el.from); render(); finishIfBothValid(); });
     el.to.addEventListener('blur', () => { applyFinalFormat(el.to); render(); finishIfBothValid(); });
