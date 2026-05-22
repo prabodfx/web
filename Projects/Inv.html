@@ -459,6 +459,15 @@
       </div>
   </div>
 
+  <div id="warningModal" class="modal-overlay">
+      <div class="modal-content">
+          <h3>Warning</h3>
+          <p id="warningModalText" style="font-size: 1rem; margin-bottom: 25px; color: #fff;"></p>
+          <button id="warningYesBtn" onclick="handleWarningYes()">Yes</button>
+          <button id="warningNoBtn" onclick="handleWarningNo()">No</button>
+      </div>
+  </div>
+
   <script>
     // --- Global State ---
     let customerData = {};
@@ -479,6 +488,7 @@
     // Feature State
     let currentDocNo = null;
     let receiptLockCount = 0;
+    let pendingInvoiceArgs = null;
 
     // --- DOM Elements ---
     const feedbackText = document.getElementById('feedback-text');
@@ -499,6 +509,7 @@
     const docNoInput = document.getElementById('docNoInput');
     const countModal = document.getElementById('countModal');
     const countInput = document.getElementById('countInput');
+    const warningModal = document.getElementById('warningModal');
 
     /**
      * Date Helper
@@ -751,13 +762,53 @@
             savedData[today] = {};
         }
 
+        const keys = Object.keys(savedData[today]);
+        let previousInvoice = null;
+        if (keys.length > 0) {
+            const lastKey = keys[keys.length - 1];
+            previousInvoice = { key: lastKey, data: savedData[today][lastKey] };
+        }
+
+        let nextReceiptNo = currentReceiptNo;
+        if (processingActive && receiptLockCount <= 0) {
+            if (receiptOperator === '+') nextReceiptNo = currentReceiptNo + 1;
+            else if (receiptOperator === '-') nextReceiptNo = currentReceiptNo - 1;
+        }
+
+        let prevReceiptNo = null;
+        if (previousInvoice) {
+            const prevReceiptMatch = previousInvoice.key.match(/Rece (\d+)/);
+            if (prevReceiptMatch) {
+                prevReceiptNo = parseInt(prevReceiptMatch[1], 10);
+            }
+        }
+
+        if (processingActive && receiptLockCount <= 0 && previousInvoice && previousInvoice.data.name === customer.name && prevReceiptNo !== null && nextReceiptNo !== prevReceiptNo) {
+            pendingInvoiceArgs = { userInput, customer, foundInvoice, prevReceiptNo };
+            document.getElementById('warningModalText').textContent = `Customer matches previous item (${customer.name}), but receipt numbers differ. Accept auto-calculated replacement?`;
+            document.getElementById('warningModal').style.display = 'flex';
+            return;
+        }
+
+        executeAddInvoice(userInput, customer, foundInvoice, false, null);
+    }
+
+    /**
+     * Complete Core Save Processing Flow
+     */
+    function executeAddInvoice(userInput, customer, foundInvoice, overrideReceipt, forcedReceiptNo) {
+        const today = getCurrentDate();
         let finalSavedKey = foundInvoice;
         let invoiceDocNo = null;
 
         if (processingActive) {
-            if (receiptLockCount > 0) { } else {
-                 if (receiptOperator === '+') currentReceiptNo++;
-                 else if (receiptOperator === '-') currentReceiptNo--;
+            if (overrideReceipt) {
+                currentReceiptNo = forcedReceiptNo;
+            } else {
+                if (receiptLockCount > 0) { } else {
+                     if (receiptOperator === '+') currentReceiptNo++;
+                     else if (receiptOperator === '-') currentReceiptNo--;
+                }
             }
             finalSavedKey = `NVAT ${userInput} - Rece ${currentReceiptNo}`;
         }
@@ -784,6 +835,26 @@
             currentDocNo++;
         }
         updateStatusBar();
+    }
+
+    /**
+     * Warning Handlers
+     */
+    function handleWarningYes() {
+        document.getElementById('warningModal').style.display = 'none';
+        if (pendingInvoiceArgs) {
+            executeAddInvoice(pendingInvoiceArgs.userInput, pendingInvoiceArgs.customer, pendingInvoiceArgs.foundInvoice, false, null);
+            pendingInvoiceArgs = null;
+        }
+    }
+
+    function handleWarningNo() {
+        document.getElementById('warningModal').style.display = 'none';
+        if (pendingInvoiceArgs) {
+            executeAddInvoice(pendingInvoiceArgs.userInput, pendingInvoiceArgs.customer, pendingInvoiceArgs.foundInvoice, true, pendingInvoiceArgs.prevReceiptNo);
+            pendingInvoiceArgs = null;
+            openCountModal();
+        }
     }
 
     /**
