@@ -462,7 +462,8 @@
   <div id="warningModal" class="modal-overlay">
       <div class="modal-content">
           <h3>Warning</h3>
-          <p id="warningModalText" style="font-size: 1rem; margin-bottom: 25px; color: #fff;"></p>
+          <p id="warningModalText" style="font-size: 1rem; margin-bottom: 10px; color: #fff;"></p>
+          <p style="font-size: 0.8rem; margin-bottom: 25px; color: #888;">(Left-click anywhere to Accept, Right-click to Cancel)</p>
           <button id="warningYesBtn" onclick="handleWarningYes()">Yes</button>
           <button id="warningNoBtn" onclick="handleWarningNo()">No</button>
       </div>
@@ -1288,9 +1289,16 @@
     invoiceInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') searchInvoice();
     });
+    
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.saved-item')) activeRow = null;
     });
+
+    // --- Prevent Default Right-Click Menu Globally ---
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
     editContentInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -1318,6 +1326,28 @@
         if (e.key === 'Enter') {
             e.preventDefault();
             submitLockCount();
+        }
+    });
+
+    // --- Warning Modal Global Area Click Handlers ---
+    warningModal.addEventListener('mouseup', function(e) {
+        // Prevent action if modal isn't visible
+        if (warningModal.style.display !== 'flex') return;
+
+        // If the user actually clicked the native buttons, let the inline onclick handlers take over
+        if (e.target.id === 'warningYesBtn' || e.target.id === 'warningNoBtn') return;
+
+        if (e.button === 0) { // Left-click anywhere
+            handleWarningYes();
+        } else if (e.button === 2) { // Right-click anywhere
+            handleWarningNo();
+        }
+    });
+
+    // Prevent standard context menu when right-clicking anywhere on the warning modal
+    warningModal.addEventListener('contextmenu', function(e) {
+        if (warningModal.style.display === 'flex') {
+            e.preventDefault();
         }
     });
 
