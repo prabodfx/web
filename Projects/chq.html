@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTO CHEQUE LIST | PRABOFfx</title>
+    
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Premium Gold & Dark Theme Palette */
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #B5952F;
+            --bg-main: #0a0a0c;
+            --surface: rgba(22, 22, 26, 0.7);
+            --surface-hover: rgba(30, 30, 35, 0.8);
+            --text-primary: #FAFAFA;
+            --text-secondary: #94A3B8;
+            --border-color: rgba(212, 175, 55, 0.15);
+            --border-light: rgba(255, 255, 255, 0.05);
+            --success: #10B981;
+            --danger: #EF4444;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #1a1a24 0%, var(--bg-main) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Container */
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            min-height: 600px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            display: flex;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            flex-direction: row;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            background: rgba(10, 10, 12, 0.4);
+            border-right: 1px solid var(--border-light);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+            flex-shrink: 0;
+        }
+
+        .logo { 
+            font-weight: 700; 
+            font-size: 1.5rem; 
+            color: var(--gold-primary); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            letter-spacing: 0.5px;
+        }
+
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .step { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            color: var(--text-secondary); 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+        .step.active { color: var(--gold-primary); }
+        
+        .step i { 
+            width: 40px; 
+            height: 40px; 
+            background: var(--border-light); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            border: 1px solid transparent;
+        }
+        .step.active i { 
+            background: rgba(212, 175, 55, 0.1); 
+            color: var(--gold-primary); 
+            border-color: var(--border-color);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Main Workspace */
+        .workspace {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .header-titles h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        
+        .header-titles p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        /* Drag & Drop Upload Box */
+        .upload-box {
+            min-height: 200px;
+            background: rgba(212, 175, 55, 0.02);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .upload-box * { pointer-events: none; }
+
+        .upload-box.dragover, .upload-box:hover { 
+            border-color: var(--gold-primary); 
+            background: rgba(212, 175, 55, 0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .upload-box i { 
+            font-size: 3rem; 
+            color: var(--gold-primary); 
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        .upload-box strong { font-size: 1.1rem; font-weight: 500; }
+
+        /* File List Area */
+        .file-scroller {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 25px;
+        }
+        .file-scroller::-webkit-scrollbar { width: 6px; }
+        .file-scroller::-webkit-scrollbar-track { background: var(--border-light); border-radius: 10px; }
+        .file-scroller::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+
+        .file-item {
+            background: var(--border-light);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .file-item:hover { 
+            background: rgba(255,255,255,0.08); 
+            border-color: var(--border-color); 
+        }
+
+        .tag-source { 
+            color: var(--gold-primary); 
+            background: rgba(212, 175, 55, 0.1); 
+            border: 1px solid var(--border-color); 
+            padding: 4px 10px; 
+            border-radius: 6px; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+        }
+
+        .btn-remove {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-remove:hover { 
+            background: var(--danger); 
+            color: white; 
+        }
+
+        /* Status & Actions */
+        #status { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .action-area {
+            margin-top: auto;
+            display: flex;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+        .btn-generate:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 25px rgba(212, 175, 55, 0.3);
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+        }
+        .btn-generate:disabled { 
+            background: var(--border-light);
+            color: var(--text-secondary);
+            box-shadow: none;
+            cursor: not-allowed; 
+        }
+
+        /* Fully Responsive Media Queries */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+                min-height: auto;
+                height: 90vh;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 20px 30px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                gap: 20px;
+            }
+            .step-container {
+                flex-direction: row;
+                gap: 20px;
+            }
+            .step span { display: none; } /* Hide text on smaller screens, keep icons */
+            .workspace {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .sidebar { padding: 15px 20px; }
+            .logo { font-size: 1.2rem; }
+            .upload-box { min-height: 160px; }
+            .btn-generate { padding: 15px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                PRABODfx
+            </div>
+            <div class="step-container">
+                <div class="step active" id="step1">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>1. Upload Files</span>
+                </div>
+                <div class="step" id="step2">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>2. Processing</span>
+                </div>
+                <div class="step" id="step3">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>3. Complete</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="workspace">
+            <div class="header-titles">
+                <h2>Auto-Cheque List Generator</h2>
+                <p>Upload raw Excel files to automatically extract, calculate daily totals, and generate strictly formatted premium output.</p>
+            </div>
+
+            <div class="upload-box" id="uploadBox">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div>
+                    <strong>Drag & drop raw files here</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; text-align: center;">or click to browse</p>
+                </div>
+            </div>
+
+            <div class="file-scroller" id="fileList"></div>
+
+            <div id="status">📂 Waiting for files...</div>
+
+            <div class="action-area">
+                <button class="btn-generate" id="runBtn" disabled>
+                    Generate Strict Excel <i class="fa-solid fa-file-arrow-down"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const uploadBox = document.getElementById('uploadBox');
+    const fileListDiv = document.getElementById('fileList');
+    const statusDiv = document.getElementById('status');
+    const runBtn = document.getElementById('runBtn');
+
+    let allFiles = [];
+
+    // --- File Upload Handlers ---
+    uploadBox.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.xlsx,.xls';
+        input.onchange = e => addFiles([...e.target.files]);
+        input.click();
+    });
+
+    uploadBox.addEventListener('dragover', e => {
+        e.preventDefault();
+        uploadBox.classList.add('dragover');
+    });
+    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+    uploadBox.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadBox.classList.remove('dragover');
+        addFiles([...e.dataTransfer.files].filter(f => f.name.endsWith('.xlsx') || f.name.endsWith('.xls')));
+    });
+
+    function addFiles(files) {
+        files.forEach(f => {
+            if (!allFiles.find(x => x.name === f.name)) {
+                allFiles.push(f);
+            }
+        });
+        renderFileList();
+    }
+
+    function removeFile(filename) {
+        allFiles = allFiles.filter(f => f.name !== filename);
+        renderFileList();
+    }
+
+    function renderFileList() {
+        fileListDiv.innerHTML = "";
+        allFiles.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fa-solid fa-file-excel" style="color: var(--gold-primary); font-size: 1.2rem;"></i>
+                    <span style="font-weight: 500;">${f.name}</span>
+                    <span class="tag-source">SOURCE</span>
+                </div>
+                <button class="btn-remove" onclick="removeFile('${f.name}')">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            `;
+            fileListDiv.appendChild(item);
+        });
+
+        if (allFiles.length === 0) {
+            statusDiv.innerHTML = "📂 Waiting for files...";
+            statusDiv.style.background = "var(--border-light)";
+            statusDiv.style.color = "var(--text-secondary)";
+            statusDiv.style.borderColor = "transparent";
+            runBtn.disabled = true;
+        } else {
+            statusDiv.innerHTML = `✨ Ready: ${allFiles.length} Source File(s) Detected`;
+            statusDiv.style.background = "rgba(16, 185, 129, 0.1)";
+            statusDiv.style.color = "var(--success)";
+            statusDiv.style.borderColor = "rgba(16, 185, 129, 0.2)";
+            runBtn.disabled = false;
+        }
+    }
+
+    // --- Main Execution Logic ---
+    async function runBtnHandler() {
+        runBtn.disabled = true;
+        runBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing Data...';
+        document.getElementById('step2').classList.add('active');
+        statusDiv.innerHTML = "🔄 Reading and structuring data...";
+        statusDiv.style.background = "rgba(212, 175, 55, 0.1)";
+        statusDiv.style.color = "var(--gold-primary)";
+        statusDiv.style.borderColor = "var(--border-color)";
+
+        try {
+            let extractedData = [];
+
+            // 1. Read files with SheetJS
+            for (let f of allFiles) {
+                const data = await f.arrayBuffer();
+                const wb = XLSX.read(data, { type: 'array', cellDates: false });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                extractedData = extractedData.concat(processSourceRows(rows));
+            }
+
+            extractedData.sort((a, b) => a.dateRaw.localeCompare(b.dateRaw));
+
+            // 2. Calculate Totals (returns Array of Arrays)
+            const finalArrayData = calculateTotals(extractedData);
+
+            // 3. Map to Object Structure expected by Exact Match Generator
+            const structuredData = finalArrayData.map(row => ({
+                no: row[0],
+                date: row[1],
+                chq: row[2],
+                amount: parseFloat(row[3]),
+                dayTotal: row[4] !== "" ? parseFloat(row[4]) : null
+            }));
+            
+            // 4. Generate and Download Exact Format using ExcelJS
+            await generateStrictFormatExcel(structuredData);
+
+            document.getElementById('step3').classList.add('active');
+            statusDiv.innerHTML = "✅ Premium Excel Document Generated Successfully!";
+            statusDiv.style.background = "rgba(16, 185, 129, 0.1)";
+            statusDiv.style.color = "var(--success)";
+            statusDiv.style.borderColor = "rgba(16, 185, 129, 0.2)";
+
+        } catch (err) {
+            console.error(err);
+            statusDiv.innerHTML = "❌ Error: " + err.message;
+            statusDiv.style.background = "rgba(239, 68, 68, 0.1)";
+            statusDiv.style.color = "var(--danger)";
+            statusDiv.style.borderColor = "rgba(239, 68, 68, 0.2)";
+        } finally {
+            runBtn.innerHTML = 'Generate Strict Excel <i class="fa-solid fa-file-arrow-down"></i>';
+            runBtn.disabled = false;
+        }
+    }
+    runBtn.onclick = runBtnHandler;
+
+    // --- Data Extraction (SheetJS logic) ---
+    function processSourceRows(rows) {
+        let results = [];
+        let headerIdx = -1;
+        
+        for (let i = 0; i < Math.min(rows.length, 15); i++) {
+            const rowStr = JSON.stringify(rows[i]).toUpperCase();
+            if (rowStr.includes("CH:NO") || rowStr.includes("CH:DATE") || rowStr.includes("CH:AMOUNT")) {
+                headerIdx = i;
+                break;
+            }
+        }
+        
+        if (headerIdx === -1) return [];
+
+        const row = rows[headerIdx].map(v => String(v).toUpperCase());
+        const colMap = {
+            date: row.findIndex(c => c.includes("CH:DATE") || c.includes("CH DATE")),
+            no: row.findIndex(c => c.includes("CH:NO") || c.includes("CHQ NO") || c.includes("CHEQUE NO")),
+            amt: row.findIndex(c => c.includes("CH:AMOUNT") || c.includes("CH AMOUNT"))
+        };
+
+        if (colMap.date === -1 || colMap.no === -1 || colMap.amt === -1) return [];
+
+        for (let i = headerIdx + 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r || r.every(cell => !cell)) continue;
+            
+            const chqNo = r[colMap.no];
+            const rawDate = r[colMap.date];
+            let amount = r[colMap.amt];
+
+            if (typeof amount === 'string' && amount.startsWith('=')) {
+                const match = amount.match(/=([A-Z]+)(\d+)/);
+                if (match) {
+                    const refCol = match[1];
+                    const refRow = parseInt(match[2]) - 1; 
+                    const colIndex = refCol.charCodeAt(0) - 65;
+                    if (rows[refRow] && rows[refRow][colIndex] !== undefined) {
+                        amount = rows[refRow][colIndex];
+                    }
+                }
+            }
+
+            amount = parseFloat(amount);
+            if (!chqNo || isNaN(amount) || !rawDate) continue;
+
+            let dateStr = "";
+            if (typeof rawDate === 'number') {
+                const dateObj = XLSX.SSF.parse_date_code(rawDate);
+                dateStr = `${dateObj.y}-${String(dateObj.m).padStart(2, '0')}-${String(dateObj.d).padStart(2, '0')}`;
+            } else if (rawDate instanceof Date) {
+                dateStr = rawDate.toISOString().split('T')[0];
+            } else {
+                dateStr = String(rawDate).split('T')[0].replace(/\//g, '-');
+            }
+            
+            results.push({ dateRaw: dateStr, chqNo: String(chqNo), amount });
+        }
+        return results;
+    }
+
+    function calculateTotals(data) {
+        const dayTotals = {};
+        data.forEach(x => dayTotals[x.dateRaw] = (dayTotals[x.dateRaw] || 0) + x.amount);
+
+        const lastMap = {};
+        data.forEach((x, i) => lastMap[x.dateRaw] = i);
+
+        return data.map((x, i) => [
+            String(i + 1).padStart(2, '0'),
+            x.dateRaw,
+            x.chqNo,
+            x.amount,
+            (lastMap[x.dateRaw] === i) ? dayTotals[x.dateRaw] : ""
+        ]);
+    }
+
+    // --- Strict Format Excel Generation (ExcelJS logic) ---
+    async function generateStrictFormatExcel(data) {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Sheet1');
+
+        // Fonts Definitions
+        const font14Bold = { name: 'Times New Roman', size: 14, bold: true };
+        const font11 = { name: 'Times New Roman', size: 11 };
+        const font12 = { name: 'Times New Roman', size: 12 };
+
+        // 1. Setup Column Widths
+        worksheet.columns = [
+            { width: 9.0 },     // A: NO
+            { width: 16.85 },   // B: DATE
+            { width: 16.71 },   // C: CHEQUE NUMBER
+            { width: 18.43 },   // D: AMOUNT
+            { width: 19.71 }    // E: DAY TOTAL
+        ];
+
+        // 2. Add Top Headers 
+        worksheet.getCell('A2').value = 'MUDALIGE DISTRIBUTORS ';
+        worksheet.getCell('A2').font = font14Bold;
+        worksheet.getRow(2).height = 30.95;
+
+        worksheet.getCell('A3').value = 'RE - DISTRIBUTION OPERATIONS OF RICHARD PIERIS \nDISTRIBUTORS (PVT) LTD ';
+        worksheet.mergeCells('A3:E3');
+        worksheet.getCell('A3').font = font14Bold;
+        worksheet.getCell('A3').alignment = { horizontal: 'left', vertical: 'bottom', wrapText: true };
+        worksheet.getRow(3).height = 38.1;
+
+        // --- Dynamic Month and Year Detection ---
+        let monthName = "MARCH"; // default values
+        let yearStr = "2026";
+        
+        if (data && data.length > 0 && data[0].date) {
+            const dateParts = data[0].date.split('-');
+            if (dateParts.length >= 2) {
+                yearStr = dateParts[0]; 
+                const monthNum = parseInt(dateParts[1], 10); 
+                
+                const monthNames = [
+                    "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
+                    "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+                ];
+                
+                if (monthNum >= 1 && monthNum <= 12) {
+                    monthName = monthNames[monthNum - 1]; 
+                }
+            }
+        }
+
+        worksheet.getCell('A4').value = `PURCHASING BILLS TO BE PAID ON ${monthName} - ${yearStr}`;
+        worksheet.getCell('A4').font = font14Bold;
+        worksheet.getRow(4).height = 30.95;
+
+        // 3. Table Headers
+        worksheet.getCell('A5').value = 'NO ';
+        worksheet.getCell('B5').value = 'DATE ';
+        worksheet.getCell('C5').value = 'CHEQUE  \nNUMBER ';
+        worksheet.getCell('D5').value = 'AMOUNT ';
+        worksheet.getCell('E5').value = 'DAY TOTAL ';
+
+        worksheet.getRow(5).height = 35.0;
+        ['A5','B5','C5','D5','E5'].forEach(cell => {
+            const c = worksheet.getCell(cell);
+            c.font = font14Bold;
+            
+            let horiz = 'center';
+            if (cell === 'C5' || cell === 'D5') horiz = 'left';
+            if (cell === 'E5') horiz = 'right';
+
+            c.alignment = { horizontal: horiz, vertical: 'middle', wrapText: true };
+            c.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+        });
+
+        // 4. Group Data by Date 
+        let currentRow = 6;
+        let i = 0;
+
+        while (i < data.length) {
+            let startRow = currentRow;
+            let currentDate = data[i].date;
+            let groupTotal = 0;
+
+            let j = i;
+            while (j < data.length && data[j].date === currentDate) {
+                worksheet.getRow(currentRow).height = 21.0;
+
+                // NO
+                let cellA = worksheet.getCell(`A${currentRow}`);
+                cellA.value = data[j].no;
+                cellA.font = font11;
+                cellA.alignment = { horizontal: 'center', vertical: 'middle' };
+
+                // DATE
+                let cellB = worksheet.getCell(`B${currentRow}`);
+                cellB.value = data[j].date;
+                cellB.font = font12;
+                cellB.alignment = { horizontal: 'center', vertical: 'middle' };
+                cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
+
+                // CHEQUE
+                let cellC = worksheet.getCell(`C${currentRow}`);
+                cellC.value = data[j].chq;
+                cellC.font = font12;
+                cellC.alignment = { horizontal: 'left', vertical: 'bottom' };
+                
+                // AMOUNT
+                let cellD = worksheet.getCell(`D${currentRow}`);
+                cellD.value = data[j].amount;
+                cellD.font = font12;
+                cellD.alignment = { horizontal: 'left', vertical: 'bottom' };
+                cellD.numFmt = '#,##0.00';
+
+                if (data[j].dayTotal) {
+                    groupTotal = data[j].dayTotal;
+                }
+
+                currentRow++;
+                j++;
+            }
+
+            let endRow = currentRow - 1;
+
+            if (!groupTotal) {
+                groupTotal = data.slice(i, j).reduce((sum, row) => sum + row.amount, 0);
+            }
+
+            // 5. Merge 'DAY TOTAL' Column (E)
+            let cellE = worksheet.getCell(`E${startRow}`);
+            cellE.value = groupTotal;
+            cellE.font = font14Bold;
+            cellE.numFmt = '#,##0.00';
+            cellE.alignment = { horizontal: 'right', vertical: 'middle' };
+            
+            if (startRow !== endRow) {
+                worksheet.mergeCells(`E${startRow}:E${endRow}`);
+            }
+
+            // 6. Apply Border Logic
+            for (let r = startRow; r <= endRow; r++) {
+                let isFirstOfDay = (r === startRow);
+                let isLastOfDay = (r === endRow);
+
+                ['A','B','C','D','E'].forEach(col => {
+                    let cell = worksheet.getCell(`${col}${r}`);
+                    let borderObj = { left: { style: 'thin' }, right: { style: 'thin' } };
+
+                    if (isFirstOfDay) borderObj.top = { style: 'thin' }; 
+                    else borderObj.top = { style: 'hair' }; 
+
+                    if (isLastOfDay) borderObj.bottom = { style: 'thin' }; 
+                    else {
+                        if (col !== 'E') borderObj.bottom = { style: 'hair' }; 
+                    }
+                    cell.border = borderObj;
+                });
+            }
+
+            i = j;
+        }
+
+        // 7. Add Grand Total Row 
+        worksheet.getRow(currentRow).height = 26.1; 
+
+        worksheet.mergeCells(`A${currentRow}:D${currentRow}`);
+        let totalLabelCell = worksheet.getCell(`A${currentRow}`);
+        totalLabelCell.value = ' TOTAL TO BE PAID DURING THE MONTH ';
+        totalLabelCell.font = { name: 'Times New Roman', size: 11, bold: true, underline: 'single' };
+        totalLabelCell.alignment = { horizontal: 'right', vertical: 'middle' };
+
+        let totalValueCell = worksheet.getCell(`E${currentRow}`);
+        totalValueCell.value = { formula: `SUM(D6:D${currentRow - 1})` };
+        totalValueCell.font = { name: 'Times New Roman', size: 14, bold: true, underline: 'doubleAccounting' };
+        totalValueCell.numFmt = '_(* #,##0.00_);_(* \\(#,##0.00\\);_(* "-"??_);_(@_)';
+        totalValueCell.alignment = { horizontal: 'right', vertical: 'middle' };
+
+        ['A','B','C','D','E'].forEach(col => {
+            let cell = worksheet.getCell(`${col}${currentRow}`);
+            cell.border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: (col === 'A') ? { style: 'thin' } : undefined,
+                right: (col === 'D' || col === 'E') ? { style: 'thin' } : undefined
+            };
+        });
+
+        // 8. Trigger File Download
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${monthName}_CHQ_LIST_Final.xlsx`; 
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+</body>
+</html>
